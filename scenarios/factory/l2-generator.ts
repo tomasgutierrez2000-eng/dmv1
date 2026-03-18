@@ -210,7 +210,6 @@ export interface FacilityFinancialRow {
   revenue_amt: number;
   operating_expense_amt: number;
   ebitda_amt: number;
-  noi_amt: number;
   total_debt_service_amt: number;
   interest_expense_amt: number;
   principal_payment_amt: number;
@@ -1268,7 +1267,6 @@ function generateFacilityFinancial(
         revenue_amt: revenue,
         operating_expense_amt: opex,
         ebitda_amt: ebitda,
-        noi_amt: noi,
         total_debt_service_amt: debtService,
         interest_expense_amt: interestExpense,
         principal_payment_amt: principalPayment,

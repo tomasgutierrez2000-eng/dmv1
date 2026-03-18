@@ -51,12 +51,22 @@ source_tables:
     join_type: LEFT
     join_on: "ffs.facility_id = fprs.facility_id AND ffs.as_of_date = fprs.as_of_date"
     fields:
-      - name: noi_amt
-        role: MEASURE
-        description: "Net Operating Income — used for CRE counterparty cashflow"
       - name: ebitda_amt
         role: MEASURE
         description: "EBITDA — used for non-CRE counterparty cashflow"
+  - schema: l2
+    table: collateral_snapshot
+    alias: cs
+    join_type: LEFT
+    join_on: "cs.facility_id = fprs.facility_id AND cs.as_of_date = fprs.as_of_date"
+    fields:
+      - name: noi_current_amt
+        role: MEASURE
+        description: "Property-level Net Operating Income — used for CRE counterparty cashflow"
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: JOIN_KEY
   - schema: l2
     table: facility_master
     alias: fm
@@ -142,10 +152,10 @@ levels:
     aggregation_type: CUSTOM
     formula_text: >
       LOB-conditional counterparty cashflow:
-      WHEN L1 LOB = 'Commercial Real Estate' THEN SUM(noi_amt) per counterparty.
+      WHEN L1 LOB = 'Commercial Real Estate' THEN SUM(noi_current_amt) per counterparty.
       WHEN L1 LOB <> 'Commercial Real Estate' AND <> 'Project Finance'
       THEN SUM(ebitda_amt) per counterparty.
-      Sources NOI from facility_financial_snapshot.noi_amt,
+      Sources NOI from collateral_snapshot.noi_current_amt (property income),
       EBITDA from facility_financial_snapshot.ebitda_amt.
     formula_sql: |
       SELECT
@@ -153,7 +163,7 @@ levels:
         SUM(
           CASE
             WHEN ebt_l1.description ILIKE '%Commercial Real Estate%'
-              THEN COALESCE(ffs.noi_amt, 0) * COALESCE(fx.rate, 1)
+              THEN COALESCE(cs_noi.total_noi, 0) * COALESCE(fx.rate, 1)
             ELSE COALESCE(ffs.ebitda_amt, 0) * COALESCE(fx.rate, 1)
           END
         ) AS metric_value
@@ -162,6 +172,14 @@ levels:
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
         AND fm.is_current_flag = 'Y'
+      LEFT JOIN (
+        SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi
+        FROM l2.collateral_snapshot cs
+        WHERE cs.noi_current_amt IS NOT NULL
+        GROUP BY cs.facility_id, cs.as_of_date
+      ) cs_noi
+        ON cs_noi.facility_id = ffs.facility_id
+        AND cs_noi.as_of_date = ffs.as_of_date
       LEFT JOIN l2.fx_rate fx
         ON fx.from_currency_code = ffs.currency_code
         AND fx.to_currency_code = 'USD'

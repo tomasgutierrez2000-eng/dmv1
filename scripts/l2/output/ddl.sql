@@ -183,6 +183,7 @@ CREATE TABLE IF NOT EXISTS l2.collateral_snapshot (
   mitigant_subtype VARCHAR(100),
   original_valuation_usd NUMERIC(18,2),
   is_risk_shifting_flag CHAR(1),
+  noi_current_amt NUMERIC(18,2),
   PRIMARY KEY (collateral_asset_id, as_of_date),
   CONSTRAINT fk_collateral_snapshot_collateral_asset_id FOREIGN KEY (collateral_asset_id) REFERENCES l2.collateral_asset_master(collateral_asset_id),
   CONSTRAINT fk_collateral_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
@@ -211,7 +212,6 @@ CREATE TABLE IF NOT EXISTS l2.cash_flow (
 CREATE TABLE IF NOT EXISTS l2.facility_financial_snapshot (
   facility_id BIGINT NOT NULL,
   as_of_date DATE NOT NULL,
-  noi_amt NUMERIC(18,2),
   total_debt_service_amt NUMERIC(18,2),
   revenue_amt NUMERIC(18,2),
   operating_expense_amt NUMERIC(18,2),

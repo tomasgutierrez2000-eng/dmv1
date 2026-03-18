@@ -10376,7 +10376,7 @@
         "dashboard_display_name": "Cashflow ($) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.facility_financial_snapshot  (ffs)\n   ON    ffs.facility_id = fprs.facility_id AND ffs.as_of_date = fprs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fprs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fprs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n   AND   ebt.description = <filter>\n7. COMPUTE\n   metric_value = fprs.interest_income_amt * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.facility_financial_snapshot  (ffs)\n   ON    ffs.facility_id = fprs.facility_id AND ffs.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = fprs.facility_id AND cs.as_of_date = fprs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n5. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n6. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fprs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fprs.as_of_date\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n   AND   ebt.description = <filter>\n8. COMPUTE\n   metric_value = fprs.interest_income_amt * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -10399,14 +10399,26 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "Net Operating Income — used for CRE counterparty cashflow"
+            "field": "ebitda_amt",
+            "description": "EBITDA — used for non-CRE counterparty cashflow"
           },
           {
             "layer": "L2",
-            "table": "facility_financial_snapshot",
-            "field": "ebitda_amt",
-            "description": "EBITDA — used for non-CRE counterparty cashflow"
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income — used for CRE counterparty cashflow"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -10494,7 +10506,7 @@
         "dashboard_display_name": "Cashflow ($) (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.facility_financial_snapshot  (ffs)\n   ON    ffs.facility_id = fprs.facility_id AND ffs.as_of_date = fprs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fprs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fprs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n   AND   ebt.description = <filter>\n7. GROUP BY fm.counterparty_id\n8. COMPUTE\n   metric_value = SUM(CASE WHEN ebt_l1.description ILIKE '%Commercial Real Estate%' THEN COALESCE(ffs.noi_amt, 0) * COALESCE(fx.rate, 1) ELSE COALESCE(ffs.ebitda_amt, 0) * COALESCE(fx.rate, 1) END)",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.facility_financial_snapshot  (ffs)\n   ON    ffs.facility_id = fprs.facility_id AND ffs.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = fprs.facility_id AND cs.as_of_date = fprs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n5. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n6. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fprs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fprs.as_of_date\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n   AND   ebt.description = <filter>\n8. GROUP BY fm.counterparty_id\n9. COMPUTE\n   metric_value = SUM(CASE WHEN ebt_l1.description ILIKE '%Commercial Real Estate%' THEN COALESCE(cs_noi.total_noi, 0) * COALESCE(fx.rate, 1) ELSE COALESCE(ffs.ebitda_amt, 0) * COALESCE(fx.rate, 1) END)",
         "source_references": [
           {
             "layer": "L2",
@@ -10517,14 +10529,26 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "Net Operating Income — used for CRE counterparty cashflow"
+            "field": "ebitda_amt",
+            "description": "EBITDA — used for non-CRE counterparty cashflow"
           },
           {
             "layer": "L2",
-            "table": "facility_financial_snapshot",
-            "field": "ebitda_amt",
-            "description": "EBITDA — used for non-CRE counterparty cashflow"
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income — used for CRE counterparty cashflow"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -10605,14 +10629,14 @@
             "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(\n    CASE\n      WHEN ebt_l1.description ILIKE '%Commercial Real Estate%'\n        THEN COALESCE(ffs.noi_amt, 0) * COALESCE(fx.rate, 1)\n      ELSE COALESCE(ffs.ebitda_amt, 0) * COALESCE(fx.rate, 1)\n    END\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n  AND ebt_l1.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id\n"
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(\n    CASE\n      WHEN ebt_l1.description ILIKE '%Commercial Real Estate%'\n        THEN COALESCE(cs_noi.total_noi, 0) * COALESCE(fx.rate, 1)\n      ELSE COALESCE(ffs.ebitda_amt, 0) * COALESCE(fx.rate, 1)\n    END\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nLEFT JOIN (\n  SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi\n  FROM l2.collateral_snapshot cs\n  WHERE cs.noi_current_amt IS NOT NULL\n  GROUP BY cs.facility_id, cs.as_of_date\n) cs_noi\n  ON cs_noi.facility_id = ffs.facility_id\n  AND cs_noi.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n  AND ebt_l1.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id\n"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Cashflow ($) (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.facility_financial_snapshot  (ffs)\n   ON    ffs.facility_id = fprs.facility_id AND ffs.as_of_date = fprs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fprs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fprs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n   AND   ebt.description = <filter>\n7. GROUP BY ebt.managed_segment_id\n8. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.facility_financial_snapshot  (ffs)\n   ON    ffs.facility_id = fprs.facility_id AND ffs.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = fprs.facility_id AND cs.as_of_date = fprs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n5. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n6. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fprs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fprs.as_of_date\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n   AND   ebt.description = <filter>\n8. GROUP BY ebt.managed_segment_id\n9. COMPUTE\n   metric_value = SUM(fac.metric_value)",
         "source_references": [
           {
             "layer": "L2",
@@ -10635,14 +10659,26 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "Net Operating Income — used for CRE counterparty cashflow"
+            "field": "ebitda_amt",
+            "description": "EBITDA — used for non-CRE counterparty cashflow"
           },
           {
             "layer": "L2",
-            "table": "facility_financial_snapshot",
-            "field": "ebitda_amt",
-            "description": "EBITDA — used for non-CRE counterparty cashflow"
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income — used for CRE counterparty cashflow"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -10730,7 +10766,7 @@
         "dashboard_display_name": "Cashflow ($) (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.facility_financial_snapshot  (ffs)\n   ON    ffs.facility_id = fprs.facility_id AND ffs.as_of_date = fprs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fprs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fprs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n   AND   ebt.description = <filter>\n7. GROUP BY ebt_l2.managed_segment_id\n8. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.facility_financial_snapshot  (ffs)\n   ON    ffs.facility_id = fprs.facility_id AND ffs.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = fprs.facility_id AND cs.as_of_date = fprs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n5. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n6. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fprs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fprs.as_of_date\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n   AND   ebt.description = <filter>\n8. GROUP BY ebt_l2.managed_segment_id\n9. COMPUTE\n   metric_value = SUM(fac.metric_value)",
         "source_references": [
           {
             "layer": "L2",
@@ -10753,14 +10789,26 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "Net Operating Income — used for CRE counterparty cashflow"
+            "field": "ebitda_amt",
+            "description": "EBITDA — used for non-CRE counterparty cashflow"
           },
           {
             "layer": "L2",
-            "table": "facility_financial_snapshot",
-            "field": "ebitda_amt",
-            "description": "EBITDA — used for non-CRE counterparty cashflow"
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income — used for CRE counterparty cashflow"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -10848,7 +10896,7 @@
         "dashboard_display_name": "Cashflow ($) (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.facility_financial_snapshot  (ffs)\n   ON    ffs.facility_id = fprs.facility_id AND ffs.as_of_date = fprs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fprs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fprs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n   AND   ebt.description = <filter>\n7. GROUP BY ebt_l1.managed_segment_id\n8. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.facility_financial_snapshot  (ffs)\n   ON    ffs.facility_id = fprs.facility_id AND ffs.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = fprs.facility_id AND cs.as_of_date = fprs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n5. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n6. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fprs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fprs.as_of_date\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n   AND   ebt.description = <filter>\n8. GROUP BY ebt_l1.managed_segment_id\n9. COMPUTE\n   metric_value = SUM(fac.metric_value)",
         "source_references": [
           {
             "layer": "L2",
@@ -10871,14 +10919,26 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "Net Operating Income — used for CRE counterparty cashflow"
+            "field": "ebitda_amt",
+            "description": "EBITDA — used for non-CRE counterparty cashflow"
           },
           {
             "layer": "L2",
-            "table": "facility_financial_snapshot",
-            "field": "ebitda_amt",
-            "description": "EBITDA — used for non-CRE counterparty cashflow"
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income — used for CRE counterparty cashflow"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -11014,8 +11074,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 4406400,
-            "contractual_amt": 9000000
+            "metric_value": 4406400
           }
         },
         {
@@ -11068,8 +11127,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 0,
-            "contractual_amt": 2500000
+            "metric_value": 0
           }
         },
         {
@@ -11122,8 +11180,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 660960,
-            "contractual_amt": 90000
+            "metric_value": 660960
           }
         },
         {
@@ -11176,8 +11233,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 3866280,
-            "contractual_amt": 24000000
+            "metric_value": 3866280
           }
         },
         {
@@ -11230,8 +11286,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 9563400,
-            "contractual_amt": 42000000
+            "metric_value": 9563400
           }
         }
       ]
@@ -18003,8 +18058,8 @@
     "item_name": "Debt Service Coverage Ratio (DSCR)",
     "abbreviation": "DSCR",
     "kind": "METRIC",
-    "definition": "Cashflow (Net Operating Income) divided by Total Debt Service (Interest Expense + Principal Payments). Measures borrower's ability to meet debt obligations from operating cash flow. DSCR > 1.0 means the borrower generates enough income to cover debt payments. Key covenant compliance and credit resilience indicator.\nIngredient derivation:\n  - NOI (noi_amt): L2 facility_financial_snapshot — raw atomic input\n  - Interest Expense (interest_expense_amt): L2 facility_financial_snapshot — raw\n  - Principal Payment (principal_payment_amt): L2 facility_financial_snapshot — raw\n  - Total Debt Service = interest_expense_amt + principal_payment_amt (L3 derived)\n  - DSCR = noi_amt / Total Debt Service (L3 derived)\n\nRollup uses sum-ratio pattern: SUM(NOI) / SUM(Debt Service) at each level, preserving the mathematical relationship between numerator and denominator.\n",
-    "generic_formula": "For each facility:\n  1. LOAD noi_amt, interest_expense_amt, principal_payment_amt\n     from l2.facility_financial_snapshot\n  2. COMPUTE Total Debt Service = interest_expense_amt + principal_payment_amt\n  3. COMPUTE DSCR = noi_amt / Total Debt Service\nIngredients: noi_amt (L2), interest_expense_amt (L2), principal_payment_amt (L2)\n",
+    "definition": "Property-level Net Operating Income (from collateral_snapshot) divided by Total Debt Service (Interest Expense + Principal Payments from facility_financial_snapshot). Measures the income-producing collateral's ability to cover debt obligations. DSCR > 1.0 means the property generates enough income to cover debt payments. Key covenant compliance and credit resilience indicator for CRE lending.\nIngredient derivation:\n  - NOI (noi_current_amt): L2 collateral_snapshot — property-level income\n  - Interest Expense (interest_expense_amt): L2 facility_financial_snapshot — raw\n  - Principal Payment (principal_payment_amt): L2 facility_financial_snapshot — raw\n  - Total Debt Service = interest_expense_amt + principal_payment_amt (L3 derived)\n  - DSCR = SUM(noi_current_amt) / Total Debt Service (L3 derived)\n\nRollup uses sum-ratio pattern: SUM(NOI) / SUM(Debt Service) at each level, preserving the mathematical relationship between numerator and denominator.\n",
+    "generic_formula": "For each facility:\n  1. LOAD interest_expense_amt, principal_payment_amt from l2.facility_financial_snapshot\n  2. LOAD noi_current_amt from l2.collateral_snapshot (SUM across collateral assets)\n  3. COMPUTE Total Debt Service = interest_expense_amt + principal_payment_amt\n  4. COMPUTE DSCR = SUM(noi_current_amt) / Total Debt Service\nIngredients: noi_current_amt (L2 collateral), interest_expense_amt (L2), principal_payment_amt (L2)\n",
     "data_type": "NUMERIC(10,6)",
     "unit_type": "PERCENTAGE",
     "direction": "HIGHER_BETTER",
@@ -18016,7 +18071,7 @@
       "Basel III Section CRE22",
       "FR Y-14Q Schedule H.1"
     ],
-    "insight": "Risk of default due to insufficient cash flow. DSCR below 1.0x signals the borrower cannot cover debt payments from operating income alone. Sum-ratio rollup at portfolio level reveals aggregate debt service coverage health — a key CRO early warning indicator.\n",
+    "insight": "Risk of default due to insufficient cash flow. DSCR below 1.0x signals the property cannot cover debt payments from operating income alone. Sum-ratio rollup at portfolio level reveals aggregate debt service coverage health — a key CRO early warning indicator.\n",
     "number_of_instances": 5,
     "directly_displayed": false,
     "status": "ACTIVE",
@@ -18055,7 +18110,7 @@
         "dashboard_display_name": "Debt Service Coverage Ratio (DSCR) (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. COMPUTE\n   metric_value = ffs.noi_amt / NULLIF(ffs.interest_expense_amt + ffs.principal_payment_amt, 0)",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date\n3. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n6. COMPUTE\n   metric_value = COALESCE(cs_noi.total_noi, 0) / NULLIF(ffs.interest_expense_amt + ffs.principal_payment_amt, 0)",
         "source_references": [
           {
             "layer": "L2",
@@ -18068,12 +18123,6 @@
             "table": "facility_financial_snapshot",
             "field": "as_of_date",
             "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "Net Operating Income — numerator of DSCR"
           },
           {
             "layer": "L2",
@@ -18092,6 +18141,24 @@
             "table": "facility_financial_snapshot",
             "field": "currency_code",
             "description": "Original currency of financial amounts — used for FX conversion"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income — numerator of DSCR"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -18154,14 +18221,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ffs.facility_id AS dimension_key,\n  ffs.noi_amt\n    / NULLIF(ffs.interest_expense_amt + ffs.principal_payment_amt, 0)\n    AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\n  AND ffs.noi_amt IS NOT NULL"
+        "formula_sql": "SELECT\n  ffs.facility_id AS dimension_key,\n  COALESCE(cs_noi.total_noi, 0)\n    / NULLIF(ffs.interest_expense_amt + ffs.principal_payment_amt, 0)\n    AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN (\n  SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi\n  FROM l2.collateral_snapshot cs\n  WHERE cs.noi_current_amt IS NOT NULL\n  GROUP BY cs.facility_id, cs.as_of_date\n) cs_noi\n  ON cs_noi.facility_id = ffs.facility_id\n  AND cs_noi.as_of_date = ffs.as_of_date\nWHERE ffs.as_of_date = :as_of_date\n  AND cs_noi.total_noi IS NOT NULL"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "Debt Service Coverage Ratio (DSCR) (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY fm.counterparty_id\n6. COMPUTE\n   metric_value = SUM(ffs.noi_amt * COALESCE(fx.rate, 1)) / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date\n3. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n6. GROUP BY fm.counterparty_id\n7. COMPUTE\n   metric_value = SUM(COALESCE(cs_noi.total_noi, 0) * COALESCE(fx.rate, 1)) / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)",
         "source_references": [
           {
             "layer": "L2",
@@ -18174,12 +18241,6 @@
             "table": "facility_financial_snapshot",
             "field": "as_of_date",
             "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "Net Operating Income — numerator of DSCR"
           },
           {
             "layer": "L2",
@@ -18198,6 +18259,24 @@
             "table": "facility_financial_snapshot",
             "field": "currency_code",
             "description": "Original currency of financial amounts — used for FX conversion"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income — numerator of DSCR"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -18260,14 +18339,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(ffs.noi_amt * COALESCE(fx.rate, 1))\n    / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)\n    AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nWHERE ffs.as_of_date = :as_of_date\n  AND ffs.noi_amt IS NOT NULL\nGROUP BY fm.counterparty_id"
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(COALESCE(cs_noi.total_noi, 0) * COALESCE(fx.rate, 1))\n    / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)\n    AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN (\n  SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi\n  FROM l2.collateral_snapshot cs\n  WHERE cs.noi_current_amt IS NOT NULL\n  GROUP BY cs.facility_id, cs.as_of_date\n) cs_noi\n  ON cs_noi.facility_id = ffs.facility_id\n  AND cs_noi.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nWHERE ffs.as_of_date = :as_of_date\n  AND cs_noi.total_noi IS NOT NULL\nGROUP BY fm.counterparty_id"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Debt Service Coverage Ratio (DSCR) (desk)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY ebt.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(ffs.noi_amt * COALESCE(fx.rate, 1)) / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date\n3. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n6. GROUP BY ebt.managed_segment_id\n7. COMPUTE\n   metric_value = SUM(COALESCE(cs_noi.total_noi, 0) * COALESCE(fx.rate, 1)) / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)",
         "source_references": [
           {
             "layer": "L2",
@@ -18280,12 +18359,6 @@
             "table": "facility_financial_snapshot",
             "field": "as_of_date",
             "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "Net Operating Income — numerator of DSCR"
           },
           {
             "layer": "L2",
@@ -18304,6 +18377,24 @@
             "table": "facility_financial_snapshot",
             "field": "currency_code",
             "description": "Original currency of financial amounts — used for FX conversion"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income — numerator of DSCR"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -18366,14 +18457,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(ffs.noi_amt * COALESCE(fx.rate, 1))\n    / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)\n    AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n    AND ebt.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\n  AND ffs.noi_amt IS NOT NULL\nGROUP BY ebt.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(COALESCE(cs_noi.total_noi, 0) * COALESCE(fx.rate, 1))\n    / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)\n    AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN (\n  SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi\n  FROM l2.collateral_snapshot cs\n  WHERE cs.noi_current_amt IS NOT NULL\n  GROUP BY cs.facility_id, cs.as_of_date\n) cs_noi\n  ON cs_noi.facility_id = ffs.facility_id\n  AND cs_noi.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n    AND ebt.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\n  AND cs_noi.total_noi IS NOT NULL\nGROUP BY ebt.managed_segment_id"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Debt Service Coverage Ratio (DSCR) (portfolio)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY ebt_l2.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(ffs.noi_amt * COALESCE(fx.rate, 1)) / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date\n3. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n6. GROUP BY ebt_l2.managed_segment_id\n7. COMPUTE\n   metric_value = SUM(COALESCE(cs_noi.total_noi, 0) * COALESCE(fx.rate, 1)) / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)",
         "source_references": [
           {
             "layer": "L2",
@@ -18386,12 +18477,6 @@
             "table": "facility_financial_snapshot",
             "field": "as_of_date",
             "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "Net Operating Income — numerator of DSCR"
           },
           {
             "layer": "L2",
@@ -18410,6 +18495,24 @@
             "table": "facility_financial_snapshot",
             "field": "currency_code",
             "description": "Original currency of financial amounts — used for FX conversion"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income — numerator of DSCR"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -18472,14 +18575,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(ffs.noi_amt * COALESCE(fx.rate, 1))\n    / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)\n    AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\n  AND ffs.noi_amt IS NOT NULL\nGROUP BY ebt_l2.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(COALESCE(cs_noi.total_noi, 0) * COALESCE(fx.rate, 1))\n    / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)\n    AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN (\n  SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi\n  FROM l2.collateral_snapshot cs\n  WHERE cs.noi_current_amt IS NOT NULL\n  GROUP BY cs.facility_id, cs.as_of_date\n) cs_noi\n  ON cs_noi.facility_id = ffs.facility_id\n  AND cs_noi.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\n  AND cs_noi.total_noi IS NOT NULL\nGROUP BY ebt_l2.managed_segment_id"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Debt Service Coverage Ratio (DSCR) (lob)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY ebt_l1.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(ffs.noi_amt * COALESCE(fx.rate, 1)) / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date\n3. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n6. GROUP BY ebt_l1.managed_segment_id\n7. COMPUTE\n   metric_value = SUM(COALESCE(cs_noi.total_noi, 0) * COALESCE(fx.rate, 1)) / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)",
         "source_references": [
           {
             "layer": "L2",
@@ -18492,12 +18595,6 @@
             "table": "facility_financial_snapshot",
             "field": "as_of_date",
             "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "Net Operating Income — numerator of DSCR"
           },
           {
             "layer": "L2",
@@ -18516,6 +18613,24 @@
             "table": "facility_financial_snapshot",
             "field": "currency_code",
             "description": "Original currency of financial amounts — used for FX conversion"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income — numerator of DSCR"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -18578,7 +18693,7 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(ffs.noi_amt * COALESCE(fx.rate, 1))\n    / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)\n    AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n    AND ebt_l1.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\n  AND ffs.noi_amt IS NOT NULL\nGROUP BY ebt_l1.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(COALESCE(cs_noi.total_noi, 0) * COALESCE(fx.rate, 1))\n    / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)\n    AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN (\n  SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi\n  FROM l2.collateral_snapshot cs\n  WHERE cs.noi_current_amt IS NOT NULL\n  GROUP BY cs.facility_id, cs.as_of_date\n) cs_noi\n  ON cs_noi.facility_id = ffs.facility_id\n  AND cs_noi.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n    AND ebt_l1.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\n  AND cs_noi.total_noi IS NOT NULL\nGROUP BY ebt_l1.managed_segment_id"
       }
     ],
     "demo_data": {
@@ -18633,9 +18748,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 2.206,
-            "noi_amt": 41587200,
-            "total_debt_service_amt": 21888000,
+            "metric_value": 10.8952,
             "drawn_amount": 450000000
           }
         },
@@ -18689,9 +18802,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 1.3472,
-            "noi_amt": 47298560,
-            "total_debt_service_amt": 38144000,
+            "metric_value": 6.6068,
             "drawn_amount": 800000000
           }
         },
@@ -18745,9 +18856,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 2.4196,
-            "noi_amt": 104371200,
-            "total_debt_service_amt": 57984000,
+            "metric_value": 11.9614,
             "drawn_amount": 1200000000
           }
         },
@@ -18801,9 +18910,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 1.6858,
-            "noi_amt": 6128640,
-            "total_debt_service_amt": 4377600,
+            "metric_value": 8.376,
             "drawn_amount": 90000000
           }
         },
@@ -18857,9 +18964,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 1.0788,
-            "noi_amt": 28122240,
-            "total_debt_service_amt": 28992000,
+            "metric_value": 5.2521,
             "drawn_amount": 600000000
           }
         }
@@ -27002,8 +27107,8 @@
     "item_name": "Net Income ($)",
     "abbreviation": "NI",
     "kind": "METRIC",
-    "definition": "Net income computed from L2 atomic inputs: NOI (Net Operating Income, which equals Revenue minus Operating Expense) minus Interest Expense minus Expected Loss (PD × LGD × Committed Amount). Indicator of facility-level profitability.\n",
-    "generic_formula": "Net Income = NOI (Revenue - OpEx) - Interest Expense - Expected Loss (PD × LGD × Committed Amount). All sourced from L2 atomic tables.\n",
+    "definition": "Net income computed from collateral-level NOI (from collateral_snapshot) minus Interest Expense (from facility_financial_snapshot) minus Expected Loss (PD × LGD × Committed Amount). Indicator of facility-level profitability for secured lending with income-producing collateral.\n",
+    "generic_formula": "Net Income = SUM(collateral NOI) - Interest Expense - Expected Loss (PD × LGD × Committed Amount). NOI sourced from collateral_snapshot.\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
     "direction": "HIGHER_BETTER",
@@ -27014,7 +27119,7 @@
     "regulatory_references": [
       "Basel III"
     ],
-    "insight": "Profitability efficiency — NOI minus Interest Expense minus Expected Loss\n",
+    "insight": "Profitability efficiency — Collateral NOI minus Interest Expense minus Expected Loss\n",
     "number_of_instances": 5,
     "directly_displayed": false,
     "status": "ACTIVE",
@@ -27077,7 +27182,7 @@
         "dashboard_display_name": "Net Income ($) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n7. COMPUTE\n   metric_value = COALESCE(ffs.noi_amt, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n8. COMPUTE\n   metric_value = COALESCE(cs_noi.total_noi, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)",
         "source_references": [
           {
             "layer": "L2",
@@ -27094,12 +27199,6 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "noi_amt"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
@@ -27108,6 +27207,24 @@
             "table": "facility_financial_snapshot",
             "field": "currency_code",
             "description": "currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -27170,14 +27287,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ffs.facility_id AS dimension_key,\n  COALESCE(ffs.noi_amt, 0)\n    - COALESCE(ffs.interest_expense_amt, 0)\n    - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n      * COALESCE(fes.committed_amount, 0)\n  AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nWHERE ffs.as_of_date = :as_of_date\n"
+        "formula_sql": "SELECT\n  ffs.facility_id AS dimension_key,\n  COALESCE(cs_noi.total_noi, 0)\n    - COALESCE(ffs.interest_expense_amt, 0)\n    - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n      * COALESCE(fes.committed_amount, 0)\n  AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN (\n  SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi\n  FROM l2.collateral_snapshot cs\n  WHERE cs.noi_current_amt IS NOT NULL\n  GROUP BY cs.facility_id, cs.as_of_date\n) cs_noi\n  ON cs_noi.facility_id = ffs.facility_id\n  AND cs_noi.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nWHERE ffs.as_of_date = :as_of_date\n"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "Net Income ($) (counterparty)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n7. GROUP BY fm.counterparty_id\n8. COMPUTE\n   metric_value = SUM((COALESCE(ffs.noi_amt, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)) * COALESCE(fx.rate, 1))",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n8. GROUP BY fm.counterparty_id\n9. COMPUTE\n   metric_value = SUM((COALESCE(cs_noi.total_noi, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)) * COALESCE(fx.rate, 1))",
         "source_references": [
           {
             "layer": "L2",
@@ -27194,12 +27311,6 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "noi_amt"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
@@ -27208,6 +27319,24 @@
             "table": "facility_financial_snapshot",
             "field": "currency_code",
             "description": "currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -27270,14 +27399,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(\n    (COALESCE(ffs.noi_amt, 0)\n     - COALESCE(ffs.interest_expense_amt, 0)\n     - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n       * COALESCE(fes.committed_amount, 0))\n    * COALESCE(fx.rate, 1)\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id\n"
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(\n    (COALESCE(cs_noi.total_noi, 0)\n     - COALESCE(ffs.interest_expense_amt, 0)\n     - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n       * COALESCE(fes.committed_amount, 0))\n    * COALESCE(fx.rate, 1)\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN (\n  SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi\n  FROM l2.collateral_snapshot cs\n  WHERE cs.noi_current_amt IS NOT NULL\n  GROUP BY cs.facility_id, cs.as_of_date\n) cs_noi\n  ON cs_noi.facility_id = ffs.facility_id\n  AND cs_noi.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id\n"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Net Income ($) (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n7. GROUP BY ebt.managed_segment_id\n8. COMPUTE\n   metric_value = SUM((COALESCE(ffs.noi_amt, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)) * COALESCE(fx.rate, 1))",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n8. GROUP BY ebt.managed_segment_id\n9. COMPUTE\n   metric_value = SUM((COALESCE(cs_noi.total_noi, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)) * COALESCE(fx.rate, 1))",
         "source_references": [
           {
             "layer": "L2",
@@ -27294,12 +27423,6 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "noi_amt"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
@@ -27308,6 +27431,24 @@
             "table": "facility_financial_snapshot",
             "field": "currency_code",
             "description": "currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -27370,14 +27511,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(\n    (COALESCE(ffs.noi_amt, 0)\n     - COALESCE(ffs.interest_expense_amt, 0)\n     - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n       * COALESCE(fes.committed_amount, 0))\n    * COALESCE(fx.rate, 1)\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n    AND ebt.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY ebt.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(\n    (COALESCE(cs_noi.total_noi, 0)\n     - COALESCE(ffs.interest_expense_amt, 0)\n     - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n       * COALESCE(fes.committed_amount, 0))\n    * COALESCE(fx.rate, 1)\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN (\n  SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi\n  FROM l2.collateral_snapshot cs\n  WHERE cs.noi_current_amt IS NOT NULL\n  GROUP BY cs.facility_id, cs.as_of_date\n) cs_noi\n  ON cs_noi.facility_id = ffs.facility_id\n  AND cs_noi.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n    AND ebt.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY ebt.managed_segment_id\n"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Net Income ($) (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n7. GROUP BY ebt_l2.managed_segment_id\n8. COMPUTE\n   metric_value = SUM((COALESCE(ffs.noi_amt, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)) * COALESCE(fx.rate, 1))",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n8. GROUP BY ebt_l2.managed_segment_id\n9. COMPUTE\n   metric_value = SUM((COALESCE(cs_noi.total_noi, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)) * COALESCE(fx.rate, 1))",
         "source_references": [
           {
             "layer": "L2",
@@ -27394,12 +27535,6 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "noi_amt"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
@@ -27408,6 +27543,24 @@
             "table": "facility_financial_snapshot",
             "field": "currency_code",
             "description": "currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -27470,14 +27623,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(\n    (COALESCE(ffs.noi_amt, 0)\n     - COALESCE(ffs.interest_expense_amt, 0)\n     - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n       * COALESCE(fes.committed_amount, 0))\n    * COALESCE(fx.rate, 1)\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY ebt_l2.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(\n    (COALESCE(cs_noi.total_noi, 0)\n     - COALESCE(ffs.interest_expense_amt, 0)\n     - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n       * COALESCE(fes.committed_amount, 0))\n    * COALESCE(fx.rate, 1)\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN (\n  SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi\n  FROM l2.collateral_snapshot cs\n  WHERE cs.noi_current_amt IS NOT NULL\n  GROUP BY cs.facility_id, cs.as_of_date\n) cs_noi\n  ON cs_noi.facility_id = ffs.facility_id\n  AND cs_noi.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY ebt_l2.managed_segment_id\n"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Net Income ($) (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n7. GROUP BY ebt_l1.managed_segment_id\n8. COMPUTE\n   metric_value = SUM((COALESCE(ffs.noi_amt, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)) * COALESCE(fx.rate, 1))",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.collateral_snapshot  (cs)\n   ON    cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n8. GROUP BY ebt_l1.managed_segment_id\n9. COMPUTE\n   metric_value = SUM((COALESCE(cs_noi.total_noi, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)) * COALESCE(fx.rate, 1))",
         "source_references": [
           {
             "layer": "L2",
@@ -27494,12 +27647,6 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "noi_amt",
-            "description": "noi_amt"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
@@ -27508,6 +27655,24 @@
             "table": "facility_financial_snapshot",
             "field": "currency_code",
             "description": "currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "noi_current_amt",
+            "description": "Property-level Net Operating Income"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
           },
           {
             "layer": "L2",
@@ -27570,7 +27735,7 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(\n    (COALESCE(ffs.noi_amt, 0)\n     - COALESCE(ffs.interest_expense_amt, 0)\n     - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n       * COALESCE(fes.committed_amount, 0))\n    * COALESCE(fx.rate, 1)\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n    AND ebt_l1.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY ebt_l1.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(\n    (COALESCE(cs_noi.total_noi, 0)\n     - COALESCE(ffs.interest_expense_amt, 0)\n     - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n       * COALESCE(fes.committed_amount, 0))\n    * COALESCE(fx.rate, 1)\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN (\n  SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi\n  FROM l2.collateral_snapshot cs\n  WHERE cs.noi_current_amt IS NOT NULL\n  GROUP BY cs.facility_id, cs.as_of_date\n) cs_noi\n  ON cs_noi.facility_id = ffs.facility_id\n  AND cs_noi.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n    AND ebt_l1.is_current_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY ebt_l1.managed_segment_id\n"
       }
     ],
     "demo_data": {
@@ -27625,8 +27790,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 6755956,
-            "noi_amt": 9216000,
+            "metric_value": 43458228,
             "interest_expense_amt": 2460000,
             "pd_pct": 0.0042,
             "lgd_pct": 0.43,
@@ -27634,61 +27798,60 @@
           }
         },
         {
-          "facility_id": "F-3",
-          "facility_name": "Pacific Ridge — Multi-Currency RCF",
-          "counterparty_id": "CP-3",
-          "counterparty_name": "Pacific Ridge Energy LLC",
-          "lob_segment_id": "SEG-3",
-          "desk_name": "Global Corporate Coverage Desk",
+          "facility_id": "F-2",
+          "facility_name": "Northbridge Pharma — Term Loan B",
+          "counterparty_id": "CP-2",
+          "counterparty_name": "Northbridge Pharmaceuticals Corp.",
+          "lob_segment_id": "SEG-2",
+          "desk_name": "Unknown",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 1000000000,
-          "collateral_value": 425566666,
-          "ltv_pct": 234.98,
+          "committed_amt": 500000000,
+          "collateral_value": 612800000,
+          "ltv_pct": 81.59,
           "positions": [
             {
-              "position_id": "P-3",
-              "facility_id": "F-3",
+              "position_id": "P-2",
+              "facility_id": "F-2",
               "product_code": "LOAN",
-              "balance_amount": 800000000,
+              "balance_amount": 450000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-13",
-              "facility_id": "F-3",
+              "position_id": "P-12",
+              "facility_id": "F-2",
               "product_code": "LOAN",
-              "balance_amount": 820000000,
+              "balance_amount": 440000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-23",
-              "facility_id": "F-3",
+              "position_id": "P-22",
+              "facility_id": "F-2",
               "product_code": "LOAN",
-              "balance_amount": 780000000,
+              "balance_amount": 460000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-33",
-              "facility_id": "F-3",
+              "position_id": "P-32",
+              "facility_id": "F-2",
               "product_code": "LOAN",
-              "balance_amount": 750000000,
+              "balance_amount": 430000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-43",
-              "facility_id": "F-3",
+              "position_id": "P-42",
+              "facility_id": "F-2",
               "product_code": "LOAN",
-              "balance_amount": 790000000,
+              "balance_amount": 445000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "metric_value": 25698477.5,
-            "noi_amt": 47298560,
-            "interest_expense_amt": 21600000,
-            "pd_pct": 0.0025,
-            "lgd_pct": 0.33,
-            "committed_amount": 1000000000
+            "metric_value": 194296896.5,
+            "interest_expense_amt": 11100000,
+            "pd_pct": 0.0185,
+            "lgd_pct": 0.38,
+            "committed_amount": 500000000
           }
         },
         {
@@ -27742,7 +27905,6 @@
           ],
           "extra_fields": {
             "metric_value": -1083.75,
-            "noi_amt": 0,
             "interest_expense_amt": 0,
             "pd_pct": 0.0095,
             "lgd_pct": 0.48,
@@ -27799,8 +27961,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 81771111.8,
-            "noi_amt": 104371200,
+            "metric_value": 493366407.8,
             "interest_expense_amt": 22600000,
             "pd_pct": 0.0015,
             "lgd_pct": 0.38,
@@ -27857,8 +28018,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 77347016,
-            "noi_amt": 115147200,
+            "metric_value": 527757928,
             "interest_expense_amt": 37800000,
             "pd_pct": 0.0008,
             "lgd_pct": 0.46,

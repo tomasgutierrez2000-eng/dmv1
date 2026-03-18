@@ -85,7 +85,7 @@ export interface DemoFacility {
   ltv_pct: number;
   positions: DemoPosition[];
   /** DSCR-specific fields (optional — only present for DSCR demo data) */
-  noi_amt?: number;
+  noi_current_amt?: number;
   debt_service_amt?: number;
   dscr_value?: number;
   cashflow_label?: string;

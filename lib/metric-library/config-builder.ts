@@ -122,7 +122,7 @@ function inferMetricFields(item: CatalogueItem, strategy: RollupStrategy): Metri
   if (abbr === 'dscr') {
     return {
       primary_value: 'dscr_value',
-      numerator_value: 'noi_amt',
+      numerator_value: 'noi_current_amt',
       denominator_value: 'debt_service_amt',
       weight_value: 'committed_amt',
     };
@@ -422,7 +422,7 @@ export function demoFacilityToEntity(
   };
 
   // Add optional DSCR fields
-  if (f.noi_amt !== undefined) fields.noi_amt = f.noi_amt;
+  if (f.noi_current_amt !== undefined) fields.noi_current_amt = f.noi_current_amt;
   if (f.debt_service_amt !== undefined) fields.debt_service_amt = f.debt_service_amt;
   if (f.dscr_value !== undefined) fields.dscr_value = f.dscr_value;
   if (f.cashflow_label !== undefined) fields.cashflow_label = f.cashflow_label;

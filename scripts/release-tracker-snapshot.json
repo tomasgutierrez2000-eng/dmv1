@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-14T06:30:00.145Z",
+  "createdAt": "2026-03-18T14:53:36.839Z",
   "tables": [
     {
       "layer": "L1",
@@ -4735,6 +4735,9 @@
         },
         {
           "name": "raw_record_id"
+        },
+        {
+          "name": "noi_current_amt"
         }
       ]
     },
@@ -5874,9 +5877,6 @@
           "name": "as_of_date"
         },
         {
-          "name": "noi_amt"
-        },
-        {
           "name": "operating_expense_amt"
         },
         {
@@ -5926,6 +5926,9 @@
         },
         {
           "name": "raw_record_id"
+        },
+        {
+          "name": "net_income_amt"
         }
       ]
     },
@@ -6010,6 +6013,9 @@
         },
         {
           "name": "raw_record_id"
+        },
+        {
+          "name": "total_assets_amt"
         }
       ]
     },
@@ -6079,6 +6085,9 @@
         },
         {
           "name": "raw_record_id"
+        },
+        {
+          "name": "defaulted_flag"
         }
       ]
     },
@@ -6669,9 +6678,6 @@
           "name": "legal_entity_id"
         },
         {
-          "name": "org_unit_id"
-        },
-        {
           "name": "profit_center_code"
         },
         {
@@ -7198,6 +7204,9 @@
         },
         {
           "name": "raw_record_id"
+        },
+        {
+          "name": "noi_at_origination_amt"
         }
       ]
     },
@@ -8505,63 +8514,6 @@
     },
     {
       "layer": "L2",
-      "tableName": "capital_position_snapshot",
-      "fields": [
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "currency_code"
-        },
-        {
-          "name": "tier1_capital_amt"
-        },
-        {
-          "name": "cet1_capital_amt"
-        },
-        {
-          "name": "rwa_amt"
-        },
-        {
-          "name": "total_assets_leverage_amt"
-        },
-        {
-          "name": "total_leverage_exposure_amt"
-        },
-        {
-          "name": "tlac_amt"
-        },
-        {
-          "name": "source_filing_code"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "load_batch_id"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "raw_record_id"
-        },
-        {
-          "name": "record_source"
-        }
-      ]
-    },
-    {
-      "layer": "L2",
       "tableName": "duns_entity_observation",
       "fields": [
         {
@@ -8607,79 +8559,73 @@
     },
     {
       "layer": "L2",
-      "tableName": "cash_flow",
+      "tableName": "capital_position_snapshot",
       "fields": [
         {
-          "name": "cash_flow_id"
-        },
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "cash_flow_date"
-        },
-        {
-          "name": "cash_flow_type"
-        },
-        {
-          "name": "amount"
-        },
-        {
-          "name": "currency_code"
+          "name": "legal_entity_id"
         },
         {
           "name": "as_of_date"
         },
         {
-          "name": "flow_direction"
+          "name": "currency_code"
         },
         {
-          "name": "flow_type"
+          "name": "cet1_ratio_pct"
+        },
+        {
+          "name": "tier1_ratio_pct"
+        },
+        {
+          "name": "total_capital_ratio_pct"
+        },
+        {
+          "name": "tier1_leverage_ratio_pct"
+        },
+        {
+          "name": "leverage_ratio_pct"
+        },
+        {
+          "name": "tlac_ratio_pct"
+        },
+        {
+          "name": "slr_pct"
+        },
+        {
+          "name": "tier1_capital_amt"
+        },
+        {
+          "name": "cet1_capital_amt"
+        },
+        {
+          "name": "total_capital_amt"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "total_assets_leverage_amt"
+        },
+        {
+          "name": "total_leverage_exposure_amt"
+        },
+        {
+          "name": "tlac_amt"
+        },
+        {
+          "name": "rwa_std_amt"
+        },
+        {
+          "name": "rwa_erba_amt"
+        },
+        {
+          "name": "source_filing_code"
         },
         {
           "name": "created_ts"
         },
         {
           "name": "updated_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "cash_flow_calc",
-      "fields": [
-        {
-          "name": "cash_flow_id"
-        },
-        {
-          "name": "contractual_amt"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "record_source"
-        },
-        {
-          "name": "load_timestamp"
-        },
-        {
-          "name": "load_batch_id"
-        },
-        {
-          "name": "run_id"
-        },
-        {
-          "name": "model_version"
         }
       ]
     },
@@ -8740,63 +8686,6 @@
         },
         {
           "name": "rating_change_status_code"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "record_source"
-        },
-        {
-          "name": "load_timestamp"
-        },
-        {
-          "name": "load_batch_id"
-        },
-        {
-          "name": "run_id"
-        },
-        {
-          "name": "model_version"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "data_quality_score_calc",
-      "fields": [
-        {
-          "name": "table_name"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "completeness_score_pct"
-        },
-        {
-          "name": "accuracy_score_pct"
-        },
-        {
-          "name": "timeliness_score_pct"
-        },
-        {
-          "name": "overall_dq_score_pct"
-        },
-        {
-          "name": "total_row_count"
-        },
-        {
-          "name": "null_field_count"
-        },
-        {
-          "name": "anomaly_count"
         },
         {
           "name": "created_ts"
@@ -9166,66 +9055,6 @@
         },
         {
           "name": "balance_change_pct"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "record_source"
-        },
-        {
-          "name": "load_timestamp"
-        },
-        {
-          "name": "load_batch_id"
-        },
-        {
-          "name": "run_id"
-        },
-        {
-          "name": "model_version"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "stress_test_result_calc",
-      "fields": [
-        {
-          "name": "stress_test_result_id"
-        },
-        {
-          "name": "position_id"
-        },
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "scenario_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "stressed_exposure_amt"
-        },
-        {
-          "name": "stressed_expected_loss"
-        },
-        {
-          "name": "capital_impact_pct"
-        },
-        {
-          "name": "currency_code"
         },
         {
           "name": "created_ts"
@@ -13410,447 +13239,6 @@
     },
     {
       "layer": "L3",
-      "tableName": "capital_binding_constraint",
-      "fields": [
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "cet1_binding_amt"
-        },
-        {
-          "name": "tier1_binding_amt"
-        },
-        {
-          "name": "total_capital_binding_amt"
-        },
-        {
-          "name": "tier1_leverage_binding_amt"
-        },
-        {
-          "name": "leverage_binding_amt"
-        },
-        {
-          "name": "slr_binding_amt"
-        },
-        {
-          "name": "tlac_binding_amt"
-        },
-        {
-          "name": "most_binding_constraint"
-        },
-        {
-          "name": "most_binding_ratio_pct"
-        },
-        {
-          "name": "most_binding_denominator"
-        },
-        {
-          "name": "binding_rwa_approach"
-        },
-        {
-          "name": "cet1_buffer_pct"
-        },
-        {
-          "name": "tier1_buffer_pct"
-        },
-        {
-          "name": "total_capital_buffer_pct"
-        },
-        {
-          "name": "tier1_leverage_buffer_pct"
-        },
-        {
-          "name": "leverage_buffer_pct"
-        },
-        {
-          "name": "slr_buffer_pct"
-        },
-        {
-          "name": "tlac_buffer_pct"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "load_batch_id"
-        },
-        {
-          "name": "run_id"
-        },
-        {
-          "name": "model_version"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "counterparty_capital_consumption",
-      "fields": [
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "exposure_count"
-        },
-        {
-          "name": "total_exposure_amt"
-        },
-        {
-          "name": "rwa_std_amt"
-        },
-        {
-          "name": "rwa_erba_amt"
-        },
-        {
-          "name": "rwa_binding_amt"
-        },
-        {
-          "name": "rwa_density_pct"
-        },
-        {
-          "name": "capital_consumption_amt"
-        },
-        {
-          "name": "capital_consumption_std_amt"
-        },
-        {
-          "name": "capital_consumption_erba_amt"
-        },
-        {
-          "name": "capital_delta_amt"
-        },
-        {
-          "name": "most_binding_constraint"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "load_batch_id"
-        },
-        {
-          "name": "run_id"
-        },
-        {
-          "name": "model_version"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "desk_capital_consumption",
-      "fields": [
-        {
-          "name": "org_unit_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "exposure_count"
-        },
-        {
-          "name": "total_exposure_amt"
-        },
-        {
-          "name": "rwa_std_amt"
-        },
-        {
-          "name": "rwa_erba_amt"
-        },
-        {
-          "name": "rwa_binding_amt"
-        },
-        {
-          "name": "rwa_density_pct"
-        },
-        {
-          "name": "capital_consumption_amt"
-        },
-        {
-          "name": "capital_consumption_std_amt"
-        },
-        {
-          "name": "capital_consumption_erba_amt"
-        },
-        {
-          "name": "capital_delta_amt"
-        },
-        {
-          "name": "most_binding_constraint"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "load_batch_id"
-        },
-        {
-          "name": "run_id"
-        },
-        {
-          "name": "model_version"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "facility_capital_consumption",
-      "fields": [
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "min_capital_std_amt"
-        },
-        {
-          "name": "min_capital_erba_amt"
-        },
-        {
-          "name": "min_capital_delta_amt"
-        },
-        {
-          "name": "capital_consumption_amt"
-        },
-        {
-          "name": "rwa_binding_amt"
-        },
-        {
-          "name": "most_binding_constraint"
-        },
-        {
-          "name": "basel_exposure_type_id"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "load_batch_id"
-        },
-        {
-          "name": "run_id"
-        },
-        {
-          "name": "model_version"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "facility_rwa_calc",
-      "fields": [
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "rwa_std_amt"
-        },
-        {
-          "name": "rwa_erba_amt"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "load_batch_id"
-        },
-        {
-          "name": "run_id"
-        },
-        {
-          "name": "model_version"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "portfolio_capital_consumption",
-      "fields": [
-        {
-          "name": "portfolio_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "basel_exposure_type_id"
-        },
-        {
-          "name": "exposure_count"
-        },
-        {
-          "name": "total_exposure_amt"
-        },
-        {
-          "name": "rwa_std_amt"
-        },
-        {
-          "name": "rwa_erba_amt"
-        },
-        {
-          "name": "rwa_density_pct"
-        },
-        {
-          "name": "capital_consumption_amt"
-        },
-        {
-          "name": "capital_consumption_std_amt"
-        },
-        {
-          "name": "capital_consumption_erba_amt"
-        },
-        {
-          "name": "capital_delta_amt"
-        },
-        {
-          "name": "most_binding_constraint"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "load_batch_id"
-        },
-        {
-          "name": "run_id"
-        },
-        {
-          "name": "model_version"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "segment_capital_consumption",
-      "fields": [
-        {
-          "name": "lob_segment_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "basel_exposure_type_id"
-        },
-        {
-          "name": "exposure_count"
-        },
-        {
-          "name": "total_exposure_amt"
-        },
-        {
-          "name": "rwa_std_amt"
-        },
-        {
-          "name": "rwa_erba_amt"
-        },
-        {
-          "name": "rwa_density_pct"
-        },
-        {
-          "name": "capital_consumption_amt"
-        },
-        {
-          "name": "capital_consumption_std_amt"
-        },
-        {
-          "name": "capital_consumption_erba_amt"
-        },
-        {
-          "name": "capital_delta_amt"
-        },
-        {
-          "name": "most_binding_constraint"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "load_batch_id"
-        },
-        {
-          "name": "run_id"
-        },
-        {
-          "name": "model_version"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
       "tableName": "capital_position_calc",
       "fields": [
         {
@@ -13948,6 +13336,12 @@
         },
         {
           "name": "model_version"
+        },
+        {
+          "name": "ebitda_amt"
+        },
+        {
+          "name": "noi_amt"
         }
       ]
     },
@@ -15439,6 +14833,261 @@
         },
         {
           "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "data_quality_score_calc",
+      "fields": [
+        {
+          "name": "table_name"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "completeness_score_pct"
+        },
+        {
+          "name": "accuracy_score_pct"
+        },
+        {
+          "name": "timeliness_score_pct"
+        },
+        {
+          "name": "overall_dq_score_pct"
+        },
+        {
+          "name": "total_row_count"
+        },
+        {
+          "name": "null_field_count"
+        },
+        {
+          "name": "anomaly_count"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "stress_test_result_calc",
+      "fields": [
+        {
+          "name": "stress_test_result_id"
+        },
+        {
+          "name": "position_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "stressed_exposure_amt"
+        },
+        {
+          "name": "stressed_expected_loss"
+        },
+        {
+          "name": "capital_impact_pct"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "metric_change_log",
+      "fields": [
+        {
+          "name": "change_id"
+        },
+        {
+          "name": "item_id"
+        },
+        {
+          "name": "change_type"
+        },
+        {
+          "name": "changed_by_id"
+        },
+        {
+          "name": "changed_by_name"
+        },
+        {
+          "name": "changed_by_role"
+        },
+        {
+          "name": "change_reason"
+        },
+        {
+          "name": "ticket_reference"
+        },
+        {
+          "name": "before_snapshot"
+        },
+        {
+          "name": "after_snapshot"
+        },
+        {
+          "name": "diff_summary"
+        },
+        {
+          "name": "governance_status"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "metric_sandbox_run",
+      "fields": [
+        {
+          "name": "sandbox_run_id"
+        },
+        {
+          "name": "item_id"
+        },
+        {
+          "name": "run_by_name"
+        },
+        {
+          "name": "run_by_id"
+        },
+        {
+          "name": "level"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "proposed_sql"
+        },
+        {
+          "name": "current_sql"
+        },
+        {
+          "name": "proposed_row_count"
+        },
+        {
+          "name": "current_row_count"
+        },
+        {
+          "name": "proposed_total"
+        },
+        {
+          "name": "current_total"
+        },
+        {
+          "name": "reconciliation_pass"
+        },
+        {
+          "name": "duration_ms"
+        },
+        {
+          "name": "result_snapshot"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "schema_change_log",
+      "fields": [
+        {
+          "name": "change_id"
+        },
+        {
+          "name": "change_type"
+        },
+        {
+          "name": "layer"
+        },
+        {
+          "name": "table_name"
+        },
+        {
+          "name": "field_name"
+        },
+        {
+          "name": "changed_by_id"
+        },
+        {
+          "name": "changed_by_name"
+        },
+        {
+          "name": "change_reason"
+        },
+        {
+          "name": "before_snapshot"
+        },
+        {
+          "name": "after_snapshot"
+        },
+        {
+          "name": "created_ts"
         }
       ]
     }

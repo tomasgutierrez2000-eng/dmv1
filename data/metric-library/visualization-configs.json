@@ -1744,18 +1744,18 @@
         },
         {
           "op": "*",
-          "field": "noi_amt",
-          "label": "Net Operating Income — used for CRE counterparty cashflow",
+          "field": "ebitda_amt",
+          "label": "EBITDA — used for non-CRE counterparty cashflow",
           "sample_value": 0,
           "source_table": "facility_financial_snapshot",
           "source_layer": "L2"
         },
         {
           "op": "*",
-          "field": "ebitda_amt",
-          "label": "EBITDA — used for non-CRE counterparty cashflow",
+          "field": "noi_current_amt",
+          "label": "Property-level Net Operating Income — used for CRE counterparty cashflow",
           "sample_value": 0,
-          "source_table": "facility_financial_snapshot",
+          "source_table": "collateral_snapshot",
           "source_layer": "L2"
         },
         {
@@ -1787,14 +1787,14 @@
         "subtotal_fn": "sum"
       },
       {
-        "field": "noi_amt",
-        "header": "Noi ($)",
+        "field": "ebitda_amt",
+        "header": "Ebitda ($)",
         "format": "currency",
         "subtotal_fn": "sum"
       },
       {
-        "field": "ebitda_amt",
-        "header": "Ebitda ($)",
+        "field": "noi_current_amt",
+        "header": "Noi Current ($)",
         "format": "currency",
         "subtotal_fn": "sum"
       },
@@ -1855,17 +1855,38 @@
           "join_on": "ffs.facility_id = fprs.facility_id AND ffs.as_of_date = fprs.as_of_date",
           "fields": [
             {
-              "name": "noi_amt",
-              "role": "MEASURE",
-              "description": "Net Operating Income — used for CRE counterparty cashflow"
-            },
-            {
               "name": "ebitda_amt",
               "role": "MEASURE",
               "description": "EBITDA — used for non-CRE counterparty cashflow"
             }
           ],
-          "purpose": "Provides Net Operating Income — used for CRE counterparty cashflow, EBITDA — used for non-CRE counterparty cashflow"
+          "purpose": "Provides EBITDA — used for non-CRE counterparty cashflow"
+        },
+        {
+          "alias": "cs",
+          "qualified_name": "l2.collateral_snapshot",
+          "table_name": "collateral_snapshot",
+          "layer": "L2",
+          "join_type": "LEFT",
+          "join_on": "cs.facility_id = fprs.facility_id AND cs.as_of_date = fprs.as_of_date",
+          "fields": [
+            {
+              "name": "noi_current_amt",
+              "role": "MEASURE",
+              "description": "Property-level Net Operating Income — used for CRE counterparty cashflow"
+            },
+            {
+              "name": "facility_id",
+              "role": "JOIN_KEY",
+              "description": "facility_id"
+            },
+            {
+              "name": "as_of_date",
+              "role": "JOIN_KEY",
+              "description": "as_of_date"
+            }
+          ],
+          "purpose": "Provides Property-level Net Operating Income — used for CRE counterparty cashflow"
         },
         {
           "alias": "fm",
@@ -1987,6 +2008,7 @@
         "counterparty": [
           "ffs",
           "fm",
+          "cs",
           "fx",
           "ebt_l3",
           "ebt_l2",
@@ -4104,14 +4126,6 @@
       "numerator": [
         {
           "op": "*",
-          "field": "noi_amt",
-          "label": "Net Operating Income — numerator of DSCR",
-          "sample_value": 0,
-          "source_table": "facility_financial_snapshot",
-          "source_layer": "L2"
-        },
-        {
-          "op": "*",
           "field": "interest_expense_amt",
           "label": "Interest expense — component of Total Debt Service denominator",
           "sample_value": 0,
@@ -4128,6 +4142,14 @@
         },
         {
           "op": "*",
+          "field": "noi_current_amt",
+          "label": "Property-level Net Operating Income — numerator of DSCR",
+          "sample_value": 0,
+          "source_table": "collateral_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
           "field": "rate",
           "label": "Spot FX rate for converting to USD reporting currency",
           "sample_value": 0,
@@ -4137,15 +4159,9 @@
       ],
       "denominator": [],
       "result_format": "ratio",
-      "formula_display": "For each facility:\n  1. LOAD noi_amt, interest_expense_amt, principal_payment_amt\n     from l2.facility_financial_snapshot\n  2. COMPUTE Total Debt Service = interest_expense_amt + principal_payment_amt\n  3. COMPUTE DSCR = noi_amt / Total Debt Service\nIngredients: noi_amt (L2), interest_expense_amt (L2), principal_payment_amt (L2)\n"
+      "formula_display": "For each facility:\n  1. LOAD interest_expense_amt, principal_payment_amt from l2.facility_financial_snapshot\n  2. LOAD noi_current_amt from l2.collateral_snapshot (SUM across collateral assets)\n  3. COMPUTE Total Debt Service = interest_expense_amt + principal_payment_amt\n  4. COMPUTE DSCR = SUM(noi_current_amt) / Total Debt Service\nIngredients: noi_current_amt (L2 collateral), interest_expense_amt (L2), principal_payment_amt (L2)\n"
     },
     "worked_example_columns": [
-      {
-        "field": "noi_amt",
-        "header": "Noi ($)",
-        "format": "currency",
-        "subtotal_fn": "sum"
-      },
       {
         "field": "interest_expense_amt",
         "header": "Interest Expense ($)",
@@ -4155,6 +4171,12 @@
       {
         "field": "principal_payment_amt",
         "header": "Principal Payment ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "noi_current_amt",
+        "header": "Noi Current ($)",
         "format": "currency",
         "subtotal_fn": "sum"
       },
@@ -4193,11 +4215,6 @@
               "description": "as_of_date"
             },
             {
-              "name": "noi_amt",
-              "role": "MEASURE",
-              "description": "Net Operating Income — numerator of DSCR"
-            },
-            {
               "name": "interest_expense_amt",
               "role": "MEASURE",
               "description": "Interest expense — component of Total Debt Service denominator"
@@ -4213,7 +4230,33 @@
               "description": "Original currency of financial amounts — used for FX conversion"
             }
           ],
-          "purpose": "Provides Net Operating Income — numerator of DSCR, Interest expense — component of Total Debt Service denominator, Principal payments — component of Total Debt Service denominator"
+          "purpose": "Provides Interest expense — component of Total Debt Service denominator, Principal payments — component of Total Debt Service denominator"
+        },
+        {
+          "alias": "cs",
+          "qualified_name": "l2.collateral_snapshot",
+          "table_name": "collateral_snapshot",
+          "layer": "L2",
+          "join_type": "LEFT",
+          "join_on": "cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date",
+          "fields": [
+            {
+              "name": "noi_current_amt",
+              "role": "MEASURE",
+              "description": "Property-level Net Operating Income — numerator of DSCR"
+            },
+            {
+              "name": "facility_id",
+              "role": "JOIN_KEY",
+              "description": "facility_id"
+            },
+            {
+              "name": "as_of_date",
+              "role": "JOIN_KEY",
+              "description": "as_of_date"
+            }
+          ],
+          "purpose": "Provides Property-level Net Operating Income — numerator of DSCR"
         },
         {
           "alias": "fx",
@@ -4302,22 +4345,26 @@
       "per_level_tables": {
         "facility": [
           "ffs",
-          "fm"
+          "fm",
+          "cs"
         ],
         "counterparty": [
           "ffs",
           "fm",
+          "cs",
           "fx"
         ],
         "desk": [
           "ffs",
           "fm",
+          "cs",
           "fx",
           "ebt"
         ],
         "portfolio": [
           "ffs",
           "fm",
+          "cs",
           "fx",
           "ebt_l3",
           "ebt_l2"
@@ -4325,6 +4372,7 @@
         "lob": [
           "ffs",
           "fm",
+          "cs",
           "fx",
           "ebt_l3",
           "ebt_l2",
@@ -4332,8 +4380,8 @@
         ]
       },
       "narration_context": {
-        "metric_description": "Cashflow (Net Operating Income) divided by Total Debt Service (Interest Expense + Principal Payments). Measures borrower's ability to meet debt obligations from operating cash flow. DSCR > 1.0 means the borrower generates enough income to cover debt payments. Key covenant compliance and credit resilience indicator.\nIngredient derivation:\n  - NOI (noi_amt): L2 facility_financial_snapshot — raw atomic input\n  - Interest Expense (interest_expense_amt): L2 facility_financial_snapshot — raw\n  - Principal Payment (principal_payment_amt): L2 facility_financial_snapshot — raw\n  - Total Debt Service = interest_expense_amt + principal_payment_amt (L3 derived)\n  - DSCR = noi_amt / Total Debt Service (L3 derived)\n\nRollup uses sum-ratio pattern: SUM(NOI) / SUM(Debt Service) at each level, preserving the mathematical relationship between numerator and denominator.\n",
-        "formula_text": "For each facility:\n  1. LOAD noi_amt, interest_expense_amt, principal_payment_amt\n     from l2.facility_financial_snapshot\n  2. COMPUTE Total Debt Service = interest_expense_amt + principal_payment_amt\n  3. COMPUTE DSCR = noi_amt / Total Debt Service\nIngredients: noi_amt (L2), interest_expense_amt (L2), principal_payment_amt (L2)\n",
+        "metric_description": "Property-level Net Operating Income (from collateral_snapshot) divided by Total Debt Service (Interest Expense + Principal Payments from facility_financial_snapshot). Measures the income-producing collateral's ability to cover debt obligations. DSCR > 1.0 means the property generates enough income to cover debt payments. Key covenant compliance and credit resilience indicator for CRE lending.\nIngredient derivation:\n  - NOI (noi_current_amt): L2 collateral_snapshot — property-level income\n  - Interest Expense (interest_expense_amt): L2 facility_financial_snapshot — raw\n  - Principal Payment (principal_payment_amt): L2 facility_financial_snapshot — raw\n  - Total Debt Service = interest_expense_amt + principal_payment_amt (L3 derived)\n  - DSCR = SUM(noi_current_amt) / Total Debt Service (L3 derived)\n\nRollup uses sum-ratio pattern: SUM(NOI) / SUM(Debt Service) at each level, preserving the mathematical relationship between numerator and denominator.\n",
+        "formula_text": "For each facility:\n  1. LOAD interest_expense_amt, principal_payment_amt from l2.facility_financial_snapshot\n  2. LOAD noi_current_amt from l2.collateral_snapshot (SUM across collateral assets)\n  3. COMPUTE Total Debt Service = interest_expense_amt + principal_payment_amt\n  4. COMPUTE DSCR = SUM(noi_current_amt) / Total Debt Service\nIngredients: noi_current_amt (L2 collateral), interest_expense_amt (L2), principal_payment_amt (L2)\n",
         "aggregation_type_by_level": {
           "facility": "RAW",
           "counterparty": "CUSTOM",
@@ -7193,18 +7241,18 @@
       "numerator": [
         {
           "op": "*",
-          "field": "noi_amt",
-          "label": "noi_amt",
+          "field": "interest_expense_amt",
+          "label": "interest_expense_amt",
           "sample_value": 0,
           "source_table": "facility_financial_snapshot",
           "source_layer": "L2"
         },
         {
           "op": "*",
-          "field": "interest_expense_amt",
-          "label": "interest_expense_amt",
+          "field": "noi_current_amt",
+          "label": "Property-level Net Operating Income",
           "sample_value": 0,
-          "source_table": "facility_financial_snapshot",
+          "source_table": "collateral_snapshot",
           "source_layer": "L2"
         },
         {
@@ -7242,18 +7290,18 @@
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "Net Income = NOI (Revenue - OpEx) - Interest Expense - Expected Loss (PD × LGD × Committed Amount). All sourced from L2 atomic tables.\n"
+      "formula_display": "Net Income = SUM(collateral NOI) - Interest Expense - Expected Loss (PD × LGD × Committed Amount). NOI sourced from collateral_snapshot.\n"
     },
     "worked_example_columns": [
       {
-        "field": "noi_amt",
-        "header": "Noi ($)",
+        "field": "interest_expense_amt",
+        "header": "Interest Expense ($)",
         "format": "currency",
         "subtotal_fn": "sum"
       },
       {
-        "field": "interest_expense_amt",
-        "header": "Interest Expense ($)",
+        "field": "noi_current_amt",
+        "header": "Noi Current ($)",
         "format": "currency",
         "subtotal_fn": "sum"
       },
@@ -7310,11 +7358,6 @@
               "description": "as_of_date"
             },
             {
-              "name": "noi_amt",
-              "role": "MEASURE",
-              "description": "noi_amt"
-            },
-            {
               "name": "interest_expense_amt",
               "role": "MEASURE",
               "description": "interest_expense_amt"
@@ -7325,7 +7368,33 @@
               "description": "currency_code"
             }
           ],
-          "purpose": "Provides noi amt, interest expense amt"
+          "purpose": "Provides interest expense amt"
+        },
+        {
+          "alias": "cs",
+          "qualified_name": "l2.collateral_snapshot",
+          "table_name": "collateral_snapshot",
+          "layer": "L2",
+          "join_type": "LEFT",
+          "join_on": "cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date",
+          "fields": [
+            {
+              "name": "noi_current_amt",
+              "role": "MEASURE",
+              "description": "Property-level Net Operating Income"
+            },
+            {
+              "name": "facility_id",
+              "role": "JOIN_KEY",
+              "description": "facility_id"
+            },
+            {
+              "name": "as_of_date",
+              "role": "JOIN_KEY",
+              "description": "as_of_date"
+            }
+          ],
+          "purpose": "Provides Property-level Net Operating Income"
         },
         {
           "alias": "fm",
@@ -7437,12 +7506,14 @@
         "facility": [
           "ffs",
           "fm",
+          "cs",
           "frs",
           "fes"
         ],
         "counterparty": [
           "ffs",
           "fm",
+          "cs",
           "frs",
           "fes",
           "fx"
@@ -7450,6 +7521,7 @@
         "desk": [
           "ffs",
           "fm",
+          "cs",
           "frs",
           "fes",
           "fx",
@@ -7458,6 +7530,7 @@
         "portfolio": [
           "ffs",
           "fm",
+          "cs",
           "frs",
           "fes",
           "fx",
@@ -7467,6 +7540,7 @@
         "lob": [
           "ffs",
           "fm",
+          "cs",
           "frs",
           "fes",
           "fx",
@@ -7476,8 +7550,8 @@
         ]
       },
       "narration_context": {
-        "metric_description": "Net income computed from L2 atomic inputs: NOI (Net Operating Income, which equals Revenue minus Operating Expense) minus Interest Expense minus Expected Loss (PD × LGD × Committed Amount). Indicator of facility-level profitability.\n",
-        "formula_text": "Net Income = NOI (Revenue - OpEx) - Interest Expense - Expected Loss (PD × LGD × Committed Amount). All sourced from L2 atomic tables.\n",
+        "metric_description": "Net income computed from collateral-level NOI (from collateral_snapshot) minus Interest Expense (from facility_financial_snapshot) minus Expected Loss (PD × LGD × Committed Amount). Indicator of facility-level profitability for secured lending with income-producing collateral.\n",
+        "formula_text": "Net Income = SUM(collateral NOI) - Interest Expense - Expected Loss (PD × LGD × Committed Amount). NOI sourced from collateral_snapshot.\n",
         "aggregation_type_by_level": {
           "facility": "CUSTOM",
           "counterparty": "SUM",

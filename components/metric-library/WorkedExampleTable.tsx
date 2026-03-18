@@ -409,7 +409,7 @@ function facilityToEntity(f: DemoFacility): DemoEntity {
       committed_amt: f.committed_amt,
       collateral_value: f.collateral_value,
       ltv_pct: f.ltv_pct,
-      noi_amt: f.noi_amt ?? 0,
+      noi_current_amt: f.noi_current_amt ?? 0,
       debt_service_amt: f.debt_service_amt ?? 0,
       dscr_value: f.dscr_value ?? 0,
       unfunded_amt: f.unfunded_amt ?? 0,
@@ -432,7 +432,7 @@ const LTV_COLUMNS: WorkedExampleColumn[] = [
 ];
 
 const DSCR_COLUMNS: WorkedExampleColumn[] = [
-  { field: 'noi_amt', header: 'Cashflow', format: 'currency', subtotal_fn: 'none' },
+  { field: 'noi_current_amt', header: 'Property NOI', format: 'currency', subtotal_fn: 'none' },
   { field: 'debt_service_amt', header: 'Debt Service', format: 'currency', subtotal_fn: 'none' },
   { field: 'dscr_value', header: 'DSCR', format: 'ratio', is_result: true, subtotal_fn: 'weighted-avg', weight_field: 'committed_amt' },
 ];

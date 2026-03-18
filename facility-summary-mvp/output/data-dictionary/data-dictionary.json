@@ -10668,6 +10668,11 @@
           "description": "",
           "data_type": "VARCHAR(200)",
           "category": "Collateral & Risk Mitigation"
+        },
+        {
+          "name": "noi_current_amt",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
         }
       ]
     },
@@ -13541,12 +13546,6 @@
             "is_pk": true,
             "is_composite": true
           }
-        },
-        {
-          "name": "noi_amt",
-          "description": "",
-          "category": "Financial Performance",
-          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "operating_expense_amt",
@@ -16806,6 +16805,11 @@
           "description": "",
           "data_type": "VARCHAR(200)",
           "category": "Collateral & Risk Mitigation"
+        },
+        {
+          "name": "noi_at_origination_amt",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
         }
       ]
     },
@@ -33924,7 +33928,7 @@
         {
           "name": "change_id",
           "description": "",
-          "data_type": "BIGINT",
+          "data_type": "BIGSERIAL",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -34000,7 +34004,7 @@
         {
           "name": "sandbox_run_id",
           "description": "",
-          "data_type": "BIGINT",
+          "data_type": "BIGSERIAL",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -34091,7 +34095,7 @@
         {
           "name": "change_id",
           "description": "",
-          "data_type": "BIGINT",
+          "data_type": "BIGSERIAL",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false

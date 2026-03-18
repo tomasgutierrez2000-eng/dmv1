@@ -19,6 +19,7 @@ This playbook enables risk stripes beyond Credit Risk -- such as Market Risk, Op
 | [03 - Onboarding Guide](03-onboarding-guide.md) | Step-by-step onboarding with intake worksheet | Business Analysts + Tech Leads |
 | [04 - Worked Example: Market Risk](04-worked-example-market-risk.md) | Complete example: new tables, YAML specs, pipeline output | Tech Leads |
 | [05 - Reference](05-reference.md) | YAML template, naming rules, CLI commands, glossary | Tech Leads |
+| [06 - Build on the Model](06-build-on-the-model.md) | AI prompts, sandbox setup, data factory, bulk metrics, merge checklist | Tech Leads + Engineers |
 
 ## Getting Help
 

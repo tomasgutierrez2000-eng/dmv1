@@ -145,6 +145,8 @@ interface CalculationWorkspaceProps {
   asOfDate: string | null;
   itemId?: string;
   item?: CatalogueItem | null;
+  activeLevel?: string;
+  onLevelChange?: (level: string) => void;
   onResultsChange?: (level: string, rows: ResultRow[]) => void;
   onFormulaSave?: (level: string, sql: string) => void;
 }
@@ -179,10 +181,17 @@ export default function CalculationWorkspace({
   asOfDate,
   itemId,
   item,
+  activeLevel: externalLevel,
+  onLevelChange,
   onResultsChange,
   onFormulaSave,
 }: CalculationWorkspaceProps) {
-  const [activeLevel, setActiveLevel] = useState('facility');
+  const [internalLevel, setInternalLevel] = useState('facility');
+  const activeLevel = externalLevel ?? internalLevel;
+  const setActiveLevel = (level: string) => {
+    setInternalLevel(level);
+    onLevelChange?.(level);
+  };
   const [rows, setRows] = useState<ResultRow[]>([]);
   const [totalRowCount, setTotalRowCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);

@@ -50,6 +50,7 @@ export default function CalculatorPage() {
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [dbConnected, setDbConnected] = useState<boolean | null>(null);
   const [activeResults, setActiveResults] = useState<{ level: string; rows: ResultRow[] } | undefined>();
+  const [activeLevel, setActiveLevel] = useState('facility');
   const [showIdentitySetup, setShowIdentitySetup] = useState(false);
 
   // Fetch catalogue item
@@ -261,7 +262,7 @@ export default function CalculatorPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left Pane: Ingredient Map */}
         <div className="w-72 shrink-0 border-r border-pwc-gray-light bg-pwc-gray overflow-hidden">
-          <IngredientMapPane itemId={itemId} />
+          <IngredientMapPane itemId={itemId} level={activeLevel} />
         </div>
 
         {/* Center Pane: Calculation Workspace */}
@@ -270,6 +271,8 @@ export default function CalculatorPage() {
             asOfDate={asOfDate}
             itemId={itemId}
             item={item}
+            activeLevel={activeLevel}
+            onLevelChange={setActiveLevel}
             onResultsChange={handleResultsChange}
             onFormulaSave={handleFormulaSave}
           />

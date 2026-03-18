@@ -3,6 +3,11 @@ import { jsonSuccess, jsonError, withErrorHandling } from '@/lib/api-response';
 import { executeSandboxQuery } from '@/lib/governance/sandbox-runner';
 import { getCatalogueItem } from '@/lib/metric-library/store';
 import { readDataDictionary, type DataDictionaryTable, type DataDictionaryField } from '@/lib/data-dictionary';
+import {
+  extractTablesFromSql as _extractTablesFromSql,
+  resolveAliasMap as _resolveAliasMap,
+  extractColumnRefsFromSql as _extractColumnRefsFromSql,
+} from '@/lib/governance/sql-parser';
 
 /* ── Types ──────────────────────────────────────────────────── */
 
@@ -44,7 +49,6 @@ interface ResolvedTable {
 
 const ALLOWED_SCHEMAS = new Set(['l1', 'l2', 'l3']);
 const COL_NAME_RE = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
-const TABLE_RE = /\b(l[123])\.([a-z_][a-z0-9_]*)\b/gi;
 const MAX_ROWS_CEILING = 200;
 const DEFAULT_MAX_ROWS = 50;
 const QUERY_TIMEOUT_MS = 10_000;
@@ -202,60 +206,11 @@ function buildScopeClause(
   return null;
 }
 
-/* ── Table resolution ───────────────────────────────────────── */
+/* ── Table resolution (delegates to shared sql-parser) ────── */
 
-function extractTablesFromSql(sql: string): Array<{ schema: string; table: string }> {
-  const seen = new Set<string>();
-  const tables: Array<{ schema: string; table: string }> = [];
-  let match;
-  const re = new RegExp(TABLE_RE.source, TABLE_RE.flags);
-  while ((match = re.exec(sql)) !== null) {
-    const key = `${match[1].toLowerCase()}.${match[2]}`;
-    if (!seen.has(key)) {
-      seen.add(key);
-      tables.push({ schema: match[1].toLowerCase(), table: match[2] });
-    }
-  }
-  return tables;
-}
-
-/**
- * Extract alias.column references from formula SQL.
- * Returns a map: alias → Set<column_name>.
- * Skips schema prefixes (l1, l2, l3) which are table references, not aliases.
- */
-function extractColumnRefsFromSql(sql: string): Map<string, Set<string>> {
-  const COL_RE = /\b([a-z_][a-z0-9_]*)\.([a-z_][a-z0-9_]*)\b/gi;
-  const refs = new Map<string, Set<string>>();
-  let match;
-  while ((match = COL_RE.exec(sql)) !== null) {
-    const alias = match[1].toLowerCase();
-    const column = match[2].toLowerCase();
-    if (ALLOWED_SCHEMAS.has(alias)) continue; // schema.table, not alias.column
-    if (!refs.has(alias)) refs.set(alias, new Set());
-    refs.get(alias)!.add(column);
-  }
-  return refs;
-}
-
-/**
- * Try to map aliases in the SQL to actual table names.
- * Parses FROM/JOIN clauses for "schema.table_name alias" patterns.
- */
-function resolveAliasMap(sql: string): Map<string, string> {
-  const aliasMap = new Map<string, string>();
-  // Match: FROM/JOIN l1.table_name alias_name  or  FROM/JOIN l1.table_name AS alias_name
-  const re = /(?:FROM|JOIN)\s+(l[123])\.([a-z_][a-z0-9_]*)(?:\s+(?:AS\s+)?([a-z_][a-z0-9_]*))?/gi;
-  let match;
-  while ((match = re.exec(sql)) !== null) {
-    const tableName = match[2];
-    const alias = match[3];
-    if (alias && !ALLOWED_SCHEMAS.has(alias)) {
-      aliasMap.set(alias.toLowerCase(), tableName);
-    }
-  }
-  return aliasMap;
-}
+const extractTablesFromSql = _extractTablesFromSql;
+const extractColumnRefsFromSql = _extractColumnRefsFromSql;
+const resolveAliasMap = _resolveAliasMap;
 
 function resolveIngredientTables(
   item: { ingredient_fields: Array<{ layer: string; table: string; field: string; description?: string }> },

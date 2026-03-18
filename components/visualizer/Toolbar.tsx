@@ -18,6 +18,7 @@ import {
   EyeOff,
   Keyboard,
   ChevronDown,
+  Package,
 } from 'lucide-react';
 import { useModelStore } from '../../store/modelStore';
 import { modelToSchemaExport, schemaExportToModel } from '../../utils/schemaExport';
@@ -29,7 +30,7 @@ import SchemaImportModal from './SchemaImportModal';
 import DdlExportModal from './DdlExportModal';
 import { useToast } from '../ui/Toast';
 
-type ExportFormat = 'png' | 'svg' | 'sql' | 'sql-postgres' | 'mermaid' | 'dbml' | 'schema-json' | 'schema-excel' | 'sample-L1' | 'sample-L2' | 'db-package';
+type ExportFormat = 'png' | 'svg' | 'sql' | 'sql-postgres' | 'mermaid' | 'dbml' | 'schema-json' | 'schema-excel' | 'sample-L1' | 'sample-L2' | 'db-package' | 'migration-package';
 
 function ToolbarTooltip({ children, label }: { children: React.ReactNode; label: string }) {
   return (
@@ -116,6 +117,7 @@ export default function Toolbar() {
   const [exportOpen, setExportOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [ddlModalOpen, setDdlModalOpen] = useState(false);
+  const [migrationDownloading, setMigrationDownloading] = useState(false);
 
   /** Zoom toward the viewport center so content doesn't drift off-screen */
   const zoomToCenter = (factor: number) => {
@@ -230,6 +232,33 @@ export default function Toolbar() {
       } catch (e) {
         console.error(e);
         toast({ type: 'error', title: 'Export failed', description: e instanceof Error ? e.message : 'Ensure sample data exists for this layer.' });
+      }
+      return;
+    }
+    if (format === 'migration-package') {
+      setMigrationDownloading(true);
+      toast({ type: 'info', title: 'Generating migration package...', description: 'This may take up to a minute.' });
+      try {
+        const res = await fetch('/api/export/migration-package');
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || res.statusText);
+        }
+        const blob = await res.blob();
+        const disposition = res.headers.get('Content-Disposition') || '';
+        const filenameMatch = disposition.match(/filename="?(.+?)"?$/);
+        const filename = filenameMatch?.[1] || `credit-risk-platform-${new Date().toISOString().slice(0, 10)}.zip`;
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        toast({ type: 'success', title: 'Migration package ready', description: `${(blob.size / 1024 / 1024).toFixed(1)} MB downloaded.` });
+      } catch (e) {
+        console.error(e);
+        toast({ type: 'error', title: 'Package generation failed', description: e instanceof Error ? e.message : 'Check server logs.' });
+      } finally {
+        setMigrationDownloading(false);
       }
       return;
     }
@@ -514,8 +543,16 @@ export default function Toolbar() {
                     <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">DDL</div>
                     <button onClick={() => handleExport('sql-postgres')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">PostgreSQL DDL (Cloud SQL Studio)</button>
                     <div className="h-px bg-gray-100 my-1" />
-                    <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Database Package</div>
+                    <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Sample Data</div>
+                    <button onClick={() => handleExport('sample-L1')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">L1 sample data (Excel)</button>
+                    <button onClick={() => handleExport('sample-L2')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">L2 sample data (Excel)</button>
+                    <div className="h-px bg-gray-100 my-1" />
+                    <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Platform</div>
                     <button onClick={() => handleExport('db-package')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">DDL + Sample Data (ZIP)</button>
+                    <button onClick={() => handleExport('migration-package')} disabled={migrationDownloading} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50" role="menuitem">
+                      <Package className="w-3.5 h-3.5" />
+                      {migrationDownloading ? 'Generating...' : 'Migration Package (.zip)'}
+                    </button>
                   </div>
                 </>
               )}

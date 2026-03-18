@@ -64,6 +64,28 @@ export function extractColumnRefsFromSql(sql: string): Map<string, Set<string>> 
   return refs;
 }
 
+/** Extract JOIN references with their join types from SQL (e.g., LEFT JOIN, INNER JOIN). */
+export function extractJoinRefs(sql: string): Array<{ schema: string; table: string; join_type: string }> {
+  const refs: Array<{ schema: string; table: string; join_type: string }> = [];
+  const normalized = sql.replace(/\s+/g, ' ').trim();
+
+  // FROM clause = BASE table
+  const fromMatch = normalized.match(/FROM\s+(l[123])\.([a-z_][a-z0-9_]*)/i);
+  if (fromMatch) {
+    refs.push({ schema: fromMatch[1].toLowerCase(), table: fromMatch[2], join_type: 'BASE' });
+  }
+
+  // JOIN clauses
+  const joinRe = /((?:LEFT\s+|INNER\s+|RIGHT\s+|CROSS\s+)?JOIN)\s+(l[123])\.([a-z_][a-z0-9_]*)/gi;
+  let match;
+  while ((match = joinRe.exec(normalized)) !== null) {
+    const joinType = match[1].trim().toUpperCase().replace(/\s+JOIN$/, '').replace(/^JOIN$/, 'INNER');
+    refs.push({ schema: match[2].toLowerCase(), table: match[3], join_type: joinType });
+  }
+
+  return refs;
+}
+
 /** Parse formula SQL into ordered steps: FROM, JOINs, WHERE, GROUP BY, SELECT. */
 export interface FormulaStep {
   order: number;

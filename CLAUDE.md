@@ -6,6 +6,12 @@ Use the `/browse` skill from gstack for all web browsing. Never use `mcp__Claude
 
 Available skills: `/office-hours`, `/plan-ceo-review`, `/plan-eng-review`, `/plan-design-review`, `/design-consultation`, `/review`, `/ship`, `/browse`, `/qa`, `/qa-only`, `/design-review`, `/setup-browser-cookies`, `/retro`, `/investigate`, `/document-release`, `/codex`, `/careful`, `/freeze`, `/guard`, `/unfreeze`, `/gstack-upgrade`
 
+## Design System
+Always read DESIGN.md before making any visual or UI decisions.
+All font choices, colors, spacing, and aesthetic direction are defined there.
+Do not deviate without explicit user approval.
+In QA mode, flag any code that doesn't match DESIGN.md.
+
 ## Project Overview
 Banking data model visualization platform with metrics calculation engine. Next.js 14 App Router, TypeScript, Tailwind CSS, Zustand, Recharts. PostgreSQL + sql.js for calculations.
 

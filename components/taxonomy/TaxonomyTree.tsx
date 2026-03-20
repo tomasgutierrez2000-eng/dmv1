@@ -8,6 +8,8 @@ import {
   buildTree,
   countLeaves,
   LEVEL_LABELS,
+  LEVEL_BADGE_LABELS,
+  LEVEL_LABELS_PLURAL,
   LEVEL_COLORS,
 } from './taxonomy-data';
 
@@ -61,7 +63,7 @@ function TreeNode({
             ${colors.bg} ${colors.border} ${colors.text} border
           `}
         >
-          L{node.level}
+          {LEVEL_BADGE_LABELS[node.level] || `L${node.level}`}
         </span>
 
         {/* Name */}
@@ -190,7 +192,7 @@ export default function TaxonomyTree() {
                 {stats[level]}
               </div>
               <div className="text-xs text-slate-500 mt-0.5">
-                {LEVEL_LABELS[level]}s
+                {LEVEL_LABELS_PLURAL[level]}
               </div>
             </div>
           );

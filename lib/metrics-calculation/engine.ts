@@ -2,7 +2,6 @@ import type { CalculationDimension, L3Metric } from '@/data/l3-metrics';
 import { CALCULATION_DIMENSIONS } from '@/data/l3-metrics';
 import { resolveFormulaForDimension } from './formula-resolver';
 import { getMetricById } from './registry';
-import { runEscapeHatchCalculator } from './escape-hatch';
 import { getDistinctAsOfDates, runSqlMetric } from './sql-runner';
 import { getTableKeysForMetric } from './table-resolver';
 import type { RunDiagnostics, RunMetricOutput } from './types';
@@ -55,20 +54,6 @@ export async function runMetricCalculation(input: {
         dimension,
       })
     );
-  }
-
-  const escaped = await runEscapeHatchCalculator({ metric, dimension, asOfDate });
-  if (escaped) {
-    logRunDiagnostics({
-      metricId: metric.id,
-      dimension,
-      durationMs: Date.now() - startedAt,
-      asOfDateRequested: asOfDate,
-      asOfDateUsed: escaped.ok ? escaped.asOfDateUsed : null,
-      tableCount: 0,
-      error: escaped.ok ? undefined : escaped.error,
-    });
-    return escaped;
   }
 
   const tableKeys = getTableKeysForMetric(metric, dimension);

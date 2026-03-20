@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Space_Mono, Inter } from 'next/font/google'
 import './globals.css'
 import { ToastProvider } from '../components/ui/Toast'
+import NavBar from '../components/ui/NavBar'
 
 const spaceMono = Space_Mono({
   subsets: ['latin'],
@@ -28,7 +29,8 @@ export default function RootLayout({
     <html lang="en" className={`${spaceMono.variable} ${inter.variable}`}>
       <body className="font-inter bg-pwc-black text-pwc-white antialiased overflow-x-hidden">
         <ToastProvider>
-          {children}
+          <NavBar />
+          <main id="main-content">{children}</main>
         </ToastProvider>
         <div className="noise-overlay" />
       </body>

@@ -12,7 +12,7 @@
  */
 
 import type { L1Chain } from './chain-builder';
-import type { L2Data } from './l2-generator';
+import type { L2Data } from './l2-types';
 import type { ScenarioConfig } from './scenario-config';
 import type { IDRegistry } from './id-registry';
 import type { V2GeneratorOutput } from './v2/generators';

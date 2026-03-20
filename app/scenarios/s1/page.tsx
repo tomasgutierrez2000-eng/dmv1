@@ -176,7 +176,7 @@ export default function S1VisualizerPage() {
                 <Tooltip
                   contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #444', borderRadius: 8 }}
                   labelStyle={{ color: '#fff' }}
-                  formatter={(value: number) => [formatUsd(value), '']}
+                  formatter={(value) => [formatUsd(Number(value ?? 0)), '']}
                   labelFormatter={(_, payload) => payload[0]?.payload?.fullName ?? ''}
                 />
                 <Legend />

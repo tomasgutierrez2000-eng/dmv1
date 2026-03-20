@@ -269,6 +269,7 @@ export default function MetricUploadView() {
             Use the guide to help your AI fill out the templates.
           </p>
           <div className="flex flex-wrap gap-3">
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- file download, not page navigation */}
             <a
               href="/api/metrics/library/upload/template"
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"

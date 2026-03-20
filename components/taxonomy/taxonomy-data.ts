@@ -74,6 +74,22 @@ export const LEVEL_LABELS: Record<number, string> = {
   3: 'Desk',
 };
 
+/** Short badge labels (avoids collision with L1/L2/L3 data layer terminology) */
+export const LEVEL_BADGE_LABELS: Record<number, string> = {
+  0: 'ENT',
+  1: 'LOB',
+  2: 'PF',
+  3: 'DSK',
+};
+
+/** Plural labels for stats display */
+export const LEVEL_LABELS_PLURAL: Record<number, string> = {
+  0: 'Enterprises',
+  1: 'Lines of Business',
+  2: 'Portfolios',
+  3: 'Desks',
+};
+
 /** Level colors (tailwind classes) */
 export const LEVEL_COLORS: Record<number, { bg: string; border: string; text: string; dot: string }> = {
   0: { bg: 'bg-amber-500/10', border: 'border-amber-500/40', text: 'text-amber-400', dot: 'bg-amber-400' },

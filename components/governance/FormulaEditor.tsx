@@ -60,7 +60,8 @@ export default function FormulaEditor({
 
   // Cleanup timers on unmount
   useEffect(() => {
-    return () => { timersRef.current.forEach(clearTimeout); };
+    const timers = timersRef.current;
+    return () => { timers.forEach(clearTimeout); };
   }, []);
 
   // Restore draft from localStorage on mount

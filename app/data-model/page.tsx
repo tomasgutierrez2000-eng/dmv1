@@ -3,140 +3,15 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Database, Key, Link2, ChevronRight, ChevronDown, Layers, Search, RefreshCw, AlertCircle, Plus, Trash2, FileCode, Loader2, Pencil, X } from 'lucide-react';
 import Link from 'next/link';
-
-interface FieldDefinition {
-  name: string;
-  description: string;
-  category: string;
-  pk_fk?: {
-    is_pk: boolean;
-    is_composite: boolean;
-    fk_target?: {
-      layer: string;
-      table: string;
-      field: string;
-    };
-  };
-  why_required?: string;
-  simplification_note?: string;
-  data_type?: string;
-  formula?: string;
-  source_tables?: Array<{ layer: string; table: string }>;
-  source_fields?: string;
-  dashboard_usage?: string;
-  grain?: string;
-  notes?: string;
-}
-
-interface ParsedTableDefinition {
-  name: string;
-  layer: 'L1' | 'L2' | 'L3';
-  category: string;
-  fields: FieldDefinition[];
-}
-
-interface DataDictionary {
-  L1: ParsedTableDefinition[];
-  L2: ParsedTableDefinition[];
-  L3: ParsedTableDefinition[];
-  relationships: Array<{
-    from_table: string;
-    from_field: string;
-    to_table: string;
-    to_field: string;
-    from_layer: string;
-    to_layer: string;
-  }>;
-  derivation_dag: Record<string, string[]>;
-}
-
-interface TableDefinition {
-  id: string;
-  name: string;
-  layer: 'L1' | 'L2' | 'L3';
-  fields: string[];
-  primaryKey: string;
-  foreignKeys: { field: string; references: string; table: string }[];
-  description?: string;
-  category?: string;
-}
-
-interface AddTablePayload {
-  layer: 'L1' | 'L2' | 'L3';
-  name: string;
-  category: string;
-  fields: Array<{
-    name: string;
-    data_type?: string;
-    pk_fk?: { is_pk: boolean; fk_target?: { layer: string; table: string; field: string } };
-  }>;
-}
-
-const layerColors = {
-  L1: { bg: '#D04A02', border: '#D04A02', text: '#ffffff', cardBadge: 'bg-white/20 text-white', badge: 'bg-orange-100 text-orange-800' },
-  L2: { bg: '#E87722', border: '#E87722', text: '#ffffff', cardBadge: 'bg-white/20 text-white', badge: 'bg-amber-100 text-amber-800' },
-  L3: { bg: '#6B7280', border: '#6B7280', text: '#ffffff', cardBadge: 'bg-white/20 text-white', badge: 'bg-gray-100 text-gray-700' },
-} as const;
-
-// Transform parsed data dictionary to visualization format
-const transformDataDictionary = (dataDict: DataDictionary): TableDefinition[] => {
-  const tables: TableDefinition[] = [];
-  const allTables = [...dataDict.L1, ...dataDict.L2, ...dataDict.L3];
-
-  allTables.forEach((table) => {
-    // Extract primary key fields
-    const pkFields = table.fields
-      .filter((f) => f.pk_fk?.is_pk)
-      .map((f) => f.name);
-    const primaryKey = pkFields.length > 0 ? pkFields.join(', ') : 'N/A';
-
-    // Extract foreign keys from relationships
-    const foreignKeys = dataDict.relationships
-      .filter((rel) => rel.from_table === table.name)
-      .map((rel) => ({
-        field: rel.from_field,
-        references: rel.to_field,
-        table: rel.to_table,
-      }));
-
-    // Get all field names
-    const fieldNames = table.fields.map((f) => {
-      let name = f.name;
-      if (f.pk_fk?.is_pk) name += ' (PK)';
-      if (f.pk_fk?.fk_target) name += ' (FK)';
-      return name;
-    });
-
-    // Get description from first field or table category
-    const description = table.fields[0]?.description || table.category || '';
-
-    tables.push({
-      id: table.name,
-      name: table.name,
-      layer: table.layer,
-      fields: fieldNames,
-      primaryKey,
-      foreignKeys,
-      description,
-      category: table.category,
-    });
-  });
-
-  return tables;
-};
-
-/** Get raw table from data dictionary by table name (id). */
-function getTableFromDict(
-  dataDict: DataDictionary | null,
-  tableId: string
-): ParsedTableDefinition & { layer: 'L1' | 'L2' | 'L3' } | null {
-  if (!dataDict) return null;
-  for (const layer of ['L1', 'L2', 'L3'] as const) {
-    const t = dataDict[layer].find((x) => x.name === tableId);
-    if (t) return { ...t, layer };
-  }
-  return null;
-}
+import {
+  LAYER_COLORS as layerColors,
+  DATA_TYPE_OPTIONS,
+  transformDataDictionary,
+  getTableFromDict,
+  type DataDictionary,
+  type TableDefinition,
+  type AddTablePayload,
+} from './data-model-types';
 
 export default function DataModelPage() {
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
@@ -670,13 +545,7 @@ export default function DataModelPage() {
                         }))}
                         className="border border-gray-300 rounded px-2 py-1 text-sm"
                       >
-                        <option value="VARCHAR(64)">VARCHAR(64)</option>
-                        <option value="VARCHAR(500)">VARCHAR(500)</option>
-                        <option value="NUMERIC(20,4)">NUMERIC(20,4)</option>
-                        <option value="DATE">DATE</option>
-                        <option value="TIMESTAMP">TIMESTAMP</option>
-                        <option value="INTEGER">INTEGER</option>
-                        <option value="BOOLEAN">BOOLEAN</option>
+                        {DATA_TYPE_OPTIONS.map((dt) => <option key={dt} value={dt}>{dt}</option>)}
                       </select>
                       <label className="flex items-center gap-1 text-sm whitespace-nowrap">
                         <input
@@ -1022,15 +891,7 @@ export default function DataModelPage() {
                       onChange={(e) => setAddFieldForm((f) => ({ ...f, data_type: e.target.value }))}
                       className="border border-gray-300 rounded px-2 py-1.5 text-sm"
                     >
-                      <option value="VARCHAR(64)">VARCHAR(64)</option>
-                      <option value="VARCHAR(500)">VARCHAR(500)</option>
-                      <option value="BIGINT">BIGINT</option>
-                      <option value="INTEGER">INTEGER</option>
-                      <option value="NUMERIC(20,4)">NUMERIC(20,4)</option>
-                      <option value="NUMERIC(10,6)">NUMERIC(10,6)</option>
-                      <option value="BOOLEAN">BOOLEAN</option>
-                      <option value="DATE">DATE</option>
-                      <option value="TIMESTAMP">TIMESTAMP</option>
+                      {DATA_TYPE_OPTIONS.map((dt) => <option key={dt} value={dt}>{dt}</option>)}
                       <option value="TEXT">TEXT</option>
                     </select>
                     <input
@@ -1221,15 +1082,7 @@ export default function DataModelPage() {
                   onChange={(e) => setEditFieldForm((f) => f ? { ...f, data_type: e.target.value } : null)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 >
-                  <option value="VARCHAR(64)">VARCHAR(64)</option>
-                  <option value="VARCHAR(500)">VARCHAR(500)</option>
-                  <option value="BIGINT">BIGINT</option>
-                  <option value="INTEGER">INTEGER</option>
-                  <option value="NUMERIC(20,4)">NUMERIC(20,4)</option>
-                  <option value="NUMERIC(10,6)">NUMERIC(10,6)</option>
-                  <option value="BOOLEAN">BOOLEAN</option>
-                  <option value="DATE">DATE</option>
-                  <option value="TIMESTAMP">TIMESTAMP</option>
+                  {DATA_TYPE_OPTIONS.map((dt) => <option key={dt} value={dt}>{dt}</option>)}
                   <option value="TEXT">TEXT</option>
                 </select>
               </div>

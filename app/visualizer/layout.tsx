@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Monitor } from 'lucide-react';
 
 export default function VisualizerLayout({
@@ -15,12 +16,12 @@ export default function VisualizerLayout({
           <p className="text-sm text-slate-400">
             The interactive visualizer needs a wider screen to display the data model. Please switch to a desktop or tablet in landscape mode.
           </p>
-          <a
+          <Link
             href="/"
             className="inline-block px-4 py-2 bg-[#D04A02] text-white text-sm rounded-md hover:bg-[#E87722] transition-colors"
           >
             Back to Overview
-          </a>
+          </Link>
         </div>
       </div>
       <div className="hidden md:contents">{children}</div>

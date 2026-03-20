@@ -8,6 +8,12 @@
  *   - Scenario header comments with narrative
  */
 
+import {
+  formatSqlValue as _formatSqlValue,
+  quoteColumn as _quoteColumn,
+  PG_RESERVED_WORDS,
+} from '../../lib/sql-value-formatter';
+
 /* ────────────────── Load Order ────────────────── */
 
 /**
@@ -20,11 +26,11 @@ export const LOAD_ORDER: string[] = [
   'l1.currency_dim',
   'l1.metric_threshold',
 
-  // L1/L2 reference data (parents first)
-  'l2.counterparty',
-  'l2.credit_agreement_master',
-  'l2.facility_master',
-  'l2.counterparty_hierarchy',
+  // L1 master tables (parents first)
+  'l1.counterparty',
+  'l1.credit_agreement_master',
+  'l1.facility_master',
+  'l1.counterparty_hierarchy',
   'l1.sccl_counterparty_group',
   'l1.sccl_counterparty_group_member',
   'l1.control_relationship',
@@ -78,90 +84,8 @@ export const LOAD_ORDER: string[] = [
 
 /* ────────────────── Value Formatting ────────────────── */
 
-/**
- * Format a value for SQL INSERT based on its type.
- * Follows the naming convention contract from CLAUDE.md:
- *   _id → BIGINT (unquoted)
- *   _code → VARCHAR (quoted)
- *   _amt → NUMERIC (unquoted)
- *   _pct → NUMERIC (unquoted)
- *   _date → DATE (quoted)
- *   _flag → BOOLEAN (quoted Y/N)
- *   _ts → TIMESTAMP (quoted or NULL)
- *   etc.
- */
-export function formatSqlValue(columnName: string, value: unknown): string {
-  if (value === null || value === undefined) return 'NULL';
-
-  // Exception IDs that are VARCHAR despite _id suffix
-  const varcharIds = new Set([
-    'metric_id', 'variant_id', 'source_metric_id', 'mdrm_id',
-    'mapped_line_id', 'mapped_column_id',
-  ]);
-
-  if (varcharIds.has(columnName)) {
-    return `'${String(value).replace(/'/g, "''")}'`;
-  }
-
-  // BIGINT columns: _id suffix → unquoted integer
-  if (columnName.endsWith('_id')) {
-    const n = Number(value);
-    if (isNaN(n)) return 'NULL';
-    return String(n);
-  }
-
-  // NUMERIC columns: _amt, _pct, _value, _bps → unquoted number
-  if (columnName.endsWith('_amt') || columnName.endsWith('_pct') ||
-      columnName.endsWith('_value') || columnName.endsWith('_bps')) {
-    const n = Number(value);
-    if (isNaN(n)) return '0';
-    return String(n);
-  }
-
-  // INTEGER columns: _count → unquoted integer
-  if (columnName.endsWith('_count')) {
-    const n = Number(value);
-    if (isNaN(n)) return '0';
-    return String(Math.round(n));
-  }
-
-  // DATE columns: _date → quoted string
-  if (columnName.endsWith('_date')) {
-    return `'${String(value)}'`;
-  }
-
-  // TIMESTAMP columns: _ts → quoted or DEFAULT
-  if (columnName.endsWith('_ts')) {
-    if (value === 'DEFAULT' || value === 'CURRENT_TIMESTAMP') return 'DEFAULT';
-    return value ? `'${String(value)}'` : 'NULL';
-  }
-
-  // BOOLEAN columns: _flag → PostgreSQL boolean literal (unquoted TRUE/FALSE)
-  if (columnName.endsWith('_flag')) {
-    const v = String(value).toUpperCase();
-    if (v === 'TRUE' || v === 'Y' || v === '1') return 'TRUE';
-    if (v === 'FALSE' || v === 'N' || v === '0') return 'FALSE';
-    return 'NULL';
-  }
-
-  // String columns: everything else → quoted string
-  if (typeof value === 'string') {
-    return `'${value.replace(/'/g, "''")}'`;
-  }
-
-  // Numbers that don't match a suffix → unquoted (guard NaN)
-  if (typeof value === 'number') {
-    if (isNaN(value)) return 'NULL';
-    return String(value);
-  }
-
-  // Boolean → PostgreSQL boolean literal
-  if (typeof value === 'boolean') {
-    return value ? 'TRUE' : 'FALSE';
-  }
-
-  return `'${String(value).replace(/'/g, "''")}'`;
-}
+// Re-export from shared module for backwards compatibility
+export const formatSqlValue = _formatSqlValue;
 
 /* ────────────────── Row Types ────────────────── */
 
@@ -178,20 +102,7 @@ export interface TableData {
  * Build a single INSERT statement from a table name and row data.
  * Handles reserved-word quoting (e.g. "value") automatically.
  */
-const RESERVED_WORDS = new Set([
-  'value', 'all', 'and', 'array', 'as', 'between', 'case', 'check',
-  'column', 'constraint', 'create', 'cross', 'default', 'distinct',
-  'do', 'else', 'end', 'except', 'false', 'fetch', 'for', 'foreign',
-  'from', 'full', 'grant', 'group', 'having', 'in', 'inner', 'into',
-  'is', 'join', 'leading', 'left', 'like', 'limit', 'not', 'null',
-  'offset', 'on', 'only', 'or', 'order', 'outer', 'primary',
-  'references', 'right', 'select', 'table', 'then', 'to', 'true',
-  'union', 'unique', 'user', 'using', 'when', 'where', 'window', 'with',
-]);
-
-function quoteColumn(col: string): string {
-  return RESERVED_WORDS.has(col.toLowerCase()) ? `"${col}"` : col;
-}
+const quoteColumn = _quoteColumn;
 
 export function buildInsert(table: string, row: SqlRow): string {
   const columns = Object.keys(row);
@@ -259,34 +170,8 @@ export function emitScenarioSql(tables: TableData[], opts: EmitOptions): string 
   return lines.join('\n');
 }
 
-/**
- * Country codes used by factory scenarios but missing from seed country_dim.
- * These INSERTs are idempotent (ON CONFLICT DO NOTHING).
- */
-const FACTORY_COUNTRY_SETUP = `-- Factory prerequisite: additional country_dim entries
-INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('BR', 'Brazil', 'Y', 'AMER', '50%', 'N', 'N', 'N', 'BRA', '076', 11) ON CONFLICT (country_code) DO NOTHING;
-INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('IN', 'India', 'Y', 'APAC', '50%', 'N', 'N', 'N', 'IND', '356', 12) ON CONFLICT (country_code) DO NOTHING;
-INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('MX', 'Mexico', 'Y', 'AMER', '50%', 'N', 'N', 'N', 'MEX', '484', 13) ON CONFLICT (country_code) DO NOTHING;
-INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('AE', 'United Arab Emirates', 'Y', 'EMEA', '50%', 'N', 'N', 'N', 'ARE', '784', 14) ON CONFLICT (country_code) DO NOTHING;
-INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('KR', 'South Korea', 'Y', 'APAC', '0%', 'Y', 'N', 'N', 'KOR', '410', 15) ON CONFLICT (country_code) DO NOTHING;
-INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('HK', 'Hong Kong', 'Y', 'APAC', '0%', 'Y', 'N', 'N', 'HKG', '344', 16) ON CONFLICT (country_code) DO NOTHING;
--- Factory prerequisite: additional currency_dim entries
-INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('BRL', 'Brazilian Real', 'R$', 'Y', '986', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;
-INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('INR', 'Indian Rupee', 'Rs', 'Y', '356', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;
-INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('MXN', 'Mexican Peso', 'Mex$', 'Y', '484', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;
-INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('AED', 'UAE Dirham', 'AED', 'Y', '784', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;
-INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('KRW', 'South Korean Won', 'W', 'Y', '410', 0, 'N') ON CONFLICT (currency_code) DO NOTHING;
--- Factory prerequisite: l1.metric_threshold seed data
-INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_type, threshold_value, effective_from_date, is_active_flag, metric_code, metric_name, metric_category) VALUES (1, 1, 'WARNING', 1.25, '2024-01-01', 'Y', 'DSCR', 'Debt Service Coverage Ratio', 'CREDIT') ON CONFLICT (threshold_id) DO NOTHING;
-INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_type, threshold_value, effective_from_date, is_active_flag, metric_code, metric_name, metric_category) VALUES (2, 1, 'BREACH', 1.00, '2024-01-01', 'Y', 'DSCR', 'Debt Service Coverage Ratio', 'CREDIT') ON CONFLICT (threshold_id) DO NOTHING;
-INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_type, threshold_value, effective_from_date, is_active_flag, metric_code, metric_name, metric_category) VALUES (3, 2, 'WARNING', 0.75, '2024-01-01', 'Y', 'LTV', 'Loan-to-Value Ratio', 'CREDIT') ON CONFLICT (threshold_id) DO NOTHING;
-INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_type, threshold_value, effective_from_date, is_active_flag, metric_code, metric_name, metric_category) VALUES (4, 2, 'BREACH', 0.90, '2024-01-01', 'Y', 'LTV', 'Loan-to-Value Ratio', 'CREDIT') ON CONFLICT (threshold_id) DO NOTHING;
-INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_type, threshold_value, effective_from_date, is_active_flag, metric_code, metric_name, metric_category) VALUES (5, 3, 'WARNING', 1.50, '2024-01-01', 'Y', 'ICR', 'Interest Coverage Ratio', 'CREDIT') ON CONFLICT (threshold_id) DO NOTHING;
-INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_type, threshold_value, effective_from_date, is_active_flag, metric_code, metric_name, metric_category) VALUES (6, 3, 'BREACH', 1.00, '2024-01-01', 'Y', 'ICR', 'Interest Coverage Ratio', 'CREDIT') ON CONFLICT (threshold_id) DO NOTHING;
-INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_type, threshold_value, effective_from_date, is_active_flag, metric_code, metric_name, metric_category) VALUES (7, 4, 'WARNING', 4.00, '2024-01-01', 'Y', 'LEVERAGE', 'Total Leverage Ratio', 'CREDIT') ON CONFLICT (threshold_id) DO NOTHING;
-INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_type, threshold_value, effective_from_date, is_active_flag, metric_code, metric_name, metric_category) VALUES (8, 4, 'BREACH', 6.00, '2024-01-01', 'Y', 'LEVERAGE', 'Total Leverage Ratio', 'CREDIT') ON CONFLICT (threshold_id) DO NOTHING;
-INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_type, threshold_value, effective_from_date, is_active_flag, metric_code, metric_name, metric_category) VALUES (9, 5, 'WARNING', 1.20, '2024-01-01', 'Y', 'CURRENT_RATIO', 'Current Ratio', 'LIQUIDITY') ON CONFLICT (threshold_id) DO NOTHING;
-INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_type, threshold_value, effective_from_date, is_active_flag, metric_code, metric_name, metric_category) VALUES (10, 5, 'BREACH', 1.00, '2024-01-01', 'Y', 'CURRENT_RATIO', 'Current Ratio', 'LIQUIDITY') ON CONFLICT (threshold_id) DO NOTHING;`;
+// Factory prerequisite data — single source of truth in factory-prerequisites.ts
+import { emitPrerequisiteSql } from './factory-prerequisites';
 
 /**
  * Emit combined SQL for multiple scenarios.
@@ -303,7 +188,7 @@ export function emitCombinedSql(scenarioSqls: string[], generatedAt?: string): s
     '',
     'SET search_path TO l1, l2, public;',
     '',
-    FACTORY_COUNTRY_SETUP,
+    emitPrerequisiteSql(),
   ].join('\n');
 
   return header + scenarioSqls.join('\n\n');

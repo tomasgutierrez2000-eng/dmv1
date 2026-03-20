@@ -119,112 +119,20 @@ async function main() {
         const startJ = i === startIdx ? skipFirst : 0;
         for (let j = startJ; j < statements.length; j++) {
           let st = statements[j] + (statements[j].endsWith(';') ? '' : ';');
-          // Cap L2 FKs to L1 dimension sizes so we don't need 2000+ L1 rows per dimension
+          // L2 seed: add ON CONFLICT DO NOTHING for tables with composite PKs
+          // (FK values in the seed data reference valid L1 IDs natively — no remapping needed)
           if (f === '04-l2-seed.sql') {
-            if (st.includes('INSERT INTO l2.exposure_counterparty_attribution')) {
-              const m = st.match(/VALUES \((\d+), '[^']+', (\d+),/);
-              if (m) {
-                const exposureTypeId = parseInt(m[2], 10);
-                const cap = ((exposureTypeId - 1) % 20) + 1;
-                st = st.replace(
-                  /(VALUES \(\d+, '[^']+', )\d+(, \d+,)/,
-                  `$1${cap}$2`
-                );
-              }
-            }
-            if (st.includes('INSERT INTO l2.facility_exposure_snapshot')) {
-              const m = st.match(/VALUES \((\d+), '[^']+', (\d+),/);
-              if (m) {
-                const facilityId = parseInt(m[1], 10);
-                const exposureTypeId = parseInt(m[2], 10);
-                const cap20 = ((exposureTypeId - 1) % 20) + 1;
-                const cap100 = ((facilityId - 1) % 100) + 1;
-                st = st.replace(
-                  /(VALUES \(\d+, '[^']+', )\d+(, \d+,)/,
-                  `$1${cap20}$2`
-                );
-                // 6th value after date = source_system_id (exposure_type, drawn, committed, undrawn, then source_system_id)
-                st = st.replace(
-                  /(VALUES \(\d+, '[^']+', \d+, \d+, \d+, \d+, )\d+(, \d+,)/,
-                  `$1${cap100}$2`
-                );
-              }
-            }
             if (st.includes('INSERT INTO l2.collateral_snapshot')) {
-              const m = st.match(/VALUES \((\d+), '[^']+', [\d.]+, [\d.]+, [\d.]+, (\d+),/);
-              if (m) {
-                const collateralAssetId = parseInt(m[1], 10);
-                const sourceSystemId = parseInt(m[2], 10);
-                const cap150 = ((collateralAssetId - 1) % 150) + 1;
-                const cap100 = ((sourceSystemId - 1) % 100) + 1;
-                st = st.replace(/^(INSERT INTO l2\.collateral_snapshot \([^)]+\) VALUES \()\d+(, '[^']+',)/, `$1${cap150}$2`);
-                st = st.replace(/(VALUES \(\d+, '[^']+', [\d.]+, [\d.]+, [\d.]+, )\d+(,)/, `$1${cap100}$2`);
-                st = st.replace(/;\s*$/, ' ON CONFLICT (collateral_asset_id, as_of_date) DO NOTHING;');
-              }
-            }
-            if (st.includes('INSERT INTO l2.facility_lob_attribution')) {
-              const m = st.match(/VALUES \((\d+), (\d+), '[^']+', (\d+),/);
-              if (m) {
-                const lobSegmentId = parseInt(m[3], 10);
-                const cap = ((lobSegmentId - 1) % 249) + 1;
-                st = st.replace(/(VALUES \(\d+, \d+, '[^']+', )\d+(,)/, `$1${cap}$2`);
-              }
+              st = st.replace(/;\s*$/, ' ON CONFLICT (collateral_asset_id, as_of_date) DO NOTHING;');
             }
             if (st.includes('INSERT INTO l2.netting_set_exposure_snapshot')) {
-              const m = st.match(/VALUES \((\d+),/);
-              if (m) {
-                const nettingSetId = parseInt(m[1], 10);
-                const cap = ((nettingSetId - 1) % 40) + 1;
-                st = st.replace(/^(INSERT INTO l2\.netting_set_exposure_snapshot \([^)]+\) VALUES \()\d+(,)/, `$1${cap}$2`);
-                st = st.replace(/;\s*$/, ' ON CONFLICT (netting_set_id, as_of_date) DO NOTHING;');
-              }
-            }
-            if (st.includes('INSERT INTO l2.facility_pricing_snapshot')) {
-              const m = st.match(/VALUES \((\d+), '[^']+', \d+, (\d+),/);
-              if (m) {
-                const facilityId = parseInt(m[1], 10);
-                const rateIndexId = parseInt(m[2], 10);
-                const capFac = ((facilityId - 1) % 405) + 1;
-                const capRate = ((rateIndexId - 1) % 10) + 1;
-                st = st.replace(/^(INSERT INTO l2\.facility_pricing_snapshot \([^)]+\) VALUES \()\d+(, '[^']+', \d+,)/, `$1${capFac}$2`);
-                st = st.replace(/(VALUES \(\d+, '[^']+', \d+, )\d+(, \d+\.?\d*,)/, `$1${capRate}$2`);
-              }
-              st = st.replace(/, '(\d+)', '([YN])',/, (_, tier, flag) => {
-                const cap = ((parseInt(tier, 10) - 1) % 10) + 1;
-                return `, 'pricing_tier_dim_${cap}', '${flag}',`;
-              });
+              st = st.replace(/;\s*$/, ' ON CONFLICT (netting_set_id, as_of_date) DO NOTHING;');
             }
             if (st.includes('INSERT INTO l2.limit_utilization_event')) {
-              const m = st.match(/VALUES \((\d+), '[^']+', (\d+),/);
-              if (m) {
-                const limitRuleId = parseInt(m[1], 10);
-                const counterpartyId = parseInt(m[2], 10);
-                const cap50 = ((limitRuleId - 1) % 50) + 1;
-                const cap100 = ((counterpartyId - 1) % 100) + 1;
-                st = st.replace(/^(INSERT INTO l2\.limit_utilization_event \([^)]+\) VALUES \()\d+(, '[^']+', \d+,)/, `$1${cap50}$2`);
-                st = st.replace(/(VALUES \(\d+, '[^']+', )\d+(, \d+,)/, `$1${cap100}$2`);
-                st = st.replace(/;\s*$/, ' ON CONFLICT (limit_rule_id, as_of_date) DO NOTHING;');
-              }
+              st = st.replace(/;\s*$/, ' ON CONFLICT (limit_rule_id, as_of_date) DO NOTHING;');
             }
             if (st.includes('INSERT INTO l2.limit_contribution_snapshot')) {
-              const m = st.match(/VALUES \((\d+), (\d+), '[^']+',/);
-              if (m) {
-                const limitRuleId = parseInt(m[1], 10);
-                const counterpartyId = parseInt(m[2], 10);
-                const cap50 = ((limitRuleId - 1) % 50) + 1;
-                const cap100 = ((counterpartyId - 1) % 100) + 1;
-                st = st.replace(/^(INSERT INTO l2\.limit_contribution_snapshot \([^)]+\) VALUES \()\d+(, \d+,)/, `$1${cap50}$2`);
-                st = st.replace(/(VALUES \(\d+, )\d+(, '[^']+',)/, `$1${cap100}$2`);
-                st = st.replace(/;\s*$/, ' ON CONFLICT (limit_rule_id, counterparty_id, as_of_date) DO NOTHING;');
-              }
-            }
-            if (st.includes('INSERT INTO l2.facility_profitability_snapshot')) {
-              const m = st.match(/VALUES \(\d+, '[^']+', [\d.]+, [\d.]+, (\d+),/);
-              if (m) {
-                const ledgerAccountId = parseInt(m[1], 10);
-                const cap = ((ledgerAccountId - 1) % 10) + 1;
-                st = st.replace(/(VALUES \(\d+, '[^']+', [\d.]+, [\d.]+, )\d+(,)/, `$1${cap}$2`);
-              }
+              st = st.replace(/;\s*$/, ' ON CONFLICT (limit_rule_id, counterparty_id, as_of_date) DO NOTHING;');
             }
             const facilityDateConflictTables = [
               'facility_financial_snapshot',
@@ -238,24 +146,6 @@ async function main() {
                 st = st.replace(/;\s*$/, ' ON CONFLICT (facility_id, as_of_date) DO NOTHING;');
                 break;
               }
-            }
-          }
-          if (f === '04-l2-seed.sql' && st.includes('INSERT INTO l2.position')) {
-            const m = st.match(/VALUES\s*\((\d+),/);
-            if (m) {
-              const positionId = parseInt(m[1], 10);
-              const cap = ((positionId - 1) % 100) + 1;
-              // 4th value = instrument_id, 8th = source_system_id, last = product_node_id
-              st = st.replace(
-                /^(INSERT INTO l2\.position \([^)]+\) VALUES \(\d+, '[^']+', \d+, )\d+(,)/,
-                `$1${cap}$2`
-              );
-              st = st.replace(/, (\d+)\);\s*$/, `, ${cap});`);
-              // source_system_id is the first number after currency_code (first ", 'CCC', N, N,")
-              st = st.replace(
-                /, '([A-Z]{3})', (\d+), (\d+),/,
-                (_, cur, _sys, next) => `, '${cur}', ${cap}, ${next},`
-              );
             }
           }
           try {

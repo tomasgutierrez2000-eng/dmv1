@@ -14,6 +14,11 @@
 import type { TableData, SqlRow } from './types';
 import * as fs from 'fs';
 import * as path from 'path';
+import {
+  formatSqlValue as sharedFormatSqlValue,
+  quoteColumn,
+  PG_RESERVED_WORDS,
+} from '../../../lib/sql-value-formatter';
 
 // ─── Connection Helper ─────────────────────────────────────────────────
 
@@ -39,43 +44,15 @@ function loadEnv(): string | undefined {
 
 // ─── SQL Value Formatting ──────────────────────────────────────────────
 
+// Use shared module for consistent formatting across factory pipeline.
+// The shared formatSqlValue takes (columnName, value) — wrapper adapts the
+// legacy (value, columnName?) signature used by DBWriter callers.
 function formatSqlValue(value: unknown, columnName?: string): string {
-  if (value === null || value === undefined) return 'NULL';
-  if (typeof value === 'boolean') {
-    // _flag columns use 'Y'/'N' convention in the DDL
-    if (columnName && columnName.endsWith('_flag')) {
-      return value ? "'Y'" : "'N'";
-    }
-    return value ? 'TRUE' : 'FALSE';
-  }
-  if (typeof value === 'number') {
-    if (!isFinite(value)) return 'NULL';
-    return String(value);
-  }
-  if (value instanceof Date) {
-    return `'${value.toISOString().slice(0, 10)}'`;
-  }
-  const str = String(value).replace(/'/g, "''");
-  return `'${str}'`;
-}
-
-/** Check if a column name is a PostgreSQL reserved word that needs quoting. */
-function needsQuoting(col: string): boolean {
-  const reserved = new Set([
-    'value', 'all', 'and', 'array', 'as', 'between', 'case', 'check',
-    'column', 'constraint', 'create', 'cross', 'default', 'distinct',
-    'do', 'else', 'end', 'except', 'false', 'fetch', 'for', 'foreign',
-    'from', 'full', 'grant', 'group', 'having', 'in', 'inner', 'into',
-    'is', 'join', 'leading', 'left', 'like', 'limit', 'not', 'null',
-    'offset', 'on', 'only', 'or', 'order', 'outer', 'primary',
-    'references', 'right', 'select', 'table', 'then', 'to', 'true',
-    'union', 'unique', 'user', 'using', 'when', 'where', 'window', 'with',
-  ]);
-  return reserved.has(col.toLowerCase());
+  return sharedFormatSqlValue(columnName ?? '', value);
 }
 
 function quoteCol(col: string): string {
-  return needsQuoting(col) ? `"${col}"` : col;
+  return quoteColumn(col);
 }
 
 // ─── DB Writer Class ───────────────────────────────────────────────────
@@ -365,19 +342,9 @@ export function writeToSqlFile(tables: TableData[], outputPath: string, generate
   lines.push('');
   lines.push('SET search_path TO l1, l2, public;');
   lines.push('');
-  // Prerequisite country/currency dim inserts for factory-generated counterparties
-  lines.push("-- Factory prerequisite: additional country_dim entries");
-  lines.push("INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('BR', 'Brazil', 'Y', 'AMER', '50%', 'N', 'N', 'N', 'BRA', '076', 11) ON CONFLICT (country_code) DO NOTHING;");
-  lines.push("INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('IN', 'India', 'Y', 'APAC', '50%', 'N', 'N', 'N', 'IND', '356', 12) ON CONFLICT (country_code) DO NOTHING;");
-  lines.push("INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('MX', 'Mexico', 'Y', 'AMER', '50%', 'N', 'N', 'N', 'MEX', '484', 13) ON CONFLICT (country_code) DO NOTHING;");
-  lines.push("INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('AE', 'United Arab Emirates', 'Y', 'EMEA', '50%', 'N', 'N', 'N', 'ARE', '784', 14) ON CONFLICT (country_code) DO NOTHING;");
-  lines.push("INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('KR', 'South Korea', 'Y', 'APAC', '0%', 'Y', 'N', 'N', 'KOR', '410', 15) ON CONFLICT (country_code) DO NOTHING;");
-  lines.push("INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('HK', 'Hong Kong', 'Y', 'APAC', '0%', 'Y', 'N', 'N', 'HKG', '344', 16) ON CONFLICT (country_code) DO NOTHING;");
-  lines.push("INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('BRL', 'Brazilian Real', 'R$', 'Y', '986', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;");
-  lines.push("INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('INR', 'Indian Rupee', 'Rs', 'Y', '356', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;");
-  lines.push("INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('MXN', 'Mexican Peso', 'Mex$', 'Y', '484', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;");
-  lines.push("INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('AED', 'UAE Dirham', 'AED', 'Y', '784', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;");
-  lines.push("INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('KRW', 'South Korean Won', 'W', 'Y', '410', 0, 'N') ON CONFLICT (currency_code) DO NOTHING;");
+  // Factory prerequisite data — single source of truth in factory-prerequisites.ts
+  const { emitPrerequisiteSql } = require('../factory-prerequisites');
+  lines.push(emitPrerequisiteSql());
   lines.push('');
 
   for (const td of tables) {

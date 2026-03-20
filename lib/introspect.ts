@@ -139,14 +139,23 @@ export function schemaToLayer(schema: string): 'L1' | 'L2' | 'L3' {
 /**
  * Run the 4 information_schema queries against PostgreSQL.
  * Accepts any client with a `.query()` method matching the pg.Client interface.
+ *
+ * @param tableNames — optional list of table names to restrict introspection to.
+ *   When provided, only these tables (and their FK relationships) are queried.
+ *   Omit for full introspection of all l1/l2/l3 tables.
  */
 export async function introspectDatabase(
   client: { query: <T>(sql: string) => Promise<{ rows: T[] }> },
+  tableNames?: string[],
 ): Promise<IntrospectedData> {
+  const tableFilter = tableNames?.length
+    ? ` AND table_name IN (${tableNames.map(t => `'${t}'`).join(',')})`
+    : '';
+
   const tablesResult = await client.query<{ table_schema: string; table_name: string }>(
     `SELECT table_schema, table_name
      FROM information_schema.tables
-     WHERE table_schema IN ('l1','l2','l3') AND table_type = 'BASE TABLE'
+     WHERE table_schema IN ('l1','l2','l3') AND table_type = 'BASE TABLE'${tableFilter}
      ORDER BY table_schema, table_name`
   );
 
@@ -155,7 +164,7 @@ export async function introspectDatabase(
             character_maximum_length, numeric_precision, numeric_scale,
             is_nullable, column_default, ordinal_position, udt_name
      FROM information_schema.columns
-     WHERE table_schema IN ('l1','l2','l3')
+     WHERE table_schema IN ('l1','l2','l3')${tableFilter}
      ORDER BY table_schema, table_name, ordinal_position`
   );
 
@@ -164,7 +173,7 @@ export async function introspectDatabase(
      FROM information_schema.table_constraints tc
      JOIN information_schema.key_column_usage kcu
        ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
-     WHERE tc.constraint_type = 'PRIMARY KEY' AND tc.table_schema IN ('l1','l2','l3')
+     WHERE tc.constraint_type = 'PRIMARY KEY' AND tc.table_schema IN ('l1','l2','l3')${tableFilter.replace(/table_name/g, 'tc.table_name')}
      ORDER BY tc.table_schema, tc.table_name, kcu.ordinal_position`
   );
 
@@ -176,7 +185,7 @@ export async function introspectDatabase(
        ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
      JOIN information_schema.constraint_column_usage ccu
        ON tc.constraint_name = ccu.constraint_name AND tc.constraint_schema = ccu.constraint_schema
-     WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_schema IN ('l1','l2','l3')
+     WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_schema IN ('l1','l2','l3')${tableFilter.replace(/table_name/g, 'tc.table_name')}
      ORDER BY tc.table_schema, tc.table_name, kcu.column_name`
   );
 
@@ -452,6 +461,7 @@ export function mergeIntoDataDictionary(
 export async function runIntrospection(
   dd: DataDictionary,
   databaseUrl: string,
+  tableNames?: string[],
 ): Promise<IntrospectReport> {
   let pg: typeof import('pg');
   try {
@@ -468,7 +478,7 @@ export async function runIntrospection(
   await client.connect();
 
   try {
-    const introspected = await introspectDatabase(client);
+    const introspected = await introspectDatabase(client, tableNames);
     return mergeIntoDataDictionary(dd, introspected);
   } finally {
     await client.end();

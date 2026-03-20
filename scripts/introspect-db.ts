@@ -82,7 +82,15 @@ async function main() {
     process.exit(1);
   }
 
-  console.log('\n  Introspecting PostgreSQL database...\n');
+  // Parse --tables flag for incremental introspection
+  const tablesArg = process.argv.find(a => a.startsWith('--tables='));
+  const tableNames = tablesArg ? tablesArg.replace('--tables=', '').split(',').map(t => t.trim()).filter(Boolean) : undefined;
+
+  if (tableNames?.length) {
+    console.log(`\n  Incremental introspection: ${tableNames.length} table(s): ${tableNames.join(', ')}\n`);
+  } else {
+    console.log('\n  Introspecting PostgreSQL database...\n');
+  }
 
   // Read existing data dictionary (preserve descriptions, categories, etc.)
   const DD_PATH = path.resolve(__dirname, '../facility-summary-mvp/output/data-dictionary/data-dictionary.json');
@@ -96,7 +104,9 @@ async function main() {
   }
 
   // Run introspection via the shared library
-  const report = await runIntrospection(dd, databaseUrl);
+  const startMs = Date.now();
+  const report = await runIntrospection(dd, databaseUrl, tableNames);
+  console.log(`  Introspection completed in ${Date.now() - startMs}ms`);
 
   // Write updated data dictionary
   const ddDir = path.dirname(DD_PATH);

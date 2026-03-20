@@ -72,7 +72,8 @@ export function readDataDictionary(): DataDictionary | null {
   try {
     const raw = fs.readFileSync(p, 'utf-8');
     return JSON.parse(raw) as DataDictionary;
-  } catch {
+  } catch (err) {
+    console.error(`[data-dictionary] Failed to parse ${p}:`, err instanceof Error ? err.message : err);
     return null;
   }
 }

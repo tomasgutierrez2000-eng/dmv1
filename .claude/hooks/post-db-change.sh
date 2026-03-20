@@ -50,8 +50,24 @@ if [ "$MATCHED" = true ]; then
     exit 0
   fi
 
-  echo "  [hook] DB schema change detected — syncing data dictionary..."
-  npm run db:introspect 2>&1 | tail -5
+  # Extract table names from DDL commands for incremental introspection
+  TABLES=$(echo "$CMD" | python3 -c "
+import sys, re
+cmd = sys.stdin.read()
+tables = set()
+for m in re.finditer(r'(?:CREATE|ALTER|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:l[123]\.)?(\w+)', cmd, re.IGNORECASE):
+    tables.add(m.group(1))
+if tables:
+    print(','.join(sorted(tables)))
+" 2>/dev/null)
+
+  if [ -n "$TABLES" ]; then
+    echo "  [hook] Incremental introspection for: $TABLES"
+    npm run db:introspect -- --tables="$TABLES" 2>&1 | tail -5
+  else
+    echo "  [hook] DB schema change detected — syncing data dictionary..."
+    npm run db:introspect 2>&1 | tail -5
+  fi
   echo "  [hook] Data dictionary synced."
 
   # Auto-sync changes to postgres_capital (silent if capital DB is unavailable)

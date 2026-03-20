@@ -7,26 +7,7 @@
  */
 
 import type { DataModel, TableDef, Field } from '../types/model';
-
-// PostgreSQL reserved words that must be quoted when used as identifiers
-const PG_RESERVED = new Set([
-  'all', 'analyse', 'analyze', 'and', 'any', 'array', 'as', 'asc', 'asymmetric',
-  'authorization', 'between', 'bigint', 'binary', 'bit', 'boolean', 'both', 'case',
-  'cast', 'char', 'character', 'check', 'coalesce', 'collate', 'column', 'constraint',
-  'create', 'cross', 'current_date', 'current_role', 'current_time', 'current_timestamp',
-  'current_user', 'dec', 'decimal', 'default', 'deferrable', 'desc', 'distinct', 'do',
-  'else', 'end', 'except', 'exists', 'extract', 'false', 'fetch', 'float', 'for',
-  'foreign', 'freeze', 'from', 'full', 'grant', 'group', 'having', 'ilike', 'in',
-  'initially', 'inner', 'inout', 'int', 'integer', 'intersect', 'interval', 'into',
-  'is', 'isnull', 'join', 'leading', 'left', 'like', 'limit', 'localtime',
-  'localtimestamp', 'natural', 'nchar', 'new', 'none', 'not', 'notnull', 'null',
-  'nullif', 'numeric', 'off', 'offset', 'old', 'on', 'only', 'or', 'order', 'out',
-  'outer', 'overlaps', 'overlay', 'placing', 'position', 'precision', 'primary',
-  'real', 'references', 'returning', 'right', 'row', 'select', 'session_user',
-  'setof', 'similar', 'smallint', 'some', 'substring', 'symmetric', 'table', 'then',
-  'time', 'timestamp', 'to', 'trailing', 'treat', 'trim', 'true', 'union', 'unique',
-  'user', 'using', 'values', 'varchar', 'variadic', 'verbose', 'when', 'where', 'with',
-]);
+import { PG_RESERVED_WORDS as PG_RESERVED } from '../lib/sql-value-formatter';
 
 /** Infer PostgreSQL type from field metadata. */
 function sqlTypeForField(field: Field): string {

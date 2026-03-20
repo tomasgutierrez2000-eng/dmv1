@@ -17,6 +17,8 @@
     "generate:fk": "tsx scripts/generate-fk-ddl.ts",
     "metric:status": "tsx scripts/metric-status-report.ts",
     "populate:metric-value-fact": "tsx scripts/populate-metric-value-fact.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:metrics": "tsx scripts/test-metrics.ts",
     "test:calc-engine": "tsx scripts/test-calculation-engine.ts",
     "release-tracker:sync": "tsx scripts/release-tracker-sync.ts",
@@ -30,6 +32,8 @@
     "db:verify-gsib": "tsx scripts/verify-gsib-load.ts",
     "db:verify-scenarios": "tsx scripts/verify-cro-scenarios.ts",
     "db:migrate": "tsx scripts/migrate-database.ts",
+    "db:run-migrations": "tsx scripts/run-migrations.ts",
+    "db:migration-status": "tsx scripts/run-migrations.ts --status",
     "db:introspect": "tsx scripts/introspect-db.ts",
     "db:sync-capital": "tsx scripts/sync-capital-db.ts",
     "sync:all": "tsx scripts/sync-all.ts",
@@ -73,18 +77,18 @@
     "framer-motion": "^11.0.0",
     "jszip": "^3.10.1",
     "lucide-react": "^0.344.0",
-    "next": "^14.2.0",
+    "next": "^15.5.14",
     "openai": "^6.25.0",
     "pg": "^8.11.3",
     "pg-copy-streams": "^7.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "recharts": "^2.10.3",
+    "recharts": "^3.8.0",
     "sql.js": "^1.14.0",
     "xlsx": "^0.18.5",
     "yaml": "^2.8.2",
     "yargs": "^18.0.0",
-    "zustand": "^4.5.7"
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
@@ -96,10 +100,11 @@
     "@types/yargs": "^17.0.35",
     "autoprefixer": "^10.4.0",
     "eslint": "^8.56.0",
-    "eslint-config-next": "^14.2.0",
+    "eslint-config-next": "^15.5.14",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "vitest": "^4.1.0"
   }
 }

@@ -41,6 +41,62 @@ import { generateProvisionRows } from './provision';
 import { generateStressTestRows } from './stress-test';
 import { generateProductTableRows } from './product-tables';
 
+// ─── Generator Dependency Declarations ────────────────────────────────
+//
+// Each generator declares its name and which other generators must run first.
+// The orchestrator validates execution order against these declarations.
+
+export interface GeneratorDef {
+  /** Unique name matching the execution step. */
+  name: string;
+  /** Names of generators that MUST run before this one. */
+  dependsOn: string[];
+}
+
+/**
+ * Static registry of all generators and their dependencies.
+ * Order here matches intended execution order in generateV2Data().
+ */
+export const GENERATOR_REGISTRY: GeneratorDef[] = [
+  { name: 'exposure',              dependsOn: [] },
+  { name: 'pricing',               dependsOn: [] },
+  { name: 'risk',                  dependsOn: [] },
+  { name: 'financial',             dependsOn: [] },
+  { name: 'position',              dependsOn: [] },
+  { name: 'product-tables',        dependsOn: ['position'] },  // reads positionIdMap from position generator
+  { name: 'delinquency',           dependsOn: [] },
+  { name: 'rating',                dependsOn: [] },
+  { name: 'collateral',            dependsOn: [] },
+  { name: 'profitability',         dependsOn: [] },
+  { name: 'events',                dependsOn: [] },
+  { name: 'limits',                dependsOn: [] },
+  { name: 'pipeline',              dependsOn: [] },
+  { name: 'cp-financial',          dependsOn: [] },
+  { name: 'stress-test',           dependsOn: [] },
+];
+
+/**
+ * Validate that the declared execution order respects all dependency constraints.
+ * Throws if any generator runs before a generator it depends on.
+ */
+export function validateGeneratorOrder(registry: GeneratorDef[]): void {
+  const executed = new Set<string>();
+  for (const gen of registry) {
+    for (const dep of gen.dependsOn) {
+      if (!executed.has(dep)) {
+        throw new Error(
+          `Generator "${gen.name}" depends on "${dep}" but "${dep}" has not run yet. ` +
+          `Reorder GENERATOR_REGISTRY so "${dep}" appears before "${gen.name}".`
+        );
+      }
+    }
+    executed.add(gen.name);
+  }
+}
+
+// Validate at module load time — catches ordering bugs immediately
+validateGeneratorOrder(GENERATOR_REGISTRY);
+
 // ─── Configuration ─────────────────────────────────────────────────────
 
 export interface V2GeneratorConfig {

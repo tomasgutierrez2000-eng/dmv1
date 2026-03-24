@@ -49,6 +49,8 @@ interface CliArgs {
   endDate: string;         // Time series end date
   deterministic: boolean;  // Freeze metadata timestamps for deterministic output
   skipQualityControls: boolean; // Skip L1-driven quality controls
+  failFast: boolean;       // Stop on first critical error (schema drift, validation failure)
+  reconcile: boolean;      // Reconcile ID registry against PostgreSQL MAX(pk) values
 }
 
 const DEFAULT_START = '2024-07-01';
@@ -69,6 +71,8 @@ function parseArgs(): CliArgs {
     endDate: DEFAULT_END,
     deterministic: false,
     skipQualityControls: false,
+    failFast: false,
+    reconcile: false,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -105,6 +109,13 @@ function parseArgs(): CliArgs {
       case '--skip-quality-controls':
       case '--skip-qc':
         result.skipQualityControls = true;
+        break;
+      case '--fail-fast':
+      case '--ff':
+        result.failFast = true;
+        break;
+      case '--reconcile':
+        result.reconcile = true;
         break;
       case '--frequency':
       case '-f':
@@ -279,6 +290,35 @@ async function main() {
   const registryPath = path.join(__dirname, '..', 'config', 'id-registry.json');
   const registry = new IDRegistry(registryPath);
 
+  // Reconcile registry against PostgreSQL MAX(pk) values
+  if (args.reconcile && process.env.DATABASE_URL) {
+    try {
+      // Dynamic import to avoid hard dependency on pg when not reconciling
+      const pg = await import('pg');
+      const PgClient = (pg as any).default?.Client ?? (pg as any).Client;
+      const client = new PgClient({ connectionString: process.env.DATABASE_URL });
+      await client.connect();
+      console.log('Reconciling ID registry against PostgreSQL...');
+      const changes = await registry.reconcileFromDatabase(client);
+      await client.end();
+      if (changes.length > 0) {
+        console.log(`Registry reconciled: ${changes.length} table(s) updated`);
+        if (args.verbose) {
+          for (const c of changes) {
+            console.log(`  ${c.table}: ${c.before} → ${c.after}`);
+          }
+        }
+      } else {
+        console.log('Registry reconciled: all nextId values already current');
+      }
+    } catch (err) {
+      console.log(`Warning: Registry reconciliation failed: ${err instanceof Error ? err.message : String(err)}`);
+      console.log('  Continuing with existing registry state.');
+    }
+  } else if (args.reconcile && !process.env.DATABASE_URL) {
+    console.log('Warning: --reconcile requires DATABASE_URL to be set. Skipping.');
+  }
+
   // Load L1 reference data registry (for quality controls)
   let refRegistry: ReferenceDataRegistry | undefined;
   if (!args.skipQualityControls) {
@@ -392,6 +432,10 @@ async function main() {
             console.log(`     ... and ${schemaCheck.errors.length - 10} more`);
           }
           allValid = false;
+          if (args.failFast) {
+            console.log(`   --fail-fast: stopping on schema drift error.`);
+            process.exit(1);
+          }
           continue; // Skip this scenario — column names don't match PG
         }
       }
@@ -407,6 +451,10 @@ async function main() {
           console.log(`     ... and ${validation.errors.length - 5} more`);
         }
         allValid = false;
+        if (args.failFast) {
+          console.log(`   --fail-fast: stopping on validation error.`);
+          process.exit(1);
+        }
         continue; // Skip this scenario — do not write bad data
       }
       if (validation.warnings.length > 0) {
@@ -432,6 +480,10 @@ async function main() {
             console.log(`     ... and ${qcErrorCount - 5} more`);
           }
           allValid = false;
+          if (args.failFast) {
+            console.log(`   --fail-fast: stopping on quality control error.`);
+            process.exit(1);
+          }
           continue;
         }
         if (qcWarnCount > 0) {
@@ -492,6 +544,10 @@ async function main() {
         console.log(`   ${err.stack.split('\n').slice(1, 4).join('\n   ')}`);
       }
       allValid = false;
+      if (args.failFast) {
+        console.log(`   --fail-fast: stopping on error.`);
+        process.exit(1);
+      }
     }
   }
 

@@ -2053,13 +2053,6 @@
           "data_type": "VARCHAR(2000)"
         },
         {
-          "name": "parent_leaf",
-          "description": "Flag: PARENT or LEAF",
-          "category": "Counterparty & Entity",
-          "why_required": "Distinguishes rollup nodes from terminal booking nodes",
-          "data_type": "VARCHAR(64)"
-        },
-        {
           "name": "requestor",
           "description": "Name or ID of person who requested the node or change",
           "category": "Counterparty & Entity",
@@ -2234,13 +2227,6 @@
           "category": "Counterparty & Entity",
           "why_required": "Detailed context for reporting and regulatory mapping",
           "data_type": "VARCHAR(2000)"
-        },
-        {
-          "name": "parent_leaf",
-          "description": "Flag: PARENT or LEAF",
-          "category": "Counterparty & Entity",
-          "why_required": "Distinguishes rollup nodes from terminal booking nodes",
-          "data_type": "VARCHAR(64)"
         },
         {
           "name": "requestor",

@@ -352,7 +352,7 @@ export function writeToSqlFile(tables: TableData[], outputPath: string, generate
       lines.push(`INSERT INTO ${td.schema}.${td.table} (${colList}) VALUES`);
 
       const valueSets = batch.map((row, i) => {
-        const vals = columns.map(col => formatSqlValue(row[col]));
+        const vals = columns.map(col => formatSqlValue(row[col], col));
         const comma = i < batch.length - 1 ? ',' : '';
         return `(${vals.join(', ')})${comma}`;
       });

@@ -220,9 +220,9 @@ export function initializeFacilityState(
 
   return {
     // Identity
-    facility_id: facility.facility_id,
-    counterparty_id: counterparty.counterparty_id,
-    credit_agreement_id: facility.credit_agreement_id,
+    facility_id: String(facility.facility_id),
+    counterparty_id: String(counterparty.counterparty_id),
+    credit_agreement_id: String(facility.credit_agreement_id),
     product_type: productType,
     currency_code: facility.currency_code,
     facility_type_code: facility.facility_type,
@@ -309,7 +309,7 @@ export function initializeFacilityState(
  */
 export function generateCounterpartyFinancials(
   rng: () => number,
-  counterpartyId: number,
+  counterpartyId: string,
   facilities: FacilityState[],
   tier: RatingTier,
   storyArc: StoryArc,
@@ -504,34 +504,48 @@ export function evolveFacilityState(
 export class FacilityStateManager {
   private stateMap: FacilityStateMap = new Map();
   private counterpartyFinancials: Map<string, CounterpartyFinancials> = new Map();
-  private facilityStates: Map<number, FacilityState> = new Map(); // Current state per facility
+  private facilityStates: Map<string, FacilityState> = new Map(); // Current state per facility
 
   /**
    * Initialize all facility states from L1 chain data.
    */
   initialize(
     chain: L1Chain,
-    storyArcMap: Map<number, StoryArc>,
-    ratingTierMap: Map<number, RatingTier>,
-    sizeProfileMap: Map<number, SizeProfile>,
+    storyArcMap: Map<string, StoryArc>,
+    ratingTierMap: Map<string, RatingTier>,
+    sizeProfileMap: Map<string, SizeProfile>,
     initialDate: string,
   ): void {
     for (const facility of chain.facilities) {
       const counterparty = chain.counterparties.find(
-        c => c.counterparty_id === facility.counterparty_id,
+        c => String(c.counterparty_id) === String(facility.counterparty_id),
       );
       if (!counterparty) continue;
 
-      const arc = storyArcMap.get(facility.counterparty_id) ?? 'STABLE_IG';
-      const tier = ratingTierMap.get(facility.counterparty_id) ?? 'IG_MID';
-      const size = sizeProfileMap.get(facility.counterparty_id) ?? 'MID';
+      const cpId = String(facility.counterparty_id);
+      const arc = storyArcMap.get(cpId) ?? 'STABLE_IG';
+      const tier = ratingTierMap.get(cpId) ?? 'IG_MID';
+      const size = sizeProfileMap.get(cpId) ?? 'MID';
 
       const state = initializeFacilityState(
         facility, counterparty, arc, tier, size, initialDate,
       );
 
-      this.facilityStates.set(facility.facility_id, state);
+      this.facilityStates.set(String(facility.facility_id), state);
       this.stateMap.set(stateKey(facility.facility_id, initialDate), state);
+    }
+
+    // ── State initialization completeness audit ──
+    const uninitializedFacs = chain.facilities.filter(
+      f => !this.facilityStates.has(String(f.facility_id))
+    );
+    if (uninitializedFacs.length > 0) {
+      console.warn(
+        `[STATE_INIT] ${uninitializedFacs.length}/${chain.facilities.length} facilities were not initialized in state manager`
+      );
+      for (const f of uninitializedFacs.slice(0, 5)) {
+        console.warn(`  - facility ${f.facility_id}: counterparty ${f.counterparty_id}`);
+      }
     }
   }
 
@@ -546,7 +560,7 @@ export class FacilityStateManager {
     frequency: TimeFrequency,
   ): void {
     // Group facilities by counterparty for financial computation
-    const counterpartyFacilities = new Map<number, FacilityState[]>();
+    const counterpartyFacilities = new Map<string, FacilityState[]>();
     for (const [, state] of Array.from(this.facilityStates)) {
       const cpId = state.counterparty_id;
       if (!counterpartyFacilities.has(cpId)) {
@@ -611,7 +625,7 @@ export class FacilityStateManager {
   }
 
   /** Get current state for a facility. */
-  getCurrentState(facilityId: number): FacilityState | undefined {
+  getCurrentState(facilityId: string): FacilityState | undefined {
     return this.facilityStates.get(facilityId);
   }
 
@@ -621,7 +635,7 @@ export class FacilityStateManager {
   }
 
   /** Get counterparty financials for a date. */
-  getFinancials(counterpartyId: number, date: string): CounterpartyFinancials | undefined {
+  getFinancials(counterpartyId: string, date: string): CounterpartyFinancials | undefined {
     return this.counterpartyFinancials.get(`${counterpartyId}|${date}`);
   }
 

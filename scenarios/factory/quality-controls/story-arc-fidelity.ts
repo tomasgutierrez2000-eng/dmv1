@@ -19,14 +19,14 @@ export function runStoryArcChecks(
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  const cpArcs = new Map<number, StoryArc>();
+  const cpArcs = new Map<string, StoryArc>();
   for (let i = 0; i < config.counterparties.length; i++) {
     const cp = chain.counterparties[i];
     if (cp) cpArcs.set(cp.counterparty_id, config.counterparties[i].story_arc);
   }
 
   // Collect time-series per facility
-  const facilityTS = new Map<number, Array<{
+  const facilityTS = new Map<string, Array<{
     date: string; drawn: number; committed: number;
     pd?: number; credit_status_code?: number; spread_bps?: number;
   }>>();
@@ -34,7 +34,7 @@ export function runStoryArcChecks(
   const exposureTable = findTable(output, 'facility_exposure_snapshot');
   if (exposureTable) {
     for (const row of exposureTable.rows) {
-      const fid = row.facility_id as number;
+      const fid = row.facility_id as string;
       if (!facilityTS.has(fid)) facilityTS.set(fid, []);
       facilityTS.get(fid)!.push({
         date: row.as_of_date as string,
@@ -49,7 +49,7 @@ export function runStoryArcChecks(
   const riskTable = findTable(output, 'facility_risk_snapshot');
   if (riskTable) {
     for (const row of riskTable.rows) {
-      const fid = row.facility_id as number;
+      const fid = row.facility_id as string;
       const date = row.as_of_date as string;
       const entry = facilityTS.get(fid)?.find(e => e.date === date);
       if (entry) entry.pd = entry.pd ?? (row.pd_pct as number | undefined);
@@ -60,7 +60,7 @@ export function runStoryArcChecks(
   const pricingTable = findTable(output, 'facility_pricing_snapshot');
   if (pricingTable) {
     for (const row of pricingTable.rows) {
-      const fid = row.facility_id as number;
+      const fid = row.facility_id as string;
       const date = row.as_of_date as string;
       const entry = facilityTS.get(fid)?.find(e => e.date === date);
       if (entry) entry.spread_bps = entry.spread_bps ?? (row.spread_bps as number | undefined);
@@ -69,11 +69,11 @@ export function runStoryArcChecks(
 
   // Credit events by counterparty
   const eventTable = findTable(output, 'credit_event');
-  const cpHasDefaultEvent = new Set<number>();
-  const cpHasAnyEvent = new Set<number>();
+  const cpHasDefaultEvent = new Set<string>();
+  const cpHasAnyEvent = new Set<string>();
   if (eventTable) {
     for (const row of eventTable.rows) {
-      const cpId = row.counterparty_id as number;
+      const cpId = row.counterparty_id as string;
       cpHasAnyEvent.add(cpId);
       const eventType = row.credit_event_type_code as number;
       if (typeof eventType === 'number' && eventType <= 7) cpHasDefaultEvent.add(cpId);

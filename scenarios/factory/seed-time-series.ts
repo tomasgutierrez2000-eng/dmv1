@@ -155,8 +155,6 @@ async function readSeedChainFromPG(): Promise<L1Chain> {
           k.endsWith('_value') || k === 'pd_annual' || k === 'lgd_unsecured'
         )) {
           out[k] = parseFloat(v);
-        } else if (v !== null && typeof v === 'string' && k.endsWith('_id') && !isNaN(Number(v))) {
-          out[k] = Number(v);
         } else {
           out[k] = v;
         }
@@ -183,16 +181,16 @@ async function readSeedChainFromPG(): Promise<L1Chain> {
  * Uses internal_risk_rating and pd_annual to determine the narrative.
  */
 function assignStoryArcs(chain: L1Chain): {
-  storyArcs: Map<number, StoryArc>;
-  ratingTiers: Map<number, RatingTier>;
-  sizeProfiles: Map<number, SizeProfile>;
+  storyArcs: Map<string, StoryArc>;
+  ratingTiers: Map<string, RatingTier>;
+  sizeProfiles: Map<string, SizeProfile>;
 } {
-  const storyArcs = new Map<number, StoryArc>();
-  const ratingTiers = new Map<number, RatingTier>();
-  const sizeProfiles = new Map<number, SizeProfile>();
+  const storyArcs = new Map<string, StoryArc>();
+  const ratingTiers = new Map<string, RatingTier>();
+  const sizeProfiles = new Map<string, SizeProfile>();
 
   // Build facility map for size estimation
-  const cpFacilityAmts = new Map<number, number>();
+  const cpFacilityAmts = new Map<string, number>();
   for (const fac of chain.facilities) {
     const amt = Number(fac.committed_facility_amt) || 0;
     cpFacilityAmts.set(
@@ -225,7 +223,7 @@ function assignStoryArcs(chain: L1Chain): {
 
     // Story arc: distribute across counterparties for diverse time-series
     // Use modulo-based assignment for deterministic, balanced distribution
-    const arcIndex = id % 6;
+    const arcIndex = Number(id) % 6;
     const arcs: StoryArc[] = [
       'STABLE_IG',           // ~17% — investment grade, steady
       'STEADY_HY',           // ~17% — high yield, steady

@@ -8,7 +8,7 @@ import type { IDRegistry } from '../../id-registry';
 
 export function generateRatingRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
   registry: IDRegistry,
 ): SqlRow[] {

@@ -43,6 +43,7 @@ describe('LTV edge cases', () => {
 
 describe('Financial ratio clamping', () => {
   const financials: CounterpartyFinancials = {
+    counterparty_id: '1',
     revenue: 0,
     ebitda: -500000, // Negative EBITDA
     total_debt: 1000000,
@@ -51,7 +52,7 @@ describe('Financial ratio clamping', () => {
     current_assets: 500000,
     current_liabilities: 400000,
     net_income: -200000,
-  };
+  } as unknown as CounterpartyFinancials;
 
   test('negative EBITDA produces clamped DSCR (>= -10)', () => {
     const result = applyDerivedMetrics(

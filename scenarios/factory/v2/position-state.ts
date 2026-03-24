@@ -58,8 +58,8 @@ export class PositionStateManager {
   }
 
   /** Get all unique position IDs. */
-  getPositionIds(): number[] {
-    const ids = new Set<number>();
+  getPositionIds(): string[] {
+    const ids = new Set<string>();
     for (const state of this.stateMap.values()) {
       ids.add(state.position_id);
     }

@@ -104,8 +104,8 @@ export interface FacilityEvent {
   description: string;
   severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   triggered_by: string;
-  facility_ids: number[];
-  counterparty_id: number;
+  facility_ids: string[];
+  counterparty_id: string;
 }
 
 // ─── Amortization ───────────────────────────────────────────────────────
@@ -173,7 +173,7 @@ export interface TimeSeriesConfig {
 // ─── Counterparty Financial Model ───────────────────────────────────────
 
 export interface CounterpartyFinancials {
-  counterparty_id: number;
+  counterparty_id: string;
   total_revenue: number;
   ebitda: number;
   net_income: number;
@@ -193,9 +193,9 @@ export interface CounterpartyFinancials {
 
 export interface FacilityState {
   // ── Identity ──
-  facility_id: number;
-  counterparty_id: number;
-  credit_agreement_id: number;
+  facility_id: string;
+  counterparty_id: string;
+  credit_agreement_id: string;
   product_type: ProductType;
   currency_code: string;
   facility_type_code: string;   // Original type code from L1
@@ -283,7 +283,7 @@ export interface FacilityState {
 export type FacilityStateMap = Map<string, FacilityState>;
 
 /** Make a state map key. */
-export function stateKey(facilityId: number, date: string): string {
+export function stateKey(facilityId: string | number, date: string): string {
   return `${facilityId}|${date}`;
 }
 

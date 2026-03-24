@@ -199,8 +199,8 @@ export function determineTransition(
 // ─── Maturity Wall Detection ───────────────────────────────────────────
 
 export interface MaturityWallEntry {
-  facilityId: number;
-  counterpartyId: number;
+  facilityId: string;
+  counterpartyId: string;
   maturityDate: string;
   drawnAmount: number;
   committedAmount: number;

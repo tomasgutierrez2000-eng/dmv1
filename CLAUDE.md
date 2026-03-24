@@ -16,9 +16,9 @@ In QA mode, flag any code that doesn't match DESIGN.md.
 Banking data model visualization platform with metrics calculation engine. Next.js 14 App Router, TypeScript, Tailwind CSS, Zustand, Recharts. PostgreSQL + sql.js for calculations.
 
 ## Architecture: Three-Layer Data Model
-- **L1 — Reference Data (75 tables):** Dimensions, masters, lookups, hierarchies, configuration. Rarely changes. Examples: `counterparty`, `facility_master`, `currency_dim`, `metric_threshold`
-- **L2 — Atomic Data (102 tables):** Raw source-system snapshots and events. Point-in-time observations, not computed. Examples: `facility_exposure_snapshot`, `credit_event`, `position`
-- **L3 — Derived Data (76 tables):** Anything calculated, aggregated, or computed from L1+L2. Examples: `exposure_metric_cube`, `facility_financial_calc`, `stress_test_result`
+- **L1 — Reference Data (75 tables):** Dimensions, lookups, hierarchies, configuration. Rarely changes. Examples: `currency_dim`, `metric_threshold`, `enterprise_business_taxonomy`, `rating_scale_dim`
+- **L2 — Atomic Data (102 tables):** Raw source-system snapshots, events, and master tables. Point-in-time observations, not computed. Examples: `counterparty`, `facility_master`, `credit_agreement_master`, `facility_exposure_snapshot`, `credit_event`, `position`
+- **L3 — Derived Data (83 tables):** Anything calculated, aggregated, or computed from L1+L2. Examples: `exposure_metric_cube`, `facility_financial_calc`, `stress_test_result`
 
 Rollup hierarchy: **Facility → Counterparty → Desk (L3) → Portfolio (L2) → Business Segment (L1)**
 
@@ -47,7 +47,7 @@ lib/                    # Core business logic
   deep-dive/            # Seed metrics, lineage parser, cross-tier resolver
 data/                   # Data definitions
   l3-metrics.ts         # 110+ metric definitions (SOURCE OF TRUTH for L3 metrics)
-  l3-tables.ts          # 76 L3 table definitions
+  l3-tables.ts          # 83 L3 table definitions
   metric-library/       # catalogue.json, variants.json, parent-metrics.json, domains.json
 scripts/                # CLI data processing scripts
 ```
@@ -1023,6 +1023,38 @@ source /Users/tomas/120/.env && /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql
 | `_flag` suffix convention | `is_active` column doesn't exist | ALL boolean columns in PG use `_flag` suffix — `is_active_flag`, `is_developed_market_flag`, etc. |
 | search_path for cross-schema queries | `l2.collateral_asset_master` not found | Set `search_path TO l1, l2, public` before querying, OR remove schema prefixes |
 | ON CONFLICT for idempotent loads | Weekly data overlaps existing monthly dates | Use `ON CONFLICT DO NOTHING` so re-runs don't fail on existing data |
+
+## Clean L2 Generation in a New Database
+
+To generate fresh L2 data in a separate database while reusing existing L1 reference data:
+
+```bash
+# 1. Create new database on same Cloud SQL instance
+source /Users/tomas/120/.env
+/opt/homebrew/Cellar/postgresql@18/18.3/bin/psql "$DATABASE_URL" -c "CREATE DATABASE postgres_l2_clean;"
+NEW_DB_URL="${DATABASE_URL%/*}/postgres_l2_clean"
+
+# 2. Copy L1 schema + seed data from source (reference/dim tables)
+/opt/homebrew/Cellar/postgresql@18/18.3/bin/pg_dump "$DATABASE_URL" -n l1 | /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql "$NEW_DB_URL"
+
+# 3. Copy L2 schema only (no data — factory will generate it)
+/opt/homebrew/Cellar/postgresql@18/18.3/bin/pg_dump "$DATABASE_URL" -n l2 --schema-only | /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql "$NEW_DB_URL"
+
+# 4. Point factory at new database and generate
+DATABASE_URL="$NEW_DB_URL" npx tsx scenarios/factory/scenario-runner.ts --all
+
+# 5. Optionally generate weekly time-series for seed facilities
+DATABASE_URL="$NEW_DB_URL" npx tsx scenarios/factory/seed-time-series.ts
+```
+
+**Key points:**
+- L1 tables (dims, reference data) are copied intact — factory depends on them for FK integrity
+- L2 tables are created empty — factory generates all L2 data from scratch
+- ID registry starts fresh (no collision with old data since the new DB has no L2 rows)
+- Use `--reconcile` flag if loading into a DB that already has some L2 data
+
+### Factory ID Convention
+All entity IDs (`facility_id`, `counterparty_id`, `credit_agreement_id`, etc.) are **strings** in TypeScript throughout the factory pipeline. The IDRegistry allocates contiguous numeric ranges internally but returns `string[]` from `allocate()`. SQL emission converts back to unquoted integers via `formatSqlValue()`. PostgreSQL stores them as `BIGINT`.
 
 ## Agent Suite Architecture
 

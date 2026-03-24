@@ -10,7 +10,7 @@ import { getBenchmarkName } from '../market-environment';
 
 export function generatePricingRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
   registry: IDRegistry,
 ): SqlRow[] {

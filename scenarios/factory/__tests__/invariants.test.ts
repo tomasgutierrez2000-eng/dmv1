@@ -8,9 +8,9 @@ import type { FacilityState } from '../v2/types';
 // Minimal valid facility state for testing
 function makeValidState(overrides: Partial<FacilityState> = {}): FacilityState {
   return {
-    facility_id: 1,
-    counterparty_id: 1,
-    credit_agreement_id: 1,
+    facility_id: '1',
+    counterparty_id: '1',
+    credit_agreement_id: '1',
     product_type: 'REVOLVING_CREDIT',
     currency_code: 'USD',
     facility_type_code: 'REVOLVING_CREDIT',

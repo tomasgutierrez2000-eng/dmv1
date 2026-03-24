@@ -44,10 +44,10 @@ export interface CollateralOutput {
 
 export function generateCollateralRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
   registry: IDRegistry,
-  collateralAssetMap: Map<number, number>, // facility_id → collateral_asset_id
+  collateralAssetMap: Map<string, string>, // facility_id → collateral_asset_id
 ): CollateralOutput {
   const snapshots: SqlRow[] = [];
   const autoCreatedAssets: SqlRow[] = [];
@@ -73,7 +73,7 @@ export function generateCollateralRows(
           counterparty_id: state.counterparty_id,
           country_code: state.country_code,
           currency_code: state.currency_code,
-          legal_entity_id: ((facId % 12) + 1),
+          legal_entity_id: ((parseInt(facId, 10) % 12) + 1),
           effective_start_date: date,
           description: `Collateral asset — facility ${facId}`,
           collateral_status: 'ACTIVE',

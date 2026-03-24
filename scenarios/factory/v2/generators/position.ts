@@ -9,13 +9,13 @@ import { round, seededRng } from '../prng';
 
 export function generatePositionRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
   registry: IDRegistry,
-): { positions: SqlRow[]; positionDetails: SqlRow[]; positionIdMap: Map<string, number> } {
+): { positions: SqlRow[]; positionDetails: SqlRow[]; positionIdMap: Map<string, string> } {
   const positions: SqlRow[] = [];
   const positionDetails: SqlRow[] = [];
-  const positionIdMap = new Map<string, number>();
+  const positionIdMap = new Map<string, string>();
 
   for (const date of dates) {
     for (const facId of facilityIds) {

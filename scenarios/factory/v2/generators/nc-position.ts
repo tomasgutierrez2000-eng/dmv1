@@ -23,13 +23,13 @@ const NC_SOURCE = 'NC_PRODUCT_FACTORY';
  */
 export function generateNCPositionRows(
   stateMap: PositionStateMap,
-  positionIds: number[],
+  positionIds: string[],
   dates: string[],
   registry: IDRegistry,
-): { positions: SqlRow[]; positionDetails: SqlRow[]; positionIdMap: Map<string, number> } {
+): { positions: SqlRow[]; positionDetails: SqlRow[]; positionIdMap: Map<string, string> } {
   const positions: SqlRow[] = [];
   const positionDetails: SqlRow[] = [];
-  const positionIdMap = new Map<string, number>();
+  const positionIdMap = new Map<string, string>();
 
   for (const date of dates) {
     for (const conceptualPosId of positionIds) {
@@ -48,7 +48,7 @@ export function generateNCPositionRows(
   return { positions, positionDetails, positionIdMap };
 }
 
-function buildPositionRow(state: PositionState, date: string, dbPosId: number): SqlRow {
+function buildPositionRow(state: PositionState, date: string, dbPosId: string): SqlRow {
   const bal = getBalanceAmount(state);
   const notional = getNotionalAmount(state);
   const accruedInterest = getAccruedInterest(state);
@@ -78,14 +78,14 @@ function buildPositionRow(state: PositionState, date: string, dbPosId: number): 
     product_subtype_id: state.product_subtype_id,
     netting_set_id: state.category === 'DERIVATIVES' ? state.netting_set_id : null,
     customer_id: `CUST-${state.counterparty_id}`,
-    cost_center_id: state.legal_entity_id * 100 + (state.position_id % 10),
+    cost_center_id: state.legal_entity_id * 100 + (parseInt(state.position_id, 10) % 10),
     source_system_id: FACTORY_SOURCE_SYSTEM_ID,
     record_source: NC_SOURCE,
     created_by: 'nc_factory',
   };
 }
 
-function buildPositionDetailRow(state: PositionState, date: string, dbPosId: number): SqlRow {
+function buildPositionDetailRow(state: PositionState, date: string, dbPosId: string): SqlRow {
   return {
     position_id: dbPosId,
     as_of_date: date,

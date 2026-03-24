@@ -62,8 +62,8 @@ export const NC_PRODUCT_CODES: Record<NonCreditCategory, { code: string; subtype
 // ─── Base Position State ─────────────────────────────────────────────────
 
 interface PositionStateBase {
-  position_id: number;
-  counterparty_id: number;
+  position_id: string;
+  counterparty_id: string;
   product_subtype_id: number;
   product_code: string;             // e.g., 'IRS', 'REPO', 'GOVT_BOND'
   category: NonCreditCategory;
@@ -189,6 +189,6 @@ export type PositionState =
 export type PositionStateMap = Map<string, PositionState>;
 
 /** Make a state map key. */
-export function positionStateKey(positionId: number, date: string): string {
+export function positionStateKey(positionId: string | number, date: string): string {
   return `${positionId}|${date}`;
 }

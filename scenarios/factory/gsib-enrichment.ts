@@ -20,6 +20,7 @@ import {
 } from '../../scripts/shared/mvp-config';
 import type { CounterpartyProfile } from './scenario-config';
 import { mulberry32, hashStr, pick } from './v2/prng';
+import { VALID_ENTITY_TYPE_CODES } from './shared-constants';
 
 /* ────────────────── Industry Mapping ────────────────── */
 
@@ -31,17 +32,20 @@ const INDUSTRY_GSIB_MAP: Record<number, {
   y14Type: string;
   regType: string;
   entityTypeCode: string;
+  /** NAICS 2-digit code for l1.industry_dim FK. Internal IDs (1-10) must NEVER be emitted
+   *  as industry_id — they don't exist in the dim table and silently break industry rollups. */
+  naicsCode: number;
 }> = {
-  1:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP' },  // TMT
-  2:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP' },  // Healthcare
-  3:  { baselAssetClass: 'BANK',      fr2590Type: 'FI',   callReportType: 'DEPOSITORY',    y14Type: 'BANK',            regType: 'BANK',      entityTypeCode: 'BANK' },  // Financials
-  4:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP' },  // Energy
-  5:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP' },  // Industrials
-  6:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP' },  // Consumer Staples
-  7:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP' },  // Retail
-  8:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP' },  // Utilities
-  9:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP' },  // Materials
-  10: { baselAssetClass: 'CRE',       fr2590Type: 'CRE',  callReportType: 'CRE_NONFARM',   y14Type: 'CRE',             regType: 'CRE',       entityTypeCode: 'RE' },    // Real Estate / Consumer Disc.
+  1:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 51 },  // TMT → Information
+  2:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 62 },  // Healthcare → Health Care
+  3:  { baselAssetClass: 'BANK',      fr2590Type: 'FI',   callReportType: 'DEPOSITORY',    y14Type: 'BANK',            regType: 'BANK',      entityTypeCode: 'BANK', naicsCode: 52 },  // Financials → Finance
+  4:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 21 },  // Energy → Mining/Oil&Gas
+  5:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 31 },  // Industrials → Manufacturing
+  6:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 42 },  // Consumer Staples → Wholesale
+  7:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 44 },  // Retail → Retail Trade
+  8:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 22 },  // Utilities → Utilities
+  9:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 23 },  // Materials → Construction
+  10: { baselAssetClass: 'CRE',       fr2590Type: 'CRE',  callReportType: 'CRE_NONFARM',   y14Type: 'CRE',             regType: 'CRE',       entityTypeCode: 'RE',   naicsCode: 53 },  // Real Estate → Real Estate
 };
 
 /** Country → currency / region / call report suffix */
@@ -126,9 +130,13 @@ export function enrichCounterparty(
     : `cp.${counterpartyId}.${profile.legal_name}`; // legacy fallback
   const rng = mulberry32(hashStr(seedKey));
   const tier = RATING_TIER_MAP[profile.rating_tier];
-  const industryMap = INDUSTRY_GSIB_MAP[profile.industry_id] ?? INDUSTRY_GSIB_MAP[1];
-  if (!INDUSTRY_GSIB_MAP[profile.industry_id]) {
-    console.warn(`GSIB enrichment: unknown industry_id ${profile.industry_id} for ${profile.legal_name}, defaulting to TMT (1)`);
+  const industryMap = INDUSTRY_GSIB_MAP[profile.industry_id];
+  if (!industryMap) {
+    throw new Error(
+      `GSIB enrichment: unknown industry_id ${profile.industry_id} for counterparty '${profile.legal_name}'. ` +
+      `Valid internal IDs: 1-10. Cannot emit counterparty with invalid industry — ` +
+      `this would create broken FK chains in l1.industry_dim.`
+    );
   }
   const countryMap = COUNTRY_MAP[profile.country] ?? COUNTRY_MAP['US'];
   if (!COUNTRY_MAP[profile.country]) {
@@ -154,13 +162,25 @@ export function enrichCounterparty(
     lei += chars[Math.floor(rng() * chars.length)];
   }
 
+  // Validate entity_type_code if overridden from YAML — don't let invalid codes
+  // bypass enrichment and reach the validator only downstream (or not at all with --skip-quality-controls)
+  const entityTypeCode = profile.entity_type_code ?? industryMap.entityTypeCode;
+  if (!VALID_ENTITY_TYPE_CODES.has(entityTypeCode)) {
+    throw new Error(
+      `GSIB enrichment: entity_type_code '${entityTypeCode}' for counterparty '${profile.legal_name}' ` +
+      `is not a valid l1.entity_type_dim code. Valid: ${[...VALID_ENTITY_TYPE_CODES].join(', ')}`
+    );
+  }
+
   return {
     counterparty_id: counterpartyId,
     legal_name: profile.legal_name,
     counterparty_type: counterpartyType,
     country_code: profile.country,
-    entity_type_code: profile.entity_type_code ?? industryMap.entityTypeCode,
-    industry_id: profile.industry_id,
+    entity_type_code: entityTypeCode,
+    // Emit NAICS 2-digit code (11-92) — NEVER the internal factory ID (1-10).
+    // Internal IDs don't exist in l1.industry_dim and silently break industry rollups.
+    industry_id: industryMap.naicsCode,
 
     // GSIB regulatory fields
     basel_asset_class: profile.basel_asset_class ?? industryMap.baselAssetClass,
@@ -318,10 +338,11 @@ export function enrichFacilities(
     const facilityCommit = Math.round(totalCommit * slot.fraction);
     const typeLabel = TYPE_LABELS[slot.facilityType] ?? slot.facilityType;
 
-    // Industry code mapping for facility_master
+    // Industry code mapping for facility_master — keyed by NAICS 2-digit code
+    // (counterparty.industry_id is now a NAICS code after the audit fix, not internal 1-10)
     const industryCodes: Record<number, string> = {
-      1: 'FIN', 2: 'TMT', 3: 'HC', 4: 'ENR', 5: 'IND',
-      6: 'CS', 7: 'RET', 8: 'UTL', 9: 'MAT', 10: 'RE',
+      51: 'TMT', 62: 'HC', 52: 'FIN', 21: 'ENR', 31: 'IND',
+      42: 'CS', 44: 'RET', 22: 'UTL', 23: 'MAT', 53: 'RE',
     };
 
     return {

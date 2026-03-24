@@ -44,6 +44,9 @@ export const LOAD_ORDER: string[] = [
   'l1.crm_protection_master',
   'l1.protection_link',
 
+  // L2 FX rates (must precede exposure snapshots for metric JOIN coverage)
+  'l2.fx_rate',
+
   // L2 snapshots (facility-level first, then counterparty-level)
   'l2.facility_exposure_snapshot',
   'l2.facility_pricing_snapshot',

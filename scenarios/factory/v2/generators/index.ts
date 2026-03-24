@@ -41,6 +41,7 @@ import { generateCounterpartyFinancialRows } from './cp-financial';
 import { generateProvisionRows } from './provision';
 import { generateStressTestRows } from './stress-test';
 import { generateProductTableRows } from './product-tables';
+import { generateFxRateRows } from './fx-rate';
 
 // ─── Generator Dependency Declarations ────────────────────────────────
 //
@@ -59,6 +60,7 @@ export interface GeneratorDef {
  * Order here matches intended execution order in generateV2Data().
  */
 export const GENERATOR_REGISTRY: GeneratorDef[] = [
+  { name: 'fx-rate',               dependsOn: [] },
   { name: 'exposure',              dependsOn: [] },
   { name: 'pricing',               dependsOn: [] },
   { name: 'risk',                  dependsOn: [] },
@@ -209,8 +211,21 @@ export function generateV2Data(
   const tables: TableData[] = [];
   const tableBreakdown: Record<string, number> = {};
 
-  // 1. Exposure
-  const exposureRows = generateExposureRows(stateMap, facilityIds, dates, registry);
+  // 0. FX Rates — must run before exposure so metric JOINs on fx.as_of_date have matching rows
+  const currencies = new Set(chain.facilities.map(f => f.currency_code));
+  currencies.add('USD'); // always include USD
+  const fxRateRows = generateFxRateRows(currencies, dates, registry);
+  tables.push({ schema: 'l2', table: 'fx_rate', rows: fxRateRows });
+  tableBreakdown['fx_rate'] = fxRateRows.length;
+
+  // 1. Exposure — pass bank_share_pct from L1 lender allocations (syndicated facilities < 1.0)
+  const bankShareMap = new Map<number, number>();
+  if (chain.facility_lender_allocations) {
+    for (const alloc of chain.facility_lender_allocations) {
+      bankShareMap.set(alloc.facility_id, alloc.bank_share_pct);
+    }
+  }
+  const exposureRows = generateExposureRows(stateMap, facilityIds, dates, registry, bankShareMap);
   tables.push({ schema: 'l2', table: 'facility_exposure_snapshot', rows: exposureRows });
   tableBreakdown['facility_exposure_snapshot'] = exposureRows.length;
 

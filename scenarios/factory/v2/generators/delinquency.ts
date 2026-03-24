@@ -23,11 +23,13 @@ export function generateDelinquencyRows(
       const snapshotId = registry.allocate('facility_delinquency_snapshot', 1)[0];
       const dpd = state.days_past_due;
 
-      // DPD bucket — must match l1.dpd_bucket_dim codes: '0-30', '31-60', '61-90', '90+'
-      let bucketCode = '0-30';
-      if (dpd > 30 && dpd <= 60) bucketCode = '31-60';
-      else if (dpd > 60 && dpd <= 90) bucketCode = '61-90';
-      else if (dpd > 90) bucketCode = '90+';
+      // DPD bucket — FFIEC Call Report standard codes matching l1.dpd_bucket_dim:
+      // CURRENT (0), 1-29, 30-59, 60-89, 90+
+      let bucketCode = 'CURRENT';
+      if (dpd >= 1 && dpd <= 29) bucketCode = '1-29';
+      else if (dpd >= 30 && dpd <= 59) bucketCode = '30-59';
+      else if (dpd >= 60 && dpd <= 89) bucketCode = '60-89';
+      else if (dpd >= 90) bucketCode = '90+';
 
       // Overdue amounts based on DPD
       const monthlyPayment = state.drawn_amount * state.all_in_rate_pct / 12;

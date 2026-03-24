@@ -197,3 +197,15 @@
 **Cons:** Adds checkpoint logic and state persistence. May not be worth it if pipeline completes in <5 minutes.
 **Context:** Current mitigation: `--scenario S35` flag runs a single scenario. But doesn't help with partial SQL file from a crash. Approach: write per-scenario SQL files, then concatenate at the end. Crash = re-run only the missing scenario.
 **Depends on:** Nothing.
+
+---
+
+## Deferred (from Data Quality Audit 2026-03-23)
+
+### 31. Generate seed data for 32 empty product-specific L2 tables
+**What:** Write seed data generators (TypeScript or SQL) for 8 product families × 4 snapshot types: borrowings, debt, deposits, derivatives, equities, securities, SFT, and stock. Each table needs: realistic value distributions, correct FK chains to existing counterparties/facilities/instruments, temporal alignment with existing weekly snapshot dates (2024-07-05 to 2025-02-28), and inter-table consistency.
+**Why:** A GSIB has positions across all product types. Currently only loans (16K rows) and off-BS commitments (3.5K rows) have data. Product-specific risk metrics (derivatives CVA, SFT haircuts, securities market risk, deposit runoff) cannot be calculated. Regulators expect coverage across all Basel III exposure classes.
+**Pros:** Enables full GSIB metric coverage, realistic portfolio diversification, product-specific risk analytics.
+**Cons:** Significant effort (~8-12 hours CC). Each of the 32 tables has 5-204 fields. Derivatives and securities tables are particularly complex (54-65 fields each with specific financial instrument semantics).
+**Context:** Identified during PostgreSQL L1/L2 data quality audit. The outside voice reviewer correctly noted this is data *generation*, not data *quality* — it belongs as a separate workstream, not mixed into audit fixes. Start with derivatives (most critical for CVA/counterparty credit risk) and securities (most critical for market risk), then expand to remaining products.
+**Depends on:** Phase 0-3 audit fixes should complete first (dedup, FK fixes, drawn amounts) so new product data references clean counterparty/facility data.

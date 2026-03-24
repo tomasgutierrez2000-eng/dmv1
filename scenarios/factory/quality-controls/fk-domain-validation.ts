@@ -36,7 +36,12 @@ export function runFKDomainValidation(
     { field: 'amendment_status_code', l1Table: 'amendment_status_dim', severity: 'warning' },
     { field: 'credit_event_type_code', l1Table: 'credit_event_type_dim', severity: 'warning' },
     { field: 'country_code', l1Table: 'country_dim', severity: 'warning' },
-    { field: 'entity_type_code', l1Table: 'entity_type_dim', severity: 'warning' },
+    // entity_type_code is CRITICAL — invalid codes silently drop counterparties from
+    // Basel III risk weight lookups and entity-type rollups (audit finding: 15 CPs with code '53')
+    { field: 'entity_type_code', l1Table: 'entity_type_dim', severity: 'error' },
+    // industry_id is CRITICAL — invalid IDs (1-10 vs NAICS 11+) silently break industry rollups
+    // (audit finding: 468 CPs with industry_id 1-10 not in industry_dim)
+    { field: 'industry_id', l1Table: 'industry_dim', severity: 'error' },
     { field: 'region_code', l1Table: 'region_dim', severity: 'warning' },
     { field: 'crm_type_code', l1Table: 'crm_type_dim', severity: 'warning' },
   ];

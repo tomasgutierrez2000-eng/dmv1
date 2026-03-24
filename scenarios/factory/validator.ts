@@ -18,6 +18,7 @@ import type { IDRegistry } from './id-registry';
 import type { V2GeneratorOutput } from './v2/generators';
 import type { FacilityState, FacilityStateMap, TableData as V2TableData } from './v2/types';
 import { stateKey } from './v2/types';
+import { VALID_ENTITY_TYPE_CODES, VALID_NAICS_CODES, VALID_DPD_CODES } from './shared-constants';
 
 export interface ValidationResult {
   valid: boolean;
@@ -590,8 +591,14 @@ export function validateV2Output(
   const exposureTable = output.tables.find(t => t.table === 'facility_exposure_snapshot');
   if (exposureTable) {
     for (const row of exposureTable.rows) {
-      const drawn = row.drawn_amount as number;
+      const drawn = row.drawn_amount as number | null | undefined;
       const committed = row.committed_amount as number;
+
+      // NULL drawn_amount check — prevents silent metric failures (utilization, EAD)
+      if (drawn === null || drawn === undefined) {
+        errors.push(`Exposure: facility ${row.facility_id} on ${row.as_of_date}: drawn_amount is NULL — metrics will return NULL`);
+        continue;
+      }
       if (drawn > committed * 1.001) {
         errors.push(`Exposure: facility ${row.facility_id} on ${row.as_of_date}: drawn (${drawn}) > committed (${committed})`);
       }
@@ -600,6 +607,12 @@ export function validateV2Output(
       }
       if (committed <= 0) {
         errors.push(`Exposure: facility ${row.facility_id}: non-positive committed_amount ${committed}`);
+      }
+
+      // Verify undrawn_amount is also populated
+      const undrawn = row.undrawn_amount as number | null | undefined;
+      if (undrawn === null || undrawn === undefined) {
+        errors.push(`Exposure: facility ${row.facility_id} on ${row.as_of_date}: undrawn_amount is NULL`);
       }
     }
   }
@@ -725,6 +738,29 @@ export function validateV2Output(
   // Uses L1 seed data via ReferenceDataRegistry (loaded dynamically from SQL).
   // Falls back to hardcoded sets when registry is not available.
 
+  // Entity type codes must exist in l1.entity_type_dim — invalid codes silently
+  // drop counterparties from Basel III risk weight lookups and entity-type rollups.
+  for (const cp of chain.counterparties) {
+    if (!VALID_ENTITY_TYPE_CODES.has(cp.entity_type_code)) {
+      errors.push(
+        `Counterparty ${cp.counterparty_id} (${cp.legal_name}): entity_type_code '${cp.entity_type_code}' not in entity_type_dim — ` +
+        `likely a NAICS code leak. Valid codes: ${[...VALID_ENTITY_TYPE_CODES].join(', ')}`
+      );
+    }
+  }
+
+  // Industry IDs must be valid NAICS 2-digit codes (11-92) that exist in l1.industry_dim.
+  // IDs 1-10 are invalid — the factory's internal industry mapping (1=TMT, 2=Healthcare, etc.)
+  // must be translated to NAICS codes before emitting counterparty rows.
+  for (const cp of chain.counterparties) {
+    if (!VALID_NAICS_CODES.has(cp.industry_id)) {
+      errors.push(
+        `Counterparty ${cp.counterparty_id} (${cp.legal_name}): industry_id ${cp.industry_id} not in industry_dim — ` +
+        `valid NAICS 2-digit codes start at 11. Factory internal IDs (1-10) must be mapped to NAICS.`
+      );
+    }
+  }
+
   const VALID_LIMIT_STATUS_CODES = new Set(['NEAR_LIMIT', 'WITHIN_LIMIT', 'OVER_LIMIT', 'INACTIVE']);
 
   // Dynamic L1 validation — if ReferenceDataRegistry is loaded by quality-controls.ts,
@@ -760,7 +796,60 @@ export function validateV2Output(
     }
   }
 
-  // ── 11. Data Completeness ──
+  // ── 11. FX Rate Coverage (per currency × date) ──
+  // Metric formulas JOIN: fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD'
+  //                       AND fx.as_of_date = fes.as_of_date
+  // Must validate per (currency, date) pair — not just per date — otherwise a facility
+  // with currency 'ZAR' would silently get NULL FX conversions even if USD has full coverage.
+
+  const fxTable = output.tables.find(t => t.table === 'fx_rate');
+  if (exposureTable && exposureTable.rows.length > 0) {
+    // Build set of (currency|date) pairs covered by FX rates (to_currency_code = 'USD')
+    const fxCoverage = new Set<string>();
+    for (const row of (fxTable?.rows ?? [])) {
+      if (row.to_currency_code === 'USD') {
+        fxCoverage.add(`${row.from_currency_code}|${row.as_of_date}`);
+      }
+    }
+
+    // Check every (currency, date) pair in exposure data
+    const missingPairs: string[] = [];
+    const checkedPairs = new Set<string>();
+    for (const row of exposureTable.rows) {
+      const key = `${row.currency_code}|${row.as_of_date}`;
+      if (checkedPairs.has(key)) continue;
+      checkedPairs.add(key);
+      if (!fxCoverage.has(key)) {
+        missingPairs.push(key);
+      }
+    }
+    if (missingPairs.length > 0) {
+      errors.push(
+        `FX coverage gap: ${missingPairs.length} (currency, date) pairs in exposure have no FX→USD rate: ` +
+        `${missingPairs.slice(0, 5).join(', ')}${missingPairs.length > 5 ? '...' : ''}. ` +
+        `Metric formulas JOINing on fx.from_currency_code + fx.as_of_date will return NULL.`
+      );
+    }
+  }
+
+  // ── 12. DPD Bucket Code Validation ──
+  // Ensure generated DPD bucket codes match FFIEC standard codes in l1.dpd_bucket_dim.
+  const delinquencyTable = output.tables.find(t => t.table === 'facility_delinquency_snapshot');
+  if (delinquencyTable) {
+    const invalidDpdCodes = new Set<string>();
+    for (const row of delinquencyTable.rows) {
+      const code = row.dpd_bucket_code as string;
+      if (code && !VALID_DPD_CODES.has(code)) invalidDpdCodes.add(code);
+    }
+    if (invalidDpdCodes.size > 0) {
+      errors.push(
+        `DPD bucket codes not in FFIEC standard: [${[...invalidDpdCodes].join(', ')}]. ` +
+        `Valid codes: ${[...VALID_DPD_CODES].join(', ')}. Old codes like '0-30', '31-60', '61-90' are no longer valid.`
+      );
+    }
+  }
+
+  // ── 13. Data Completeness ──
 
   if (chain.counterparties.length === 0) errors.push('No counterparties generated');
   if (chain.facilities.length === 0) errors.push('No facilities generated');
@@ -803,6 +892,7 @@ function guessPKFields(table: string, sampleRow: Record<string, unknown>): strin
     counterparty_financial_snapshot: ['counterparty_id', 'as_of_date'],
     ecl_provision_snapshot: ['facility_id', 'as_of_date'],
     limit_contribution_snapshot: ['limit_rule_id', 'facility_id', 'as_of_date'],
+    fx_rate: ['from_currency_code', 'to_currency_code', 'as_of_date'],
   };
 
   if (compositePKs[table]) {

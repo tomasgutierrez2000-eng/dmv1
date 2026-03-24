@@ -1,0 +1,79 @@
+# Bank Profile — institutional configuration for the agent suite
+# This file drives tier-aware behavior across all agents.
+
+institution_name: "GSIB Wholesale Lending Platform"
+institution_tier: GSIB  # GSIB (>$700B assets) | Large Regional ($100B-$700B) | Regional (<$100B)
+jurisdiction: US
+asset_threshold_usd: 700_000_000_000
+
+active_risk_stripes:
+  - name: credit_risk
+    status: live
+    scope: wholesale  # no retail credit
+    domains: [exposure, pricing, reference, amendments, profitability]
+  - name: capital_risk
+    status: live
+    domains: [capital]
+  - name: counterparty_credit_risk
+    status: planned
+  - name: liquidity_risk
+    status: planned
+  - name: market_risk
+    status: planned
+  - name: irrbb_alm
+    status: planned
+  - name: operational_risk
+    status: planned
+  - name: compliance_regulatory
+    status: planned
+
+database:
+  primary:
+    name: postgres
+    host: "${DATABASE_URL}"  # resolved from .env
+    port: 5432
+    schemas: [l1, l2, l3, public]
+    schema_convention: "l1=reference, l2=atomic, l3=derived"
+  capital:
+    name: postgres_capital
+    schemas: [l1, l2, l3, public]
+    notes: "Full copy of main + capital-specific extensions"
+  audit:
+    name: postgres_audit
+    schemas: [audit]
+    notes: "Separate database for agent audit trail"
+
+migration_tooling:
+  current: raw_sql_with_prefixes  # sql/migrations/NNN-*.sql
+  target: formal  # to be selected — Flyway, golang-migrate, or sqitch
+  migration_dir: sql/migrations/
+
+data_factory:
+  primary_tooling: typescript
+  primary_dir: scenarios/factory/
+  secondary_tooling: python
+  secondary_dir: scripts/
+  recommendation: |
+    TypeScript V2 factory (scenarios/factory/) is the go-forward engine.
+    For GSIB-quality synthetic data:
+    1. Domain-specific statistical generators per risk stripe
+    2. Correlation-aware cross-table generation (PD-LGD-EAD triangles)
+    3. Temporal coherence engine (rating migrations, exposure trends)
+    4. PostgreSQL-native validation (run generated data through L3 formulas)
+    Python scripts retained for one-off data transforms and Excel I/O.
+
+secrets:
+  approach: dotenv
+  file: .env
+  required_vars:
+    - DATABASE_URL
+    - GOOGLE_GEMINI_API_KEY
+    - ANTHROPIC_API_KEY
+
+agent_defaults:
+  audit_log_path: .claude/audit/sessions/
+  audit_db_write: true  # also write to postgres_audit
+  default_confidence_threshold: MEDIUM
+  require_reviewer_gate: true
+  bank_tier_infer_from_config: true
+  max_retries_on_failure: 2

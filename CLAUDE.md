@@ -1023,3 +1023,68 @@ source /Users/tomas/120/.env && /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql
 | `_flag` suffix convention | `is_active` column doesn't exist | ALL boolean columns in PG use `_flag` suffix — `is_active_flag`, `is_developed_market_flag`, etc. |
 | search_path for cross-schema queries | `l1.collateral_asset_master` not found | Set `search_path TO l1, l2, public` before querying, OR remove schema prefixes |
 | ON CONFLICT for idempotent loads | Weekly data overlaps existing monthly dates | Use `ON CONFLICT DO NOTHING` so re-runs don't fail on existing data |
+
+## Agent Suite Architecture
+
+### Directory Structure
+```
+.claude/
+  commands/
+    add-metric.md          # Metric addition workflow
+    fix-metric.md          # Metric debugging workflow
+    review-pr.md           # PR review workflow
+    experts/               # Domain decomposition agents (metric-decomp, schema-advisor, etc.)
+    builders/              # Schema/data/metric builder agents
+    reviewers/             # Reviewer gate agents (pre/post-execution validation)
+  config/
+    bank-profile.yaml      # Institutional config: tier, jurisdiction, risk stripes, DB settings
+    schema-manifest.yaml   # Auto-generated schema summary (from data dictionary)
+    generate-schema-manifest.ts  # Generator script for schema-manifest.yaml
+  audit/
+    sessions/              # JSON session logs (one file per agent run)
+    schema-changes/        # JSON records of DDL changes (one file per change)
+    schema/
+      audit_ddl.sql        # DDL for postgres_audit database
+    audit_logger.py        # Python utility for writing audit records
+```
+
+### Configuration Files
+
+**bank-profile.yaml** — Institutional configuration that drives tier-aware behavior across all agents. Contains:
+- Institution tier (GSIB/Large Regional/Regional) and jurisdiction
+- Active risk stripes with live/planned status
+- Database connection details and schema conventions
+- Data factory tooling preferences
+- Agent defaults (confidence thresholds, reviewer gates)
+
+**schema-manifest.yaml** — Living schema summary auto-generated from the golden-source data dictionary. Contains every table, column, type, FK reference, and risk stripe classification. Regenerate with:
+```bash
+npx tsx .claude/config/generate-schema-manifest.ts
+```
+This file is maintained by the DB Schema Builder agent after any schema change.
+
+### 4-Layer Audit Trail
+
+1. **Local JSON** (`.claude/audit/sessions/`) — Immediate, always-available log of every agent run. One JSON file per execution with reasoning chain, actions, and output.
+2. **Schema Change JSON** (`.claude/audit/schema-changes/`) — Individual DDL change records with before/after state and rollback DDL.
+3. **PostgreSQL Audit DB** (`postgres_audit`) — Structured relational store with 5 tables: `agent_runs`, `schema_changes`, `metric_decompositions`, `review_findings`, `data_lineage`. Supports queries, dashboards, and regulatory reporting.
+4. **Git History** — All code/config changes tracked via standard git commits with descriptive messages.
+
+### Session Sequencing (Agent Build Order)
+
+| Session | Agent | Purpose |
+|---------|-------|---------|
+| S0 (this) | Foundation | Directory scaffolding, configs, audit DDL, logger |
+| S1 | Metric Decomp Expert | Domain expert that decomposes metrics into ingredients |
+| S2 | DB Schema Builder | Proposes and applies DDL changes with reviewer gate |
+| S3 | Data Factory Agent | Generates GSIB-quality synthetic data |
+| S4 | Pre-Execution Reviewer | Validates proposed changes before execution |
+| S5 | Post-Execution Reviewer | Validates applied changes after execution |
+| S6 | Orchestrator | Coordinates multi-agent workflows end-to-end |
+
+### Agent Conventions
+- All agents call `AuditLogger` to record reasoning and actions
+- Agents read `bank-profile.yaml` to determine tier-appropriate behavior
+- Agents read `schema-manifest.yaml` for current schema state
+- Builder agents require reviewer gate approval before applying DDL changes (`require_reviewer_gate: true`)
+- Confidence levels: HIGH (>90% certainty), MEDIUM (70-90%), LOW (<70% — requires human review)

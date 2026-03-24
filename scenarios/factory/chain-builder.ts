@@ -86,14 +86,17 @@ export function buildL1Chain(config: ScenarioConfig, registry: IDRegistry): L1Ch
   const agrIds = registry.allocate('credit_agreement_master', cpCount, config.scenario_id);
   const facIds = registry.allocate('facility_master', cpCount * facPerCp, config.scenario_id);
 
+  // Version-pinned scenario seed for deterministic PRNG
+  const scenarioSeed = `${config.scenario_id}.v1`;
+
   // 2. Build counterparties (enriched with GSIB fields)
   const counterparties = config.counterparties.map((profile, i) =>
-    enrichCounterparty(profile, cpIds[i])
+    enrichCounterparty(profile, cpIds[i], scenarioSeed)
   );
 
   // 3. Build agreements (each referencing its counterparty)
   const agreements = counterparties.map((cp, i) =>
-    enrichAgreement(agrIds[i], cp, config.counterparties[i].size)
+    enrichAgreement(agrIds[i], cp, config.counterparties[i].size, scenarioSeed)
   );
 
   // 4. Build facilities (each referencing agreement + counterparty)
@@ -106,6 +109,7 @@ export function buildL1Chain(config: ScenarioConfig, registry: IDRegistry): L1Ch
       cpFacIds,
       config.counterparties[i].size,
       config.counterparties[i].rating_tier,
+      scenarioSeed,
     );
     facilities.push(...cpFacs);
   }

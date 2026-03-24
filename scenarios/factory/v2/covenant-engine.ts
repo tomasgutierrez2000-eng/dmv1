@@ -306,12 +306,15 @@ export function testCovenants(
     const currentValue = computeCovenantMetric(covDef.type, state, financials);
     const threshold = covDef.threshold;
 
-    // Compute headroom
+    // Compute headroom (NULLIF-style: guard against threshold === 0 to avoid div-by-zero)
     let headroom_pct: number;
-    if (covDef.direction === 'MIN') {
-      headroom_pct = threshold > 0 ? (currentValue - threshold) / threshold : 0;
+    if (threshold === 0) {
+      // With a zero threshold, headroom is undefined — treat as zero headroom
+      headroom_pct = 0;
+    } else if (covDef.direction === 'MIN') {
+      headroom_pct = (currentValue - threshold) / threshold;
     } else {
-      headroom_pct = threshold > 0 ? (threshold - currentValue) / threshold : 0;
+      headroom_pct = (threshold - currentValue) / threshold;
     }
     headroom_pct = Math.round(headroom_pct * 10000) / 10000;
 

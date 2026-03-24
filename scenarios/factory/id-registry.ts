@@ -174,6 +174,66 @@ export class IDRegistry {
     return { tables, scenarios, totalIds };
   }
 
+  /**
+   * Reconcile registry nextId values against PostgreSQL MAX(pk) values.
+   * Ensures nextId is always > MAX(pk) in the database, preventing PK collisions
+   * when the registry JSON is stale or missing.
+   *
+   * @param client A connected pg Client instance
+   */
+  async reconcileFromDatabase(client: { query: (sql: string) => Promise<{ rows: { max_id: string | null }[] }> }): Promise<{ table: string; before: number; after: number }[]> {
+    const TABLE_PK_MAP: Record<string, { schema: string; pk: string }> = {
+      counterparty:                   { schema: 'l2', pk: 'counterparty_id' },
+      credit_agreement_master:        { schema: 'l2', pk: 'credit_agreement_id' },
+      facility_master:                { schema: 'l2', pk: 'facility_id' },
+      credit_event:                   { schema: 'l2', pk: 'credit_event_id' },
+      credit_event_facility_link:     { schema: 'l2', pk: 'link_id' },
+      risk_flag:                      { schema: 'l2', pk: 'risk_flag_id' },
+      amendment_event:                { schema: 'l2', pk: 'amendment_id' },
+      amendment_change_detail:        { schema: 'l2', pk: 'change_detail_id' },
+      exception_event:                { schema: 'l2', pk: 'exception_id' },
+      stress_test_result:             { schema: 'l2', pk: 'result_id' },
+      stress_test_breach:             { schema: 'l2', pk: 'breach_id' },
+      deal_pipeline_fact:             { schema: 'l2', pk: 'pipeline_id' },
+      limit_utilization_event:        { schema: 'l2', pk: 'limit_utilization_event_id' },
+      facility_exposure_snapshot:     { schema: 'l2', pk: 'facility_exposure_id' },
+      collateral_asset_master:        { schema: 'l2', pk: 'collateral_asset_id' },
+      position:                       { schema: 'l2', pk: 'position_id' },
+      position_detail:                { schema: 'l2', pk: 'position_detail_id' },
+      cash_flow:                      { schema: 'l2', pk: 'cash_flow_id' },
+      facility_lender_allocation:     { schema: 'l2', pk: 'lender_allocation_id' },
+      counterparty_hierarchy:         { schema: 'l2', pk: 'counterparty_id' },
+      limit_rule:                     { schema: 'l1', pk: 'limit_rule_id' },
+    };
+
+    const changes: { table: string; before: number; after: number }[] = [];
+
+    for (const [table, { schema, pk }] of Object.entries(TABLE_PK_MAP)) {
+      try {
+        const result = await client.query(`SELECT MAX(${pk})::TEXT AS max_id FROM ${schema}.${table}`);
+        const maxId = result.rows[0]?.max_id;
+        if (maxId == null) continue; // Table is empty
+
+        const dbMax = parseInt(maxId, 10);
+        if (isNaN(dbMax)) continue;
+
+        const newNextId = dbMax + 1;
+        const currentNextId = this.state.nextId[table] ?? DEFAULT_STARTS[table] ?? 10001;
+
+        // Never go below the existing nextId — only increase
+        if (newNextId > currentNextId) {
+          const before = currentNextId;
+          this.state.nextId[table] = newNextId;
+          changes.push({ table, before, after: newNextId });
+        }
+      } catch {
+        // Table may not exist in DB — skip silently
+      }
+    }
+
+    return changes;
+  }
+
   /** Remove all allocations for a scenario (allows re-generation) */
   deallocate(scenarioId: string): number {
     const before = this.state.allocations.length;

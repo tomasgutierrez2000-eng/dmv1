@@ -82,24 +82,24 @@ export function validateScenario(
 
   // Exposure snapshots
   for (const exp of (l2Data.facility_exposure_snapshot ?? [])) {
-    if (!facilityIds.has(exp.facility_id)) {
+    if (!facilityIds.has(exp.facility_id!)) {
       errors.push(`Exposure: facility_id ${exp.facility_id} not in L1 chain`);
     }
-    if (!counterpartyIds.has(exp.counterparty_id)) {
+    if (!counterpartyIds.has(exp.counterparty_id!)) {
       errors.push(`Exposure: counterparty_id ${exp.counterparty_id} not in L1 chain`);
     }
   }
 
   // Credit events
   for (const evt of (l2Data.credit_event ?? [])) {
-    if (!counterpartyIds.has(evt.counterparty_id)) {
+    if (!counterpartyIds.has(evt.counterparty_id!)) {
       errors.push(`Credit event ${evt.credit_event_id}: counterparty_id ${evt.counterparty_id} not in L1`);
     }
   }
 
   // Credit event facility links
   for (const link of (l2Data.credit_event_facility_link ?? [])) {
-    if (!facilityIds.has(link.facility_id)) {
+    if (!facilityIds.has(link.facility_id!)) {
       errors.push(`Event link: facility_id ${link.facility_id} not in L1`);
     }
   }
@@ -116,21 +116,21 @@ export function validateScenario(
 
   // Rating observations
   for (const obs of (l2Data.counterparty_rating_observation ?? [])) {
-    if (!counterpartyIds.has(obs.counterparty_id)) {
+    if (!counterpartyIds.has(obs.counterparty_id!)) {
       errors.push(`Rating observation: counterparty_id ${obs.counterparty_id} not in L1`);
     }
   }
 
   // Collateral snapshots
   for (const cs of (l2Data.collateral_snapshot ?? [])) {
-    if (cs.counterparty_id && !counterpartyIds.has(cs.counterparty_id)) {
+    if (cs.counterparty_id && !counterpartyIds.has(cs.counterparty_id!)) {
       errors.push(`Collateral snapshot: counterparty_id ${cs.counterparty_id} not in L1`);
     }
   }
 
   // Facility pricing snapshots
   for (const fp of (l2Data.facility_pricing_snapshot ?? [])) {
-    if (!facilityIds.has(fp.facility_id)) {
+    if (!facilityIds.has(fp.facility_id!)) {
       errors.push(`Facility pricing: facility_id ${fp.facility_id} not in L1`);
     }
   }
@@ -140,24 +140,24 @@ export function validateScenario(
     if (!facilityIds.has(fr.facility_id)) {
       errors.push(`Facility risk: facility_id ${fr.facility_id} not in L1`);
     }
-    if (!counterpartyIds.has(fr.counterparty_id)) {
+    if (!counterpartyIds.has(fr.counterparty_id!)) {
       errors.push(`Facility risk: counterparty_id ${fr.counterparty_id} not in L1`);
     }
   }
 
   // Facility financial snapshots
   for (const ff of (l2Data.facility_financial_snapshot ?? [])) {
-    if (!facilityIds.has(ff.facility_id)) {
+    if (!facilityIds.has(ff.facility_id!)) {
       errors.push(`Facility financial: facility_id ${ff.facility_id} not in L1`);
     }
   }
 
   // Positions
   for (const pos of (l2Data.position ?? [])) {
-    if (!facilityIds.has(pos.facility_id)) {
+    if (!facilityIds.has(pos.facility_id!)) {
       errors.push(`Position ${pos.position_id}: facility_id ${pos.facility_id} not in L1`);
     }
-    if (!counterpartyIds.has(pos.counterparty_id)) {
+    if (!counterpartyIds.has(pos.counterparty_id!)) {
       errors.push(`Position ${pos.position_id}: counterparty_id ${pos.counterparty_id} not in L1`);
     }
   }
@@ -165,38 +165,38 @@ export function validateScenario(
   // Position details → position FK
   const positionIds = new Set((l2Data.position ?? []).map(p => p.position_id));
   for (const pd of (l2Data.position_detail ?? [])) {
-    if (!positionIds.has(pd.position_id)) {
+    if (!positionIds.has(pd.position_id!)) {
       errors.push(`Position detail ${pd.position_detail_id}: position_id ${pd.position_id} not in generated positions`);
     }
   }
 
-  // Cash flows
-  for (const cf of (l2Data.cash_flow ?? [])) {
-    if (!facilityIds.has(cf.facility_id)) {
+  // Cash flows (table may not exist in DD-generated types)
+  for (const cf of ((l2Data as any).cash_flow ?? [])) {
+    if (!facilityIds.has(cf.facility_id!)) {
       errors.push(`Cash flow ${cf.cash_flow_id}: facility_id ${cf.facility_id} not in L1`);
     }
-    if (!counterpartyIds.has(cf.counterparty_id)) {
+    if (!counterpartyIds.has(cf.counterparty_id!)) {
       errors.push(`Cash flow ${cf.cash_flow_id}: counterparty_id ${cf.counterparty_id} not in L1`);
     }
   }
 
   // LOB attribution
   for (const la of (l2Data.facility_lob_attribution ?? [])) {
-    if (!facilityIds.has(la.facility_id)) {
+    if (!facilityIds.has(la.facility_id!)) {
       errors.push(`LOB attribution ${la.attribution_id}: facility_id ${la.facility_id} not in L1`);
     }
   }
 
   // Counterparty financial snapshots
   for (const cpf of (l2Data.counterparty_financial_snapshot ?? [])) {
-    if (!counterpartyIds.has(cpf.counterparty_id)) {
+    if (!counterpartyIds.has(cpf.counterparty_id!)) {
       errors.push(`CP financial ${cpf.financial_snapshot_id}: counterparty_id ${cpf.counterparty_id} not in L1`);
     }
   }
 
   // Facility profitability
   for (const fp of (l2Data.facility_profitability_snapshot ?? [])) {
-    if (!facilityIds.has(fp.facility_id)) {
+    if (!facilityIds.has(fp.facility_id!)) {
       errors.push(`Facility profitability: facility_id ${fp.facility_id} not in L1`);
     }
   }
@@ -204,17 +204,17 @@ export function validateScenario(
   // Amendment change details → amendment FK
   const amendmentIds = new Set((l2Data.amendment_event ?? []).map(a => a.amendment_id));
   for (const acd of (l2Data.amendment_change_detail ?? [])) {
-    if (!amendmentIds.has(acd.amendment_id)) {
+    if (!amendmentIds.has(acd.amendment_id!)) {
       errors.push(`Amendment detail ${acd.change_detail_id}: amendment_id ${acd.amendment_id} not in generated amendments`);
     }
   }
 
   // Exception events
   for (const ee of (l2Data.exception_event ?? [])) {
-    if (!facilityIds.has(ee.facility_id)) {
+    if (!facilityIds.has(ee.facility_id!)) {
       errors.push(`Exception ${ee.exception_id}: facility_id ${ee.facility_id} not in L1`);
     }
-    if (!counterpartyIds.has(ee.counterparty_id)) {
+    if (!counterpartyIds.has(ee.counterparty_id!)) {
       errors.push(`Exception ${ee.exception_id}: counterparty_id ${ee.counterparty_id} not in L1`);
     }
   }
@@ -665,11 +665,21 @@ export function validateV2Output(
     const firstDate = output.dates[0];
     const lastDate = output.dates[output.dates.length - 1];
 
+    // Build O(1) lookup maps keyed by "facilityId|date" to avoid O(n) .find() per facility
+    const riskByKey = new Map<string, Record<string, unknown>>();
+    for (const r of riskTable.rows) {
+      riskByKey.set(`${r.facility_id}|${r.as_of_date}`, r);
+    }
+    const pricingByKey = new Map<string, Record<string, unknown>>();
+    for (const r of pricingTable.rows) {
+      pricingByKey.set(`${r.facility_id}|${r.as_of_date}`, r);
+    }
+
     for (const facId of Array.from(facilityIds)) {
-      const pdFirst = riskTable.rows.find(r => r.facility_id === facId && r.as_of_date === firstDate);
-      const pdLast = riskTable.rows.find(r => r.facility_id === facId && r.as_of_date === lastDate);
-      const spreadFirst = pricingTable.rows.find(r => r.facility_id === facId && r.as_of_date === firstDate);
-      const spreadLast = pricingTable.rows.find(r => r.facility_id === facId && r.as_of_date === lastDate);
+      const pdFirst = riskByKey.get(`${facId}|${firstDate}`);
+      const pdLast = riskByKey.get(`${facId}|${lastDate}`);
+      const spreadFirst = pricingByKey.get(`${facId}|${firstDate}`);
+      const spreadLast = pricingByKey.get(`${facId}|${lastDate}`);
 
       if (pdFirst && pdLast && spreadFirst && spreadLast) {
         const pdIncrease = (pdLast.pd_pct as number) / Math.max(pdFirst.pd_pct as number, 0.0001);

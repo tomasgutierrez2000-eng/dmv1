@@ -12,9 +12,10 @@ export function generatePositionRows(
   facilityIds: number[],
   dates: string[],
   registry: IDRegistry,
-): { positions: SqlRow[]; positionDetails: SqlRow[] } {
+): { positions: SqlRow[]; positionDetails: SqlRow[]; positionIdMap: Map<string, number> } {
   const positions: SqlRow[] = [];
   const positionDetails: SqlRow[] = [];
+  const positionIdMap = new Map<string, number>();
 
   for (const date of dates) {
     for (const facId of facilityIds) {
@@ -24,6 +25,9 @@ export function generatePositionRows(
       const rng = seededRng(`pos-${facId}-${date}`);
       const posId = registry.allocate('position', 1)[0];
       const detailId = registry.allocate('position_detail', 1)[0];
+
+      // Track position_id for product table generators
+      positionIdMap.set(`${facId}|${date}`, posId);
 
       const accruedInterest = round(state.drawn_amount * state.all_in_rate_pct / 12, 2);
 
@@ -79,5 +83,5 @@ export function generatePositionRows(
     }
   }
 
-  return { positions, positionDetails };
+  return { positions, positionDetails, positionIdMap };
 }

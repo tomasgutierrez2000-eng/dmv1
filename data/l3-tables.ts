@@ -119,6 +119,12 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T86', name: 'metric_change_log',                    category: 'Data Quality & Infrastructure',  tier: 1 },
   { id: 'T87', name: 'metric_sandbox_run',                   category: 'Data Quality & Infrastructure',  tier: 1 },
   { id: 'T88', name: 'schema_change_log',                    category: 'Data Quality & Infrastructure',  tier: 1 },
+
+  // ── Product-Level Aggregation (Migration 033) ──
+  { id: 'T89', name: 'facility_position_agg',               category: 'Exposure & Position',            tier: 1, description: 'Aggregates positions per facility across products' },
+  { id: 'T90', name: 'cross_product_accounting_view',       category: 'Financial Performance',           tier: 1, description: 'Unified accounting fields across all 10 product types' },
+  { id: 'T91', name: 'cross_product_risk_view',             category: 'Credit Risk & Ratings',           tier: 1, description: 'Unified risk fields (PD, LGD, EAD, RWA) across products' },
+  { id: 'T92', name: 'position_exposure_calc',              category: 'Exposure & Position',            tier: 1, description: 'Per-position EAD, expected loss, RWA, capital consumption' },
 ];
 
 export const L3_TABLE_BY_NAME = new Map(L3_TABLES.map(t => [t.name, t]));

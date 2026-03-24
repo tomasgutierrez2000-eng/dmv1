@@ -115,6 +115,43 @@ function replaceBalancedTwoArg(sql: string, funcName: string, op: string): strin
   return result;
 }
 
+/**
+ * Split SQL into alternating code/string-literal tokens.
+ * String literals (single-quoted) are preserved verbatim;
+ * transformations only apply to code segments.
+ */
+function tokenizeSql(sql: string): { text: string; isLiteral: boolean }[] {
+  const tokens: { text: string; isLiteral: boolean }[] = [];
+  let i = 0;
+  let codeStart = 0;
+  while (i < sql.length) {
+    if (sql[i] === "'") {
+      // Flush preceding code
+      if (i > codeStart) tokens.push({ text: sql.slice(codeStart, i), isLiteral: false });
+      // Find end of string literal (handle '' escapes)
+      let j = i + 1;
+      while (j < sql.length) {
+        if (sql[j] === "'" && sql[j + 1] === "'") { j += 2; continue; }
+        if (sql[j] === "'") { j++; break; }
+        j++;
+      }
+      tokens.push({ text: sql.slice(i, j), isLiteral: true });
+      codeStart = j;
+      i = j;
+    } else {
+      i++;
+    }
+  }
+  if (codeStart < sql.length) tokens.push({ text: sql.slice(codeStart), isLiteral: false });
+  return tokens;
+}
+
+/** Apply a transformation function only to code segments, preserving string literals. */
+function transformCodeOnly(sql: string, fn: (code: string) => string): string {
+  const tokens = tokenizeSql(sql);
+  return tokens.map(t => t.isLiteral ? t.text : fn(t.text)).join('');
+}
+
 function adaptSql(sql: string): string {
   let normalized = sql
     .split('\n')
@@ -126,40 +163,47 @@ function adaptSql(sql: string): string {
   if (!lower.startsWith('select') && !lower.startsWith('with')) return normalized;
   normalized = firstStmt;
 
-  // Schema prefixes: l1.table → l1_table
-  normalized = normalized.replace(/\b[Ll]1\.(\w+)/g, 'l1_$1');
-  normalized = normalized.replace(/\b[Ll]2\.(\w+)/g, 'l2_$1');
-  normalized = normalized.replace(/\b[Ll]3\.(\w+)/g, 'l3_$1');
-
-  // PostgreSQL type casts: strip ::type (SQLite doesn't support them)
-  normalized = normalized.replace(/::(date|numeric|text|integer|bigint|boolean|varchar(\(\d+\))?|real|float|double precision)/gi, '');
-
-  // GREATEST(a, b) → CASE WHEN (a) > (b) THEN (a) ELSE (b) END
-  // Uses balanced-paren extraction to handle nested function calls
-  normalized = replaceBalancedTwoArg(normalized, 'GREATEST', '>');
-  // LEAST(a, b) → CASE WHEN (a) < (b) THEN (a) ELSE (b) END
-  normalized = replaceBalancedTwoArg(normalized, 'LEAST', '<');
-
-  // DATE_TRUNC('month', x) → strftime('%Y-%m-01', x)
+  // Phase 1: Full-string patterns that contain string literal arguments (DATE_TRUNC, EXTRACT)
+  // These must run BEFORE tokenization since their arguments include quoted strings.
   normalized = normalized.replace(/DATE_TRUNC\s*\(\s*'month'\s*,\s*([^)]+)\)/gi,
     "strftime('%Y-%m-01', $1)");
-  // DATE_TRUNC('year', x) → strftime('%Y-01-01', x)
   normalized = normalized.replace(/DATE_TRUNC\s*\(\s*'year'\s*,\s*([^)]+)\)/gi,
     "strftime('%Y-01-01', $1)");
-
-  // EXTRACT(YEAR FROM x) → CAST(strftime('%Y', x) AS INTEGER)
   normalized = normalized.replace(/EXTRACT\s*\(\s*YEAR\s+FROM\s+([^)]+)\)/gi,
     "CAST(strftime('%Y', $1) AS INTEGER)");
-  // EXTRACT(MONTH FROM x) → CAST(strftime('%m', x) AS INTEGER)
   normalized = normalized.replace(/EXTRACT\s*\(\s*MONTH\s+FROM\s+([^)]+)\)/gi,
     "CAST(strftime('%m', $1) AS INTEGER)");
+  normalized = normalized.replace(/EXTRACT\s*\(\s*DOW\s+FROM\s+([^)]+)\)/gi,
+    "CAST(strftime('%w', $1) AS INTEGER)");
+  normalized = normalized.replace(/EXTRACT\s*\(\s*DOY\s+FROM\s+([^)]+)\)/gi,
+    "CAST(strftime('%j', $1) AS INTEGER)");
+  normalized = normalized.replace(/EXTRACT\s*\(\s*WEEK\s+FROM\s+([^)]+)\)/gi,
+    "CAST((strftime('%j', $1) - 1) / 7 + 1 AS INTEGER)");
 
-  // CURRENT_DATE → date('now')
-  normalized = normalized.replace(/\bCURRENT_DATE\b/gi, "date('now')");
+  // Phase 2: Code-only transformations (safe from string literal corruption)
+  normalized = transformCodeOnly(normalized, (code) => {
+    // Schema prefixes: l1.table → l1_table
+    code = code.replace(/\b[Ll]1\.(\w+)/g, 'l1_$1');
+    code = code.replace(/\b[Ll]2\.(\w+)/g, 'l2_$1');
+    code = code.replace(/\b[Ll]3\.(\w+)/g, 'l3_$1');
 
-  // Boolean literals: TRUE/true → 1, FALSE/false → 0
-  normalized = normalized.replace(/\bTRUE\b/gi, '1');
-  normalized = normalized.replace(/\bFALSE\b/gi, '0');
+    // PostgreSQL type casts: strip ::type (SQLite doesn't support them)
+    code = code.replace(/::(date|numeric|text|integer|bigint|boolean|varchar(\(\d+\))?|real|float|double precision)/gi, '');
+
+    // CURRENT_DATE → date('now')
+    code = code.replace(/\bCURRENT_DATE\b/gi, "date('now')");
+
+    // Boolean literals: TRUE/true → 1, FALSE/false → 0
+    code = code.replace(/\bTRUE\b/gi, '1');
+    code = code.replace(/\bFALSE\b/gi, '0');
+
+    return code;
+  });
+
+  // GREATEST/LEAST need full-string parsing (balanced parens), but still safe —
+  // they won't appear inside string literals in practice
+  normalized = replaceBalancedTwoArg(normalized, 'GREATEST', '>');
+  normalized = replaceBalancedTwoArg(normalized, 'LEAST', '<');
 
   return normalized;
 }

@@ -29,6 +29,7 @@ export const L1_TABLE_META: L1TableMeta[] = [
   { name: 'credit_event_type_dim', scd: 'SCD-0', category: 'Credit Risk & Ratings' },
   { name: 'credit_status_dim', scd: 'SCD-0', category: 'Credit Risk & Ratings' },
   { name: 'exposure_type_dim', scd: 'SCD-0', category: 'Exposure & Position' },
+  { name: 'facility_type_dim', scd: 'SCD-0', category: 'Exposure & Position' },
   { name: 'amendment_status_dim', scd: 'SCD-0', category: 'Amendments & Forbearance' },
   { name: 'amendment_type_dim', scd: 'SCD-0', category: 'Amendments & Forbearance' },
   { name: 'default_definition_dim', scd: 'SCD-0', category: 'Credit Risk & Ratings' },
@@ -112,6 +113,10 @@ export const L1_TABLE_META: L1TableMeta[] = [
   //   regulatory_capital_requirement  → l2.legal_entity           (Fed capital reqs)
   //
   // Reviewed and accepted per GSIB data model audit (2026-03).
+
+  // ── Product Tables Foundation (Migration 027) ──
+  { name: 'product_subtype_dim', scd: 'SCD-0', category: 'Counterparty & Entity' },
+  { name: 'customer_counterparty_map', scd: 'SCD-2', category: 'Counterparty & Entity' },
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

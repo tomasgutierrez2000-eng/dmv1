@@ -143,7 +143,7 @@ export default function CatalogueItemDetailView({ itemId }: { itemId: string }) 
             Ingredient Fields ({item.ingredient_fields.length})
           </h2>
           <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-800">
-            <IngredientFieldsTable fields={item.ingredient_fields} />
+            <IngredientFieldsTable fields={item.ingredient_fields} itemId={item.item_id} level="facility" />
           </div>
         </section>
 

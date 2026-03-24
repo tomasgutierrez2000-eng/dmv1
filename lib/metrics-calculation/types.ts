@@ -35,7 +35,7 @@ export interface RunMetricRequest {
 export interface FormulaResolution {
   formula: string;
   formulaSQL?: string;
-  source: 'metric-dimension' | 'metric-base' | 'legacy-fallback';
+  source: 'metric-dimension' | 'metric-base';
 }
 
 export interface RunDiagnostics {

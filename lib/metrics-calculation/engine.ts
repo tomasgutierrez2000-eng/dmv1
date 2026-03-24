@@ -36,24 +36,13 @@ export async function runMetricCalculation(input: {
 }): Promise<RunMetricOutput> {
   const startedAt = Date.now();
   const { metric, dimension, asOfDate } = input;
-  const resolved = resolveFormulaForDimension(metric, dimension, { allowLegacyFallback: true });
+  const resolved = resolveFormulaForDimension(metric, dimension);
   if (!resolved?.formulaSQL?.trim()) {
     return {
       ok: false,
       error: 'No formulaSQL defined for this metric and dimension',
       hint: 'Add formulaSQL in the metric record (base or per-dimension).',
     };
-  }
-
-  if (resolved.source === 'legacy-fallback') {
-    console.warn(
-      '[metrics-calculation]',
-      JSON.stringify({
-        event: 'legacy_formula_fallback_used',
-        metricId: metric.id,
-        dimension,
-      })
-    );
   }
 
   const tableKeys = getTableKeysForMetric(metric, dimension);

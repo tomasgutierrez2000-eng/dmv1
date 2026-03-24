@@ -92,7 +92,7 @@ export default function AgentCatalog() {
             <button
               key={tab.key}
               onClick={() => setSelectedCategory(tab.key)}
-              className={`text-[11px] px-2.5 py-1 rounded-md font-medium transition-colors ${
+              className={`text-[11px] px-3 py-1.5 rounded-md font-medium transition-colors ${
                 selectedCategory === tab.key
                   ? 'bg-emerald-600 text-white'
                   : 'bg-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-700'

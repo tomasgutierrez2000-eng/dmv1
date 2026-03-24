@@ -21,6 +21,9 @@
 export const VARCHAR_EXCEPTION_IDS = new Set([
   'metric_id', 'variant_id', 'source_metric_id', 'mdrm_id',
   'mapped_line_id', 'mapped_column_id',
+  'customer_id', 'isda_id', 'sft_contract_id', 'derivative_id',
+  'deposit_id', 'borrowing_id', 'hedge_id', 'transaction_id',
+  'stock_position_id', 'unique_id', 'qmna_id', 'qmna_netting_id',
 ]);
 
 /* ────────────────── PostgreSQL Reserved Words ────────────────── */
@@ -129,12 +132,15 @@ export function formatSqlValue(columnName: string, value: unknown): string {
   }
 
   // BOOLEAN columns: _flag → PostgreSQL boolean literal (unquoted TRUE/FALSE)
+  // Exception: some _flag columns are VARCHAR in PG (e.g., stable_vs_less_stable_flag)
+  // If the value is not a recognized boolean, fall through to VARCHAR handling
   if (columnName.endsWith('_flag')) {
     if (typeof value === 'boolean') return value ? 'TRUE' : 'FALSE';
     const v = String(value).toUpperCase();
     if (v === 'TRUE' || v === 'Y' || v === '1') return 'TRUE';
     if (v === 'FALSE' || v === 'N' || v === '0') return 'FALSE';
-    return 'NULL';
+    // Not a recognized boolean — treat as VARCHAR (e.g., 'STABLE', 'LESS_STABLE')
+    return `'${escapeString(String(value))}'`;
   }
 
   // Date objects for non-suffix columns

@@ -50,7 +50,7 @@ export default function CalculatorPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [asOfDate, setAsOfDate] = useState<string | null>(null);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
-  const [dbConnected, setDbConnected] = useState<boolean | null>(null);
+  const [dbStatus, setDbStatus] = useState<'checking' | 'postgresql' | 'sample-data' | 'disconnected'>('checking');
   const [activeResults, setActiveResults] = useState<{ level: string; rows: ResultRow[] } | undefined>();
   const [showIdentitySetup, setShowIdentitySetup] = useState(false);
 
@@ -76,26 +76,26 @@ export default function CalculatorPage() {
     if (itemId) loadItem();
   }, [itemId]);
 
-  // Fetch dates for picker
+  // Fetch dates for picker (falls back to sample data when DB unavailable)
   useEffect(() => {
     async function loadDates() {
       try {
         const res = await fetch('/api/metrics/governance/reference-data?type=dates');
         if (res.status === 503) {
-          setDbConnected(false);
+          setDbStatus('disconnected');
           setAvailableDates([]);
           return;
         }
         if (res.ok) {
-          setDbConnected(true);
           const data = await res.json();
+          setDbStatus(data.source === 'postgresql' ? 'postgresql' : 'sample-data');
           setAvailableDates(data.available ?? []);
           setAsOfDate((prev) => prev ?? data.latest ?? data.available?.[0] ?? null);
         } else {
-          setDbConnected(false);
+          setDbStatus('disconnected');
         }
       } catch {
-        setDbConnected(false);
+        setDbStatus('disconnected');
       }
     }
     loadDates();
@@ -240,7 +240,7 @@ export default function CalculatorPage() {
         <div className="flex items-center gap-1.5 text-xs text-gray-400 shrink-0">
           <Calendar className="w-3.5 h-3.5" />
           <span>as_of:</span>
-          {dbConnected === false ? (
+          {dbStatus === 'disconnected' ? (
             <span className="text-amber-400" title="Database not connected">DB not connected</span>
           ) : availableDates.length > 0 ? (
             <select
@@ -262,10 +262,25 @@ export default function CalculatorPage() {
         </div>
 
         {/* DB status */}
-        <div className="flex items-center gap-1 text-[10px] shrink-0" title={dbConnected === true ? 'Database connected' : dbConnected === false ? 'Database not connected' : 'Checking...'}>
-          <Database className={`w-3 h-3 ${dbConnected === true ? 'text-emerald-500' : dbConnected === false ? 'text-amber-500' : 'text-gray-500'}`} />
-          <span className={dbConnected === true ? 'text-emerald-400' : dbConnected === false ? 'text-amber-400' : 'text-gray-500'}>
-            {dbConnected === true ? 'Connected' : dbConnected === false ? 'Disconnected' : 'PostgreSQL'}
+        <div className="flex items-center gap-1 text-[10px] shrink-0" title={{
+          checking: 'Checking database connection...',
+          postgresql: 'Connected to PostgreSQL',
+          'sample-data': 'Using in-memory sample data (no DATABASE_URL)',
+          disconnected: 'Database not connected',
+        }[dbStatus]}>
+          <Database className={`w-3 h-3 ${{
+            checking: 'text-gray-500',
+            postgresql: 'text-emerald-500',
+            'sample-data': 'text-blue-500',
+            disconnected: 'text-amber-500',
+          }[dbStatus]}`} />
+          <span className={{
+            checking: 'text-gray-500',
+            postgresql: 'text-emerald-400',
+            'sample-data': 'text-blue-400',
+            disconnected: 'text-amber-400',
+          }[dbStatus]}>
+            {{ checking: 'Checking...', postgresql: 'PostgreSQL', 'sample-data': 'Sample Data', disconnected: 'Disconnected' }[dbStatus]}
           </span>
         </div>
 

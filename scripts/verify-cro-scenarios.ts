@@ -27,8 +27,8 @@ const SCENARIOS: ScenarioCheck[] = [
     narrative: 'Single-name concentration exceeding limit — $2.5B drawn vs $2B limit (125%)',
     query: `SELECT c.legal_name, f.facility_name, fes.outstanding_balance_amt, fes.committed_amount,
        fes.limit_status_code, lu.utilized_amount, lu.available_amount
-FROM l1.counterparty c
-JOIN l1.facility_master f ON f.counterparty_id = c.counterparty_id
+FROM l2.counterparty c
+JOIN l2.facility_master f ON f.counterparty_id = c.counterparty_id
 JOIN l2.facility_exposure_snapshot fes ON fes.facility_id = f.facility_id
 LEFT JOIN l2.limit_utilization_event lu ON lu.counterparty_id = c.counterparty_id
 WHERE c.counterparty_id = 1001 AND fes.as_of_date = '2025-01-31'`,
@@ -45,7 +45,7 @@ WHERE c.counterparty_id = 1001 AND fes.as_of_date = '2025-01-31'`,
     query: `SELECT fes.as_of_date, f.facility_name, fes.outstanding_balance_amt, fes.committed_amount,
        ROUND(fes.outstanding_balance_amt::numeric / NULLIF(fes.committed_amount,0) * 100, 1) AS util_pct
 FROM l2.facility_exposure_snapshot fes
-JOIN l1.facility_master f ON f.facility_id = fes.facility_id
+JOIN l2.facility_master f ON f.facility_id = fes.facility_id
 WHERE fes.counterparty_id = 1051
 ORDER BY fes.as_of_date, f.facility_id`,
     minRows: 6,
@@ -61,7 +61,7 @@ ORDER BY fes.as_of_date, f.facility_id`,
     query: `SELECT c.legal_name, cro.rating_type, cro.rating_value, cro.rating_grade_id,
        cro.is_internal_flag, cro.pd_implied
 FROM l2.counterparty_rating_observation cro
-JOIN l1.counterparty c ON c.counterparty_id = cro.counterparty_id
+JOIN l2.counterparty c ON c.counterparty_id = cro.counterparty_id
 WHERE cro.counterparty_id = 1101 AND cro.as_of_date = '2025-01-31'`,
     minRows: 2,
     validate: (r) => {
@@ -76,7 +76,7 @@ WHERE cro.counterparty_id = 1101 AND cro.as_of_date = '2025-01-31'`,
     narrative: 'SCCL group aggregate $3.4B exceeds $3B limit across 5 entities',
     query: `SELECT c.legal_name, lcs.contribution_amount_usd, lcs.contribution_pct
 FROM l2.limit_contribution_snapshot lcs
-JOIN l1.counterparty c ON c.counterparty_id = lcs.counterparty_id
+JOIN l2.counterparty c ON c.counterparty_id = lcs.counterparty_id
 WHERE lcs.limit_rule_id = 5021 AND lcs.as_of_date = '2025-01-31'
 ORDER BY lcs.contribution_amount_usd DESC`,
     minRows: 5,
@@ -93,7 +93,7 @@ ORDER BY lcs.contribution_amount_usd DESC`,
        stb.breach_severity, c.legal_name, stb.breach_amount_usd
 FROM l2.stress_test_result str
 JOIN l2.stress_test_breach stb ON stb.stress_test_result_id = str.result_id
-JOIN l1.counterparty c ON c.counterparty_id = stb.counterparty_id
+JOIN l2.counterparty c ON c.counterparty_id = stb.counterparty_id
 WHERE str.result_id = 5001`,
     minRows: 3,
     validate: (r) =>
@@ -108,7 +108,7 @@ WHERE str.result_id = 5001`,
     query: `SELECT cam.description AS asset_description, cs.original_valuation_usd, cs.current_valuation_usd,
        ROUND((1 - cs.current_valuation_usd::numeric / NULLIF(cs.original_valuation_usd,0)) * 100, 1) AS decline_pct
 FROM l2.collateral_snapshot cs
-JOIN l1.collateral_asset_master cam ON cam.collateral_asset_id = cs.collateral_asset_id
+JOIN l2.collateral_asset_master cam ON cam.collateral_asset_id = cs.collateral_asset_id
 WHERE cs.counterparty_id = 1251 AND cs.as_of_date = '2025-01-31'`,
     minRows: 8,
     validate: (r) => r.every((x) => Number(x.decline_pct) >= 14 && Number(x.decline_pct) <= 16),
@@ -119,7 +119,7 @@ WHERE cs.counterparty_id = 1251 AND cs.as_of_date = '2025-01-31'`,
     narrative: '$2.1B syndicated facility with borrower + 3 participants/guarantors',
     query: `SELECT c.legal_name, eca.counterparty_role_code, eca.attributed_exposure_usd, eca.attribution_pct
 FROM l2.exposure_counterparty_attribution eca
-JOIN l1.counterparty c ON c.counterparty_id = eca.counterparty_id
+JOIN l2.counterparty c ON c.counterparty_id = eca.counterparty_id
 WHERE eca.facility_id = 5301 AND eca.as_of_date = '2025-01-31'
 ORDER BY eca.attribution_pct DESC`,
     minRows: 4,
@@ -152,8 +152,8 @@ ORDER BY lu.as_of_date`,
     query: `SELECT c.legal_name, f.facility_name, dpf.proposed_amount, dpf.pipeline_stage,
        dpf.expected_close_date
 FROM l2.deal_pipeline_fact dpf
-JOIN l1.counterparty c ON c.counterparty_id = dpf.counterparty_id
-JOIN l1.facility_master f ON f.facility_id = dpf.facility_id
+JOIN l2.counterparty c ON c.counterparty_id = dpf.counterparty_id
+JOIN l2.facility_master f ON f.facility_id = dpf.facility_id
 WHERE dpf.pipeline_id BETWEEN 5001 AND 5012
 ORDER BY dpf.proposed_amount DESC`,
     minRows: 12,
@@ -169,8 +169,8 @@ ORDER BY dpf.proposed_amount DESC`,
     query: `SELECT f.facility_name, c.legal_name, fes.outstanding_balance_amt, fes.days_until_maturity,
        f.maturity_date, rf.flag_severity
 FROM l2.facility_exposure_snapshot fes
-JOIN l1.facility_master f ON f.facility_id = fes.facility_id
-JOIN l1.counterparty c ON c.counterparty_id = fes.counterparty_id
+JOIN l2.facility_master f ON f.facility_id = fes.facility_id
+JOIN l2.counterparty c ON c.counterparty_id = fes.counterparty_id
 LEFT JOIN l2.risk_flag rf ON rf.facility_id = fes.facility_id AND rf.flag_code = 'MATURITY_CONCENTRATION'
 WHERE fes.facility_id BETWEEN 5461 AND 5475 AND fes.as_of_date = '2025-01-31'
 ORDER BY fes.days_until_maturity`,
@@ -220,7 +220,7 @@ ORDER BY fes.as_of_date, fes.fr2590_category_code`,
        ROUND(fps.nii_ytd::numeric / NULLIF(fes.outstanding_balance_amt,0) * 100, 2) AS nii_yield_pct,
        cro.rating_value, cro.rating_grade_id
 FROM l2.facility_exposure_snapshot fes
-JOIN l1.facility_master f ON f.facility_id = fes.facility_id
+JOIN l2.facility_master f ON f.facility_id = fes.facility_id
 JOIN l2.facility_profitability_snapshot fps ON fps.facility_id = fes.facility_id AND fps.as_of_date = fes.as_of_date
 JOIN l2.counterparty_rating_observation cro ON cro.counterparty_id = fes.counterparty_id AND cro.as_of_date = fes.as_of_date
 WHERE fes.facility_id BETWEEN 5551 AND 5554 AND fes.as_of_date = '2025-01-31'`,
@@ -236,7 +236,7 @@ WHERE fes.facility_id BETWEEN 5551 AND 5554 AND fes.as_of_date = '2025-01-31'`,
        mt.threshold_value AS minimum,
        fmo.metric_value - mt.threshold_value AS buffer
 FROM l2.financial_metric_observation fmo
-JOIN l2.metric_threshold mt ON mt.metric_definition_id = fmo.metric_definition_id
+JOIN l1.metric_threshold mt ON mt.metric_definition_id = fmo.metric_definition_id
 WHERE fmo.observation_id BETWEEN 5001 AND 5004 AND fmo.as_of_date = '2025-01-31'`,
     minRows: 4,
     validate: (r) =>
@@ -293,7 +293,7 @@ ORDER BY ae.amendment_status_code, ae.facility_id`,
        SUM(fes.outstanding_balance_amt) AS total_drawn,
        COUNT(*) AS facility_count
 FROM l2.facility_exposure_snapshot fes
-JOIN l1.counterparty c ON c.counterparty_id = fes.counterparty_id
+JOIN l2.counterparty c ON c.counterparty_id = fes.counterparty_id
 WHERE fes.counterparty_id BETWEEN 1651 AND 1655
 GROUP BY fes.as_of_date, c.country_code
 ORDER BY fes.as_of_date`,

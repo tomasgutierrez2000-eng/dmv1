@@ -61,7 +61,7 @@ The primary credit risk regulatory report for GSIBs. Filed quarterly.
 | **Collateral** | Collateral type, appraised value, LTV, lien position | l2.collateral_snapshot, l1.collateral_type_dim |
 | **Pricing** | Interest rate, spread, fee structure, benchmark rate | l2.facility_pricing_snapshot, l1.benchmark_rate_index |
 | **Performance** | DPD bucket, accrual status, TDR flag, charge-off amount | l2.facility_delinquency_snapshot, l2.credit_event |
-| **Participation** | Syndicated flag, agent bank, participant share, retained amount | l1.credit_agreement_counterparty_participation |
+| **Participation** | Syndicated flag, agent bank, participant share, retained amount | l2.credit_agreement_counterparty_participation |
 | **Loss Mitigation** | Workout status, modification type, concession amount | l2.credit_event (amendment/modification events) |
 | **Stress Testing** | Stressed PD, stressed LGD, stressed EL, scenario ID | l3.facility_stress_test_calc |
 | **CECL/Allowance** | CECL stage, allowance amount, qualitative factors | l3.facility_financial_calc (if CECL fields exist) |

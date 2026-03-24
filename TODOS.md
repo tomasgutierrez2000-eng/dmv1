@@ -44,9 +44,10 @@
 **Depends on:** Issue 7 (shared formatter) for consistent type formatting.
 
 ### 9. Fix LOAD_ORDER schema labels
-**What:** Change 'l2.counterparty' → 'l1.counterparty' (and credit_agreement_master, facility_master) in sql-emitter.ts LOAD_ORDER.
-**Why:** Documentation bug — these are L1 tables labeled as L2. Would break schema-qualified lookups.
+**What:** Verify LOAD_ORDER schema labels in sql-emitter.ts match the L2 schema for counterparty, credit_agreement_master, facility_master.
+**Why:** These are L2 master tables — LOAD_ORDER labels must use `l2.` prefix for correct schema-qualified lookups.
 **Depends on:** Nothing. 3-line fix.
+**Completed:** affectionate-banzai branch (2026-03-24) — Fixed 12 tables (10 master tables l1→l2, metric_threshold l2→l1, fx_rate l1→l2, facility_lender_allocation l1→l2) across 33 files. All tests pass.
 
 ### 10. Add error logging to readDataDictionary
 **What:** Log parse errors in lib/data-dictionary.ts before returning null. Distinguish ENOENT from corruption.

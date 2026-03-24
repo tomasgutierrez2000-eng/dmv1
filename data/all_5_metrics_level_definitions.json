@@ -8,7 +8,7 @@
       "definition": "The contractual credit spread on this individual facility, expressed as the margin over the reference base rate (e.g., SOFR + 250bps = 2.50% spread). This is a sourced field from the credit agreement  —  not a calculation. It represents the risk premium the bank earns on this specific loan. Reported as FR Y-14Q Corporate Loan Schedule Field 40 (Interest Rate Spread). At facility level this is not a \"weighted average\"  —  it is the single facility's spread.",
       "laymanFormula": "The spread is the raw field from the loan  —  no calculation needed. It's the credit margin over the benchmark rate.",
       "formula": "spread_pct = facility.spread_bps / 100",
-      "lineageNarrative": "[SOURCE] L2.facility_pricing_snapshot.spread_bps  →  Description: Contractual credit spread in basis points, snapshotted at as_of_date  →  Sample: 250 | [TRANSFORM] Convert bps to pct  →  Formula: spread_bps / 100  →  Sample: 2.50 | [OUTPUT] Facility Spread (%) | Reference rate context: l1.facility_master.rate_index_id  →  l1.interest_rate_index_dim.index_name",
+      "lineageNarrative": "[SOURCE] L2.facility_pricing_snapshot.spread_bps  →  Description: Contractual credit spread in basis points, snapshotted at as_of_date  →  Sample: 250 | [TRANSFORM] Convert bps to pct  →  Formula: spread_bps / 100  →  Sample: 2.50 | [OUTPUT] Facility Spread (%) | Reference rate context: l2.facility_master.rate_index_id  →  l1.interest_rate_index_dim.index_name",
       "sourceFields": [
         {
           "layer": "L2",

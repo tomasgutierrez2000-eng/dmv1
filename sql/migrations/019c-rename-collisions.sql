@@ -5,7 +5,7 @@
 -- Renames:
 --   l3.stress_test_result       → l3.stress_test_result_calc
 --   l3.data_quality_score_snapshot → l3.data_quality_score_calc
---   l2.metric_threshold         → l2.metric_threshold_snapshot
+--   l1.metric_threshold         → l1.metric_threshold_snapshot
 
 SET search_path TO l1, l2, l3, public;
 
@@ -43,19 +43,19 @@ BEGIN
   END IF;
 END $$;
 
--- 3. l2.metric_threshold → l2.metric_threshold_snapshot
+-- 3. l1.metric_threshold → l1.metric_threshold_snapshot
 DO $$
 BEGIN
   IF EXISTS (
     SELECT 1 FROM information_schema.tables
-    WHERE table_schema = 'l2' AND table_name = 'metric_threshold'
+    WHERE table_schema = 'l1' AND table_name = 'metric_threshold'
   ) AND NOT EXISTS (
     SELECT 1 FROM information_schema.tables
-    WHERE table_schema = 'l2' AND table_name = 'metric_threshold_snapshot'
+    WHERE table_schema = 'l1' AND table_name = 'metric_threshold_snapshot'
   ) THEN
-    ALTER TABLE l2.metric_threshold RENAME TO metric_threshold_snapshot;
-    RAISE NOTICE 'Renamed l2.metric_threshold → metric_threshold_snapshot';
+    ALTER TABLE l1.metric_threshold RENAME TO metric_threshold_snapshot;
+    RAISE NOTICE 'Renamed l1.metric_threshold → metric_threshold_snapshot';
   ELSE
-    RAISE NOTICE 'Skipped l2.metric_threshold rename (already done or source missing)';
+    RAISE NOTICE 'Skipped l1.metric_threshold rename (already done or source missing)';
   END IF;
 END $$;

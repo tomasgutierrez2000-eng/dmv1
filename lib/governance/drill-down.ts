@@ -171,7 +171,7 @@ WHERE dimension_key ${filter}`;
  */
 const LABEL_QUERIES: Record<string, string> = {
   facility: `SELECT facility_id::text AS dim_key, facility_name AS dim_label FROM l2.facility_master`,
-  counterparty: `SELECT counterparty_id::text AS dim_key, legal_name AS dim_label FROM l1.counterparty`,
+  counterparty: `SELECT counterparty_id::text AS dim_key, legal_name AS dim_label FROM l2.counterparty`,
   desk: `SELECT managed_segment_id::text AS dim_key, segment_name AS dim_label FROM l1.enterprise_business_taxonomy WHERE is_current_flag = 'Y'`,
   portfolio: `SELECT managed_segment_id::text AS dim_key, segment_name AS dim_label FROM l1.enterprise_business_taxonomy WHERE is_current_flag = 'Y'`,
   business_segment: `SELECT managed_segment_id::text AS dim_key, segment_name AS dim_label FROM l1.enterprise_business_taxonomy WHERE is_current_flag = 'Y'`,

@@ -77,10 +77,10 @@ JOIN      l2.position_detail pd              ON p.position_id = pd.position_id A
 LEFT JOIN l2.facility_exposure_snapshot fes   ON p.facility_id = fes.facility_id AND fes.as_of_date = p_as_of_date
 LEFT JOIN l2.netting_set_exposure_snapshot nse ON p.netting_set_id = nse.netting_set_id AND nse.as_of_date = p_as_of_date
 -- L1 reference joins: static attributes (org_unit, portfolio, product_type, country)
-LEFT JOIN l1.facility_master fm              ON p.facility_id = fm.facility_id
-LEFT JOIN l1.counterparty cp                 ON p.counterparty_id = cp.counterparty_id
--- L1 fx_rate: reference rate table filtered by as_of_date for point-in-time conversion
-LEFT JOIN l1.fx_rate fx                      ON p.currency_code = fx.from_currency_code
+LEFT JOIN l2.facility_master fm              ON p.facility_id = fm.facility_id
+LEFT JOIN l2.counterparty cp                 ON p.counterparty_id = cp.counterparty_id
+-- L2 fx_rate: reference rate table filtered by as_of_date for point-in-time conversion
+LEFT JOIN l2.fx_rate fx                      ON p.currency_code = fx.from_currency_code
                                              AND fx.to_currency_code = p_base_currency
                                              AND fx.as_of_date = p_as_of_date
 LEFT JOIN l2.facility_lob_attribution fla    ON p.facility_id = fla.facility_id AND fla.as_of_date = p_as_of_date
@@ -187,11 +187,11 @@ SELECT
 FROM      l2.position p
 JOIN      l2.position_detail pd              ON p.position_id = pd.position_id AND pd.as_of_date = p_as_of_date
 LEFT JOIN l2.facility_exposure_snapshot fes   ON p.facility_id = fes.facility_id AND fes.as_of_date = p_as_of_date
-LEFT JOIN l1.facility_master fm              ON p.facility_id = fm.facility_id
+LEFT JOIN l2.facility_master fm              ON p.facility_id = fm.facility_id
 LEFT JOIN l2.counterparty_rating_observation cro
             ON p.counterparty_id = cro.counterparty_id AND cro.as_of_date = p_as_of_date AND cro.rating_source_id = 'INTERNAL'
 LEFT JOIN l3.stress_test_result_calc str          ON p.position_id = str.position_id AND str.as_of_date = p_as_of_date
-LEFT JOIN l1.fx_rate fx                      ON p.currency_code = fx.from_currency_code
+LEFT JOIN l2.fx_rate fx                      ON p.currency_code = fx.from_currency_code
                                              AND fx.to_currency_code = p_base_currency AND fx.as_of_date = p_as_of_date
 LEFT JOIN l2.facility_lob_attribution fla    ON p.facility_id = fla.facility_id AND fla.as_of_date = p_as_of_date
 WHERE p.as_of_date = p_as_of_date;
@@ -255,16 +255,16 @@ SELECT
     rmt.parent_group_code   -- 'M1' (funded) or 'M2' (unfunded)
 
 FROM      l2.collateral_snapshot cs
-LEFT JOIN l1.collateral_asset_master ca      ON cs.collateral_asset_id = ca.collateral_asset_id
-LEFT JOIN l1.crm_protection_master pm        ON cs.protection_id = pm.protection_id
-LEFT JOIN l1.collateral_link cl              ON ca.collateral_asset_id = cl.collateral_asset_id
-LEFT JOIN l1.protection_link pl              ON pm.protection_id = pl.protection_id
+LEFT JOIN l2.collateral_asset_master ca      ON cs.collateral_asset_id = ca.collateral_asset_id
+LEFT JOIN l2.crm_protection_master pm        ON cs.protection_id = pm.protection_id
+LEFT JOIN l2.collateral_link cl              ON ca.collateral_asset_id = cl.collateral_asset_id
+LEFT JOIN l2.protection_link pl              ON pm.protection_id = pl.protection_id
 LEFT JOIN l1.netting_set_link nl             ON ca.collateral_asset_id = nl.collateral_asset_id
 LEFT JOIN l1.collateral_haircut_dim hc       ON ca.collateral_type_id = hc.collateral_type_id
 LEFT JOIN l2.facility_exposure_snapshot fes   ON cl.facility_id = fes.facility_id AND fes.as_of_date = p_as_of_date
-LEFT JOIN l1.fx_rate fx                      ON cs.currency_code = fx.from_currency_code
+LEFT JOIN l2.fx_rate fx                      ON cs.currency_code = fx.from_currency_code
                                              AND fx.to_currency_code = p_base_currency AND fx.as_of_date = p_as_of_date
-LEFT JOIN l1.fx_rate fx2                     ON fes.currency_code = fx2.from_currency_code
+LEFT JOIN l2.fx_rate fx2                     ON fes.currency_code = fx2.from_currency_code
                                              AND fx2.to_currency_code = p_base_currency AND fx2.as_of_date = p_as_of_date
 LEFT JOIN l1.risk_mitigant_master rm         ON COALESCE(ca.collateral_asset_id, pm.protection_id) = rm.source_asset_id
 LEFT JOIN l1.risk_mitigant_type_dim rmt      ON rm.risk_mitigant_type_code = rmt.risk_mitigant_type_code
@@ -475,8 +475,8 @@ SELECT
     SUM(COALESCE(ce.estimated_exposure_impact, 0) * COALESCE(fx.exchange_rate, 1))
 FROM l2.credit_event ce
 JOIN l1.credit_event_type_dim cet ON ce.credit_event_type_id = cet.credit_event_type_id
-JOIN l1.counterparty cp ON ce.counterparty_id = cp.counterparty_id
-LEFT JOIN l1.fx_rate fx ON ce.currency_code = fx.from_currency_code
+JOIN l2.counterparty cp ON ce.counterparty_id = cp.counterparty_id
+LEFT JOIN l2.fx_rate fx ON ce.currency_code = fx.from_currency_code
                         AND fx.to_currency_code = p_base_currency AND fx.as_of_date = p_as_of_date
 LEFT JOIN l2.facility_lob_attribution fla ON ce.facility_id = fla.facility_id AND fla.as_of_date = p_as_of_date
 WHERE ce.event_date BETWEEN p_as_of_date - INTERVAL '3 months' AND p_as_of_date
@@ -517,7 +517,7 @@ SELECT
 FROM l3.stress_test_result_calc str
 JOIN l1.scenario_dim sd ON str.scenario_id = sd.scenario_id
 LEFT JOIN l2.stress_test_breach stb ON str.scenario_id = stb.scenario_id AND str.as_of_date = stb.as_of_date
-LEFT JOIN l1.fx_rate fx ON str.currency_code = fx.from_currency_code
+LEFT JOIN l2.fx_rate fx ON str.currency_code = fx.from_currency_code
                         AND fx.to_currency_code = p_base_currency AND fx.as_of_date = p_as_of_date
 WHERE str.as_of_date = p_as_of_date
 GROUP BY str.scenario_id, sd.scenario_name, sd.scenario_type, sd.scenario_description, sd.scope_description;

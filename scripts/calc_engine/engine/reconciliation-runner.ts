@@ -138,7 +138,7 @@ async function checkCompleteness(
 ): Promise<ValidationCheckResult> {
   const result = await executor.query(
     `SELECT fm.facility_id
-     FROM l1.facility_master fm
+     FROM l2.facility_master fm
      WHERE fm.is_active_flag = 'Y'
        AND NOT EXISTS (
          SELECT 1 FROM l3.metric_result mr
@@ -189,7 +189,7 @@ async function checkOrphans(
        AND mr.aggregation_level = 'facility'
        AND mr.dimension_key IS NOT NULL
        AND NOT EXISTS (
-         SELECT 1 FROM l1.facility_master fm
+         SELECT 1 FROM l2.facility_master fm
          WHERE fm.facility_id::TEXT = mr.dimension_key
        )
      LIMIT 20`,

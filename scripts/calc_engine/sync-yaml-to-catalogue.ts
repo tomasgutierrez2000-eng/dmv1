@@ -76,7 +76,7 @@ function aggregationToSourcing(agg: string): 'Raw' | 'Calc' | 'Agg' | 'Avg' {
  * Produces numbered steps like:
  *   1. LOAD  l2.collateral_snapshot  (cs)
  *      WHERE cs.as_of_date = :as_of_date
- *   2. JOIN  l1.facility_master  (fm)
+ *   2. JOIN  l2.facility_master  (fm)
  *      ON    fm.facility_id = cs.facility_id
  *      AND   fm.is_active_flag = 'Y'
  *   3. GROUP BY cs.facility_id

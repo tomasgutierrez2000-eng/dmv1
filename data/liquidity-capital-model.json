@@ -312,7 +312,7 @@
         },
         {
           "name": "collateral id",
-          "description": "Add to l2.borrowing_position_detail.collateral_id VARCHAR(64) \u2014 FK to l1.collateral_asset_master",
+          "description": "Add to l2.borrowing_position_detail.collateral_id VARCHAR(64) \u2014 FK to l2.collateral_asset_master",
           "isPK": false,
           "isFK": true
         },
@@ -669,7 +669,7 @@
         },
         {
           "name": "customer id",
-          "description": "Add to l2.equity_position_detail.customer_id BIGINT \u2014 FK to l1.counterparty",
+          "description": "Add to l2.equity_position_detail.customer_id BIGINT \u2014 FK to l2.counterparty",
           "isPK": false,
           "isFK": true
         },
@@ -1782,7 +1782,7 @@
         },
         {
           "name": "customer id",
-          "description": "Add to l2.operational_loss_event.customer_id BIGINT \u2014 FK to l1.counterparty",
+          "description": "Add to l2.operational_loss_event.customer_id BIGINT \u2014 FK to l2.counterparty",
           "isPK": false,
           "isFK": true
         },
@@ -4308,7 +4308,7 @@
         },
         {
           "name": "customer id",
-          "description": "Add to l2.sft_position_detail.customer_id BIGINT \u2014 FK to l1.counterparty",
+          "description": "Add to l2.sft_position_detail.customer_id BIGINT \u2014 FK to l2.counterparty",
           "isPK": false,
           "isFK": true
         },
@@ -4737,7 +4737,7 @@
         },
         {
           "name": "customer id",
-          "description": "Add to l2.bond_security_position_detail.customer_id BIGINT \u2014 FK to l1.counterparty",
+          "description": "Add to l2.bond_security_position_detail.customer_id BIGINT \u2014 FK to l2.counterparty",
           "isPK": false,
           "isFK": true
         },
@@ -5094,43 +5094,43 @@
         },
         {
           "name": "customer id",
-          "description": "Existing: l1.counterparty.counterparty_id",
+          "description": "Existing: l2.counterparty.counterparty_id",
           "isPK": true,
           "isFK": false
         },
         {
           "name": "counterparty naics/sic/gic code",
-          "description": "Existing: l1.counterparty.industry_id -> l1.industry_dim.industry_code",
+          "description": "Existing: l2.counterparty.industry_id -> l1.industry_dim.industry_code",
           "isPK": false,
           "isFK": true
         },
         {
           "name": "counterparty code type",
-          "description": "Add to l1.counterparty.industry_code_type VARCHAR(20) \u2014 NAICS 2022",
+          "description": "Add to l2.counterparty.industry_code_type VARCHAR(20) \u2014 NAICS 2022",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "counterparty tin",
-          "description": "Add to l1.counterparty.tin VARCHAR(20) \u2014 Taxpayer Identification Number",
+          "description": "Add to l2.counterparty.tin VARCHAR(20) \u2014 Taxpayer Identification Number",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "stock exchange code",
-          "description": "Add to l1.counterparty.stock_exchange_code VARCHAR(20)",
+          "description": "Add to l2.counterparty.stock_exchange_code VARCHAR(20)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "ticker symbol",
-          "description": "Add to l1.counterparty.ticker_symbol VARCHAR(20)",
+          "description": "Add to l2.counterparty.ticker_symbol VARCHAR(20)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "special purpose entity flag",
-          "description": "Add to l1.counterparty.spe_flag CHAR(1)",
+          "description": "Add to l2.counterparty.spe_flag CHAR(1)",
           "isPK": false,
           "isFK": false
         },
@@ -5142,55 +5142,55 @@
         },
         {
           "name": "domicile",
-          "description": "Existing: l1.counterparty.country_code",
+          "description": "Existing: l2.counterparty.country_code",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "obligor name",
-          "description": "Existing: l1.counterparty.legal_name",
+          "description": "Existing: l2.counterparty.legal_name",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "city",
-          "description": "Add to l1.counterparty.city VARCHAR(100)",
+          "description": "Add to l2.counterparty.city VARCHAR(100)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "country",
-          "description": "Existing: l1.counterparty.country_code",
+          "description": "Existing: l2.counterparty.country_code",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "zip code",
-          "description": "Add to l1.counterparty.zip_code VARCHAR(20)",
+          "description": "Add to l2.counterparty.zip_code VARCHAR(20)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "mailing street address",
-          "description": "Add to l1.counterparty.mailing_street_address VARCHAR(500)",
+          "description": "Add to l2.counterparty.mailing_street_address VARCHAR(500)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "mailing city",
-          "description": "Add to l1.counterparty.mailing_city VARCHAR(100)",
+          "description": "Add to l2.counterparty.mailing_city VARCHAR(100)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "mailing state",
-          "description": "Add to l1.counterparty.mailing_state VARCHAR(10)",
+          "description": "Add to l2.counterparty.mailing_state VARCHAR(10)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "mailing zip code",
-          "description": "Add to l1.counterparty.mailing_zip_code VARCHAR(20)",
+          "description": "Add to l2.counterparty.mailing_zip_code VARCHAR(20)",
           "isPK": false,
           "isFK": false
         },
@@ -5238,67 +5238,67 @@
         },
         {
           "name": "bankruptcy chapter",
-          "description": "Add to l1.counterparty.bankruptcy_chapter VARCHAR(20)",
+          "description": "Add to l2.counterparty.bankruptcy_chapter VARCHAR(20)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "bankruptcy flag",
-          "description": "Add to l1.counterparty.bankruptcy_flag CHAR(1)",
+          "description": "Add to l2.counterparty.bankruptcy_flag CHAR(1)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "internal risk rating",
-          "description": "Existing: l1.counterparty.internal_risk_rating",
+          "description": "Existing: l2.counterparty.internal_risk_rating",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "counterparty type - fr 2052a",
-          "description": "Add to l1.counterparty.fr2052a_counterparty_type VARCHAR(50)",
+          "description": "Add to l2.counterparty.fr2052a_counterparty_type VARCHAR(50)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "sme indicator - fr 2052a",
-          "description": "Add to l1.counterparty.sme_indicator_fr2052a CHAR(1)",
+          "description": "Add to l2.counterparty.sme_indicator_fr2052a CHAR(1)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "designated as \"bank\"",
-          "description": "Add to l1.counterparty.designated_as_bank_flag CHAR(1) \u2014 FR2052a specific",
+          "description": "Add to l2.counterparty.designated_as_bank_flag CHAR(1) \u2014 FR2052a specific",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "commercial paper issuance program",
-          "description": "Add to l1.counterparty.commercial_paper_issuance_flag CHAR(1)",
+          "description": "Add to l2.counterparty.commercial_paper_issuance_flag CHAR(1)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "counterparty type - other regulatory reports",
-          "description": "Add to l1.counterparty.counterparty_type_other_regulatory VARCHAR(50)",
+          "description": "Add to l2.counterparty.counterparty_type_other_regulatory VARCHAR(50)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "sme/small business indicator - y9c/call/y15",
-          "description": "Add to l1.counterparty.sme_indicator_y9c_call_y15 CHAR(1)",
+          "description": "Add to l2.counterparty.sme_indicator_y9c_call_y15 CHAR(1)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "parent counterparty id",
-          "description": "Existing: l1.counterparty_hierarchy.parent_counterparty_id",
+          "description": "Existing: l2.counterparty_hierarchy.parent_counterparty_id",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "parent counterparty naics/sic/gic code",
-          "description": "Derive from l1.counterparty_hierarchy -> parent l1.counterparty.industry_id \u2014 add parent_industry_code_type if needed",
+          "description": "Derive from l2.counterparty_hierarchy -> parent l2.counterparty.industry_id \u2014 add parent_industry_code_type if needed",
           "isPK": false,
           "isFK": false
         },
@@ -5310,25 +5310,25 @@
         },
         {
           "name": "obligor",
-          "description": "Add to l1.counterparty.obligor_flag CHAR(1) \u2014 identifies principal obligor",
+          "description": "Add to l2.counterparty.obligor_flag CHAR(1) \u2014 identifies principal obligor",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "relationship account",
-          "description": "Add to l1.counterparty.relationship_account_flag CHAR(1)",
+          "description": "Add to l2.counterparty.relationship_account_flag CHAR(1)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "fatca organization type",
-          "description": "Add to l1.counterparty.fatca_organization_type VARCHAR(50)",
+          "description": "Add to l2.counterparty.fatca_organization_type VARCHAR(50)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "fatca exemption code",
-          "description": "Add to l1.counterparty.fatca_exemption_code VARCHAR(20)",
+          "description": "Add to l2.counterparty.fatca_exemption_code VARCHAR(20)",
           "isPK": false,
           "isFK": false
         },
@@ -5550,13 +5550,13 @@
         },
         {
           "name": "obligor internal id",
-          "description": "Add to l1.counterparty.obligor_internal_id VARCHAR(64) \u2014 Y-14 specific internal ID",
+          "description": "Add to l2.counterparty.obligor_internal_id VARCHAR(64) \u2014 Y-14 specific internal ID",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "entity internal id",
-          "description": "Add to l1.counterparty.entity_internal_id VARCHAR(64) \u2014 BHC/IHC/SLHC subsidiary ID",
+          "description": "Add to l2.counterparty.entity_internal_id VARCHAR(64) \u2014 BHC/IHC/SLHC subsidiary ID",
           "isPK": false,
           "isFK": false
         }
@@ -5778,79 +5778,79 @@
       "fields": [
         {
           "name": "collateral id",
-          "description": "Existing: l1.collateral_asset_master.collateral_asset_id",
+          "description": "Existing: l2.collateral_asset_master.collateral_asset_id",
           "isPK": true,
           "isFK": false
         },
         {
           "name": "owned instrument id",
-          "description": "Add to l1.collateral_asset_master.owned_instrument_id VARCHAR(64)",
+          "description": "Add to l2.collateral_asset_master.owned_instrument_id VARCHAR(64)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "collateral class - fr 2052a",
-          "description": "Add to l1.collateral_asset_master.fr2052a_collateral_class_code VARCHAR(30)",
+          "description": "Add to l2.collateral_asset_master.fr2052a_collateral_class_code VARCHAR(30)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "rehypothecated",
-          "description": "Add to l1.collateral_asset_master.rehypothecated_flag CHAR(1)",
+          "description": "Add to l2.collateral_asset_master.rehypothecated_flag CHAR(1)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "country code",
-          "description": "Existing: l1.collateral_asset_master.location_country_code",
+          "description": "Existing: l2.collateral_asset_master.location_country_code",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "collateral mapping id",
-          "description": "Add to l1.collateral_asset_master.collateral_mapping_id VARCHAR(64)",
+          "description": "Add to l2.collateral_asset_master.collateral_mapping_id VARCHAR(64)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "instrument id",
-          "description": "Add to l1.collateral_asset_master.instrument_id VARCHAR(64) \u2014 FK to l1.instrument_master",
+          "description": "Add to l2.collateral_asset_master.instrument_id VARCHAR(64) \u2014 FK to l1.instrument_master",
           "isPK": false,
           "isFK": true
         },
         {
           "name": "instrument type",
-          "description": "Add to l1.collateral_asset_master.instrument_type_code VARCHAR(30)",
+          "description": "Add to l2.collateral_asset_master.instrument_type_code VARCHAR(30)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "collateral-to-loan flag",
-          "description": "Add to l1.collateral_asset_master.collateral_to_loan_pct NUMERIC(10,4)",
+          "description": "Add to l2.collateral_asset_master.collateral_to_loan_pct NUMERIC(10,4)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "primary collateral flag",
-          "description": "Add to l1.collateral_asset_master.primary_collateral_flag CHAR(1)",
+          "description": "Add to l2.collateral_asset_master.primary_collateral_flag CHAR(1)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "customer id",
-          "description": "Existing: l1.collateral_asset_master.counterparty_id",
+          "description": "Existing: l2.collateral_asset_master.counterparty_id",
           "isPK": false,
           "isFK": true
         },
         {
           "name": "encumbrance flag",
-          "description": "Add to l1.collateral_asset_master.encumbrance_flag CHAR(1)",
+          "description": "Add to l2.collateral_asset_master.encumbrance_flag CHAR(1)",
           "isPK": false,
           "isFK": false
         },
         {
           "name": "encumbrance type",
-          "description": "Add to l1.collateral_asset_master.encumbrance_type_code VARCHAR(30)",
+          "description": "Add to l2.collateral_asset_master.encumbrance_type_code VARCHAR(30)",
           "isPK": false,
           "isFK": false
         }

@@ -36,7 +36,7 @@ SELECT
   lu.utilized_amount,
   lu.available_amount,
   lu.as_of_date
-FROM l1.counterparty c
+FROM l2.counterparty c
 JOIN l1.limit_rule lr ON lr.counterparty_id = c.counterparty_id AND lr.limit_type = 'LARGE_EXPOSURE'
 LEFT JOIN l2.limit_utilization_event lu ON lu.limit_rule_id = lr.limit_rule_id AND lu.as_of_date = '2025-01-31'
 WHERE c.counterparty_id = 1001
@@ -50,7 +50,7 @@ SELECT
   fes.drawn_amount,
   fes.committed_amount,
   fes.limit_status_code
-FROM l1.facility_master f
+FROM l2.facility_master f
 JOIN l2.facility_exposure_snapshot fes ON fes.facility_id = f.facility_id
 WHERE f.counterparty_id = $1 AND fes.as_of_date = $2
 ORDER BY fes.drawn_amount DESC

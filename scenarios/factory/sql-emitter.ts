@@ -2,7 +2,7 @@
  * SQL Emitter — generates INSERT statements with correct load ordering and type formatting.
  *
  * Handles:
- *   - Load order: L1 dims → L1 masters → L2 snapshots → L2 events
+ *   - Load order: L1 dims → L2 entity/master tables → L2 snapshots → L2 events
  *   - Type-correct value formatting (BIGINT unquoted, VARCHAR quoted, etc.)
  *   - SET search_path header
  *   - Scenario header comments with narrative
@@ -26,23 +26,23 @@ export const LOAD_ORDER: string[] = [
   'l1.currency_dim',
   'l1.metric_threshold',
 
-  // L1 master tables (parents first)
-  'l1.counterparty',
-  'l1.credit_agreement_master',
-  'l1.facility_master',
-  'l1.counterparty_hierarchy',
+  // L2 master/entity tables (parents first)
+  'l2.counterparty',
+  'l2.credit_agreement_master',
+  'l2.facility_master',
+  'l2.counterparty_hierarchy',
   'l1.sccl_counterparty_group',
   'l1.sccl_counterparty_group_member',
-  'l1.control_relationship',
-  'l1.collateral_asset_master',
-  'l1.collateral_link',
+  'l2.control_relationship',
+  'l2.collateral_asset_master',
+  'l2.collateral_link',
   'l1.limit_rule',
   'l1.limit_threshold',
   'l2.facility_lender_allocation',
   'l2.facility_counterparty_participation',
-  'l1.credit_agreement_counterparty_participation',
-  'l1.crm_protection_master',
-  'l1.protection_link',
+  'l2.credit_agreement_counterparty_participation',
+  'l2.crm_protection_master',
+  'l2.protection_link',
 
   // L2 FX rates (must precede exposure snapshots for metric JOIN coverage)
   'l2.fx_rate',
@@ -65,7 +65,6 @@ export const LOAD_ORDER: string[] = [
   'l2.data_quality_score_snapshot',
   'l2.facility_lob_attribution',
   'l2.netting_set_exposure_snapshot',
-  'l2.metric_threshold',
 
   // L2 position tables (position before position_detail, then product tables)
   'l2.position',
@@ -148,7 +147,7 @@ export const formatSqlValue = _formatSqlValue;
 export type SqlRow = Record<string, unknown>;
 
 export interface TableData {
-  table: string;     // e.g. 'l1.counterparty'
+  table: string;     // e.g. 'l2.counterparty'
   rows: SqlRow[];
 }
 

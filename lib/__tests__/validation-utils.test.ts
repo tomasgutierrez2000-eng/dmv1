@@ -225,7 +225,7 @@ describe('validateFormulaLogic', () => {
     const sql = `SELECT fm.facility_id AS dimension_key,
       SUM(fes.drawn_amount) / NULLIF(SUM(fes.committed_amount), 0) AS metric_value
       FROM l2.facility_exposure_snapshot fes
-      LEFT JOIN l1.facility_master fm ON fm.facility_id = fes.facility_id
+      LEFT JOIN l2.facility_master fm ON fm.facility_id = fes.facility_id
       WHERE fes.as_of_date = '2025-01-31'
       GROUP BY fm.facility_id`;
     const w = validateFormulaLogic(ctx, entries(sql));

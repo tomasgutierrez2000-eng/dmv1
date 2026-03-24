@@ -107,7 +107,7 @@ LEFT JOIN (
     FROM l2.risk_flag rf
     JOIN l2.facility_exposure_snapshot fes ON rf.facility_id = fes.facility_id AND fes.as_of_date = p_as_of_date
     JOIN l2.facility_lob_attribution fla ON rf.facility_id = fla.facility_id AND fla.as_of_date = p_as_of_date
-    LEFT JOIN l1.fx_rate fx ON fes.currency_code = fx.from_currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = p_as_of_date
+    LEFT JOIN l2.fx_rate fx ON fes.currency_code = fx.from_currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = p_as_of_date
     WHERE rf.risk_flag_type = 'NPL' AND rf.as_of_date = p_as_of_date
     GROUP BY fla.lob_node_id
 ) npl_agg ON emc.lob_node_id = npl_agg.lob_node_id
@@ -161,9 +161,9 @@ SELECT
     ces.base_currency_code, ces.lob_node_id, CURRENT_TIMESTAMP
 
 FROM l3.counterparty_exposure_summary ces
-JOIN l1.counterparty cp ON ces.counterparty_id = cp.counterparty_id
-LEFT JOIN l1.counterparty_hierarchy ch ON ces.counterparty_id = ch.counterparty_id
-LEFT JOIN l1.counterparty pcp ON ch.parent_counterparty_id = pcp.counterparty_id
+JOIN l2.counterparty cp ON ces.counterparty_id = cp.counterparty_id
+LEFT JOIN l2.counterparty_hierarchy ch ON ces.counterparty_id = ch.counterparty_id
+LEFT JOIN l2.counterparty pcp ON ch.parent_counterparty_id = pcp.counterparty_id
 LEFT JOIN l1.industry_dim ind ON ces.industry_code = ind.industry_code
 LEFT JOIN l2.counterparty_rating_observation cro_int
     ON ces.counterparty_id = cro_int.counterparty_id AND cro_int.as_of_date = p_as_of_date AND cro_int.rating_source_id = 'INTERNAL'
@@ -267,8 +267,8 @@ SELECT
     fes.base_currency_code, CURRENT_TIMESTAMP
 
 FROM l3.facility_exposure_summary fes
-JOIN l1.facility_master fm ON fes.facility_id = fm.facility_id
-JOIN l1.counterparty cp ON fes.counterparty_id = cp.counterparty_id
+JOIN l2.facility_master fm ON fes.facility_id = fm.facility_id
+JOIN l2.counterparty cp ON fes.counterparty_id = cp.counterparty_id
 LEFT JOIN l1.portfolio_dim pd ON fes.portfolio_id = pd.portfolio_id
 LEFT JOIN l1.enterprise_product_taxonomy pt ON fm.product_type_code = pt.product_node_id
 LEFT JOIN l1.enterprise_business_taxonomy bt_l1 ON fes.lob_node_id = bt_l1.business_node_id AND bt_l1.node_level = 1
@@ -282,7 +282,7 @@ LEFT JOIN (
 ) crm ON fes.facility_id = crm.facility_id
 LEFT JOIN (
     SELECT facility_id, MAX(bank_share_pct) AS bank_share_pct
-    FROM l1.facility_lender_allocation
+    FROM l2.facility_lender_allocation
     GROUP BY facility_id
 ) fla ON fes.facility_id = fla.facility_id
 WHERE fes.run_version_id = p_run_version_id AND fes.scenario_id = 'BASE';

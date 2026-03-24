@@ -42,7 +42,7 @@ SELECT
 
     -- PARENT FLAG
     CASE WHEN ch.parent_counterparty_id IS NULL AND EXISTS (
-        SELECT 1 FROM l1.counterparty_hierarchy ch2 WHERE ch2.parent_counterparty_id = emc.counterparty_id
+        SELECT 1 FROM l2.counterparty_hierarchy ch2 WHERE ch2.parent_counterparty_id = emc.counterparty_id
     ) THEN TRUE ELSE FALSE END                                     AS is_parent_flag,
 
     -- COMMITTED = drawn + undrawn; OUTSTANDING = drawn only
@@ -73,8 +73,8 @@ SELECT
     cp.industry_code
 
 FROM l3.exposure_metric_cube emc
-JOIN l1.counterparty cp                       ON emc.counterparty_id = cp.counterparty_id
-LEFT JOIN l1.counterparty_hierarchy ch        ON emc.counterparty_id = ch.counterparty_id
+JOIN l2.counterparty cp                       ON emc.counterparty_id = cp.counterparty_id
+LEFT JOIN l2.counterparty_hierarchy ch        ON emc.counterparty_id = ch.counterparty_id
 LEFT JOIN l1.sccl_counterparty_group_member scm ON emc.counterparty_id = scm.counterparty_id
 LEFT JOIN l1.country_dim cd                   ON cp.country_of_domicile = cd.country_code
 LEFT JOIN l1.region_dim rd                    ON cd.region_code = rd.region_code

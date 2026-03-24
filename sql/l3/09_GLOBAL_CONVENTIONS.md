@@ -52,7 +52,7 @@ Every L3 table MUST include these governance columns for SR 11-7 compliance and 
 
 All monetary measures stored in `base_currency_code` (typically USD).
 Conversion: `amount * COALESCE(fx.exchange_rate, 1)`
-FX rate join: `l1.fx_rate ON currency_code = from_currency_code AND to_currency_code = @base_currency_code AND as_of_date = @as_of_date`
+FX rate join: `l2.fx_rate ON currency_code = from_currency_code AND to_currency_code = @base_currency_code AND as_of_date = @as_of_date`
 
 ## Period-over-Period Pattern
 

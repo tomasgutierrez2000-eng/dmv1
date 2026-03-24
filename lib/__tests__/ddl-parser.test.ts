@@ -4,18 +4,18 @@ import { parseDDL, parseFkReference } from '../ddl-parser';
 // ─── parseDDL ─────────────────────────────────────────────────────────
 
 describe('parseDDL', () => {
-  it('parses a simple L1 table with inline PK', () => {
+  it('parses a simple L2 table with inline PK', () => {
     const sql = `
-      CREATE TABLE IF NOT EXISTS l1.counterparty (
+      CREATE TABLE IF NOT EXISTS l2.counterparty (
         counterparty_id BIGINT NOT NULL PRIMARY KEY,
         legal_name VARCHAR(500),
         country_code VARCHAR(30)
       );
     `;
-    const tables = parseDDL(sql, 'l1');
+    const tables = parseDDL(sql, 'l2');
     expect(tables).toHaveLength(1);
     expect(tables[0].name).toBe('counterparty');
-    expect(tables[0].schema).toBe('l1');
+    expect(tables[0].schema).toBe('l2');
     expect(tables[0].pkColumns).toEqual(['counterparty_id']);
     expect(tables[0].columns).toHaveLength(3);
     expect(tables[0].columns[0].pk).toBe(true);
@@ -25,11 +25,11 @@ describe('parseDDL', () => {
 
   it('parses quoted table names', () => {
     const sql = `
-      CREATE TABLE IF NOT EXISTS "l1"."counterparty" (
+      CREATE TABLE IF NOT EXISTS "l2"."counterparty" (
         counterparty_id BIGINT NOT NULL PRIMARY KEY
       );
     `;
-    const tables = parseDDL(sql, 'l1');
+    const tables = parseDDL(sql, 'l2');
     expect(tables).toHaveLength(1);
     expect(tables[0].name).toBe('counterparty');
   });
@@ -54,12 +54,12 @@ describe('parseDDL', () => {
       CREATE TABLE IF NOT EXISTS l2.facility_master (
         facility_id BIGINT NOT NULL PRIMARY KEY,
         counterparty_id BIGINT,
-        CONSTRAINT fk_fm_cp FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
+        CONSTRAINT fk_fm_cp FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id)
       );
     `;
     const tables = parseDDL(sql, 'l2');
     const cpCol = tables[0].columns.find(c => c.name === 'counterparty_id');
-    expect(cpCol?.fk).toBe('l1.counterparty(counterparty_id)');
+    expect(cpCol?.fk).toBe('l2.counterparty(counterparty_id)');
   });
 
   it('parses DEFAULT values', () => {
@@ -112,9 +112,9 @@ describe('parseDDL', () => {
 // ─── parseFkReference ─────────────────────────────────────────────────
 
 describe('parseFkReference', () => {
-  it('parses l1/l2 format: l1.table(field)', () => {
-    const result = parseFkReference('l1.counterparty(counterparty_id)');
-    expect(result).toEqual({ layer: 'L1', table: 'counterparty', field: 'counterparty_id' });
+  it('parses l1/l2 format: l2.table(field)', () => {
+    const result = parseFkReference('l2.counterparty(counterparty_id)');
+    expect(result).toEqual({ layer: 'L2', table: 'counterparty', field: 'counterparty_id' });
   });
 
   it('parses l2 format', () => {
@@ -122,9 +122,9 @@ describe('parseFkReference', () => {
     expect(result).toEqual({ layer: 'L2', table: 'facility_master', field: 'facility_id' });
   });
 
-  it('parses L3 format: L1.table.field', () => {
-    const result = parseFkReference('L1.counterparty.counterparty_id');
-    expect(result).toEqual({ layer: 'L1', table: 'counterparty', field: 'counterparty_id' });
+  it('parses L3 format: L2.table.field', () => {
+    const result = parseFkReference('L2.counterparty.counterparty_id');
+    expect(result).toEqual({ layer: 'L2', table: 'counterparty', field: 'counterparty_id' });
   });
 
   it('returns null for invalid format', () => {

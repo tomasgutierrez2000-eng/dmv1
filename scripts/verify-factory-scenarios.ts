@@ -93,9 +93,9 @@ async function main() {
       try {
         // Check 1: FK chain — facility → agreement → counterparty
         const fkRes = await client.query(
-          `SELECT COUNT(*) AS cnt FROM l1.facility_master fm
-           JOIN l1.credit_agreement_master cam ON fm.credit_agreement_id = cam.credit_agreement_id
-           JOIN l1.counterparty c ON fm.counterparty_id = c.counterparty_id
+          `SELECT COUNT(*) AS cnt FROM l2.facility_master fm
+           JOIN l2.credit_agreement_master cam ON fm.credit_agreement_id = cam.credit_agreement_id
+           JOIN l2.counterparty c ON fm.counterparty_id = c.counterparty_id
            WHERE fm.facility_id BETWEEN $1 AND $2`,
           [r.facStart, r.facEnd]
         );

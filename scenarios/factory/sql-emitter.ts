@@ -62,7 +62,7 @@ export const LOAD_ORDER: string[] = [
   'l2.limit_contribution_snapshot',
   'l2.limit_utilization_event',
   'l2.exposure_counterparty_attribution',
-  'l2.data_quality_score_snapshot',
+  // 'l2.data_quality_score_snapshot',  // removed from DD
   'l2.facility_lob_attribution',
   'l2.netting_set_exposure_snapshot',
 
@@ -131,7 +131,7 @@ export const LOAD_ORDER: string[] = [
   'l2.amendment_change_detail',
   'l2.exception_event',
   'l2.risk_flag',
-  'l2.stress_test_result',
+  // 'l2.stress_test_result',  // removed from DD
   'l2.stress_test_breach',
   'l2.deal_pipeline_fact',
   'l2.facility_credit_approval',

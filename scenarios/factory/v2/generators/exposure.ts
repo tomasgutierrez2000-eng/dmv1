@@ -13,10 +13,10 @@ import { round } from '../prng';
  */
 export function generateExposureRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
   registry: IDRegistry,
-  bankShareMap?: Map<number, number>,
+  bankShareMap?: Map<string, number>,
 ): SqlRow[] {
   const rows: SqlRow[] = [];
 

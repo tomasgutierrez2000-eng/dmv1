@@ -158,9 +158,9 @@ function buildV2Config(
   chain: L1Chain,
   cliArgs: CliArgs,
 ): V2GeneratorConfig {
-  const storyArcs = new Map<number, StoryArc>();
-  const ratingTiers = new Map<number, RatingTier>();
-  const sizeProfiles = new Map<number, SizeProfile>();
+  const storyArcs = new Map<string, StoryArc>();
+  const ratingTiers = new Map<string, RatingTier>();
+  const sizeProfiles = new Map<string, SizeProfile>();
 
   // Map counterparty profiles to their allocated IDs
   for (let i = 0; i < config.counterparties.length; i++) {
@@ -187,7 +187,7 @@ function buildV2Config(
   const market = config.market_environment ?? undefined;
 
   // Limit rules from chain
-  const limitRules = new Map<number, number>();
+  const limitRules = new Map<string, string>();
   if (chain.limit_rules) {
     for (const rule of chain.limit_rules) {
       if (rule.counterparty_id !== null) {

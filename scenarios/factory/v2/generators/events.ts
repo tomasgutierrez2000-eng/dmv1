@@ -18,7 +18,7 @@ export interface EventRows {
 
 export function generateEventRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
   registry: IDRegistry,
 ): EventRows {

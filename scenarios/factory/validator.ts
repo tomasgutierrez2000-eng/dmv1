@@ -83,82 +83,82 @@ export function validateScenario(
 
   // Exposure snapshots
   for (const exp of (l2Data.facility_exposure_snapshot ?? [])) {
-    if (!facilityIds.has(exp.facility_id!)) {
+    if (!facilityIds.has(String(exp.facility_id))) {
       errors.push(`Exposure: facility_id ${exp.facility_id} not in L1 chain`);
     }
-    if (!counterpartyIds.has(exp.counterparty_id!)) {
+    if (!counterpartyIds.has(String(exp.counterparty_id))) {
       errors.push(`Exposure: counterparty_id ${exp.counterparty_id} not in L1 chain`);
     }
   }
 
   // Credit events
   for (const evt of (l2Data.credit_event ?? [])) {
-    if (!counterpartyIds.has(evt.counterparty_id!)) {
+    if (!counterpartyIds.has(String(evt.counterparty_id))) {
       errors.push(`Credit event ${evt.credit_event_id}: counterparty_id ${evt.counterparty_id} not in L1`);
     }
   }
 
   // Credit event facility links
   for (const link of (l2Data.credit_event_facility_link ?? [])) {
-    if (!facilityIds.has(link.facility_id!)) {
+    if (!facilityIds.has(String(link.facility_id))) {
       errors.push(`Event link: facility_id ${link.facility_id} not in L1`);
     }
   }
 
   // Risk flags
   for (const flag of (l2Data.risk_flag ?? [])) {
-    if (flag.facility_id && !facilityIds.has(flag.facility_id)) {
+    if (flag.facility_id && !facilityIds.has(String(flag.facility_id))) {
       errors.push(`Risk flag ${flag.risk_flag_id}: facility_id ${flag.facility_id} not in L1`);
     }
-    if (flag.counterparty_id && !counterpartyIds.has(flag.counterparty_id)) {
+    if (flag.counterparty_id && !counterpartyIds.has(String(flag.counterparty_id))) {
       errors.push(`Risk flag ${flag.risk_flag_id}: counterparty_id ${flag.counterparty_id} not in L1`);
     }
   }
 
   // Rating observations
   for (const obs of (l2Data.counterparty_rating_observation ?? [])) {
-    if (!counterpartyIds.has(obs.counterparty_id!)) {
+    if (!counterpartyIds.has(String(obs.counterparty_id))) {
       errors.push(`Rating observation: counterparty_id ${obs.counterparty_id} not in L1`);
     }
   }
 
   // Collateral snapshots
   for (const cs of (l2Data.collateral_snapshot ?? [])) {
-    if (cs.counterparty_id && !counterpartyIds.has(cs.counterparty_id!)) {
+    if (cs.counterparty_id && !counterpartyIds.has(String(cs.counterparty_id))) {
       errors.push(`Collateral snapshot: counterparty_id ${cs.counterparty_id} not in L1`);
     }
   }
 
   // Facility pricing snapshots
   for (const fp of (l2Data.facility_pricing_snapshot ?? [])) {
-    if (!facilityIds.has(fp.facility_id!)) {
+    if (!facilityIds.has(String(fp.facility_id))) {
       errors.push(`Facility pricing: facility_id ${fp.facility_id} not in L1`);
     }
   }
 
   // Facility risk snapshots
   for (const fr of (l2Data.facility_risk_snapshot ?? [])) {
-    if (!facilityIds.has(fr.facility_id)) {
+    if (!facilityIds.has(String(fr.facility_id))) {
       errors.push(`Facility risk: facility_id ${fr.facility_id} not in L1`);
     }
-    if (!counterpartyIds.has(fr.counterparty_id!)) {
+    if (!counterpartyIds.has(String(fr.counterparty_id))) {
       errors.push(`Facility risk: counterparty_id ${fr.counterparty_id} not in L1`);
     }
   }
 
   // Facility financial snapshots
   for (const ff of (l2Data.facility_financial_snapshot ?? [])) {
-    if (!facilityIds.has(ff.facility_id!)) {
+    if (!facilityIds.has(String(ff.facility_id))) {
       errors.push(`Facility financial: facility_id ${ff.facility_id} not in L1`);
     }
   }
 
   // Positions
   for (const pos of (l2Data.position ?? [])) {
-    if (!facilityIds.has(pos.facility_id!)) {
+    if (!facilityIds.has(String(pos.facility_id))) {
       errors.push(`Position ${pos.position_id}: facility_id ${pos.facility_id} not in L1`);
     }
-    if (!counterpartyIds.has(pos.counterparty_id!)) {
+    if (!counterpartyIds.has(String(pos.counterparty_id))) {
       errors.push(`Position ${pos.position_id}: counterparty_id ${pos.counterparty_id} not in L1`);
     }
   }
@@ -173,31 +173,31 @@ export function validateScenario(
 
   // Cash flows (table may not exist in DD-generated types)
   for (const cf of ((l2Data as any).cash_flow ?? [])) {
-    if (!facilityIds.has(cf.facility_id!)) {
+    if (!facilityIds.has(String(cf.facility_id))) {
       errors.push(`Cash flow ${cf.cash_flow_id}: facility_id ${cf.facility_id} not in L1`);
     }
-    if (!counterpartyIds.has(cf.counterparty_id!)) {
+    if (!counterpartyIds.has(String(cf.counterparty_id))) {
       errors.push(`Cash flow ${cf.cash_flow_id}: counterparty_id ${cf.counterparty_id} not in L1`);
     }
   }
 
   // LOB attribution
   for (const la of (l2Data.facility_lob_attribution ?? [])) {
-    if (!facilityIds.has(la.facility_id!)) {
+    if (!facilityIds.has(String(la.facility_id))) {
       errors.push(`LOB attribution ${la.attribution_id}: facility_id ${la.facility_id} not in L1`);
     }
   }
 
   // Counterparty financial snapshots
   for (const cpf of (l2Data.counterparty_financial_snapshot ?? [])) {
-    if (!counterpartyIds.has(cpf.counterparty_id!)) {
+    if (!counterpartyIds.has(String(cpf.counterparty_id))) {
       errors.push(`CP financial ${cpf.financial_snapshot_id}: counterparty_id ${cpf.counterparty_id} not in L1`);
     }
   }
 
   // Facility profitability
   for (const fp of (l2Data.facility_profitability_snapshot ?? [])) {
-    if (!facilityIds.has(fp.facility_id!)) {
+    if (!facilityIds.has(String(fp.facility_id))) {
       errors.push(`Facility profitability: facility_id ${fp.facility_id} not in L1`);
     }
   }
@@ -212,30 +212,30 @@ export function validateScenario(
 
   // Exception events
   for (const ee of (l2Data.exception_event ?? [])) {
-    if (!facilityIds.has(ee.facility_id!)) {
+    if (!facilityIds.has(String(ee.facility_id))) {
       errors.push(`Exception ${ee.exception_id}: facility_id ${ee.facility_id} not in L1`);
     }
-    if (!counterpartyIds.has(ee.counterparty_id!)) {
+    if (!counterpartyIds.has(String(ee.counterparty_id))) {
       errors.push(`Exception ${ee.exception_id}: counterparty_id ${ee.counterparty_id} not in L1`);
     }
   }
 
   // Credit approvals
   for (const ca of (l2Data.facility_credit_approval ?? [])) {
-    if (ca.facility_id != null && !facilityIds.has(ca.facility_id)) {
+    if (ca.facility_id != null && !facilityIds.has(String(ca.facility_id))) {
       errors.push(`Credit approval ${ca.approval_id}: facility_id ${ca.facility_id} not in L1`);
     }
-    if (ca.counterparty_id != null && !counterpartyIds.has(ca.counterparty_id)) {
+    if (ca.counterparty_id != null && !counterpartyIds.has(String(ca.counterparty_id))) {
       errors.push(`Credit approval ${ca.approval_id}: counterparty_id ${ca.counterparty_id} not in L1`);
     }
   }
 
   // Financial metric observations
   for (const fmo of (l2Data.financial_metric_observation ?? [])) {
-    if (fmo.counterparty_id != null && !counterpartyIds.has(fmo.counterparty_id)) {
+    if (fmo.counterparty_id != null && !counterpartyIds.has(String(fmo.counterparty_id))) {
       errors.push(`Metric observation ${fmo.observation_id}: counterparty_id ${fmo.counterparty_id} not in L1`);
     }
-    if (fmo.facility_id != null && !facilityIds.has(fmo.facility_id)) {
+    if (fmo.facility_id != null && !facilityIds.has(String(fmo.facility_id))) {
       errors.push(`Metric observation ${fmo.observation_id}: facility_id ${fmo.facility_id} not in L1`);
     }
   }
@@ -364,7 +364,8 @@ export function validateScenario(
       // Check that IDs were allocated by this scenario (not squatting on someone else's)
       const allocs = registry.getAllocationsForScenario(config.scenario_id);
       const cpAlloc = allocs.find(a => a.table === 'counterparty');
-      if (cpAlloc && (cp.counterparty_id < cpAlloc.startId || cp.counterparty_id > cpAlloc.endId)) {
+      const cpIdNum = Number(cp.counterparty_id);
+      if (cpAlloc && (cpIdNum < cpAlloc.startId || cpIdNum > cpAlloc.endId)) {
         errors.push(
           `Counterparty ${cp.counterparty_id} outside allocated range ${cpAlloc.startId}-${cpAlloc.endId}`
         );
@@ -484,14 +485,14 @@ export function validateV2Output(
 
   for (const td of output.tables) {
     for (const row of td.rows) {
-      if ('facility_id' in row && typeof row.facility_id === 'number') {
-        if (!facilityIds.has(row.facility_id)) {
+      if ('facility_id' in row && row.facility_id != null) {
+        if (!facilityIds.has(String(row.facility_id))) {
           errors.push(`${td.schema}.${td.table}: facility_id ${row.facility_id} not in L1`);
           break; // One error per table is enough
         }
       }
-      if ('counterparty_id' in row && typeof row.counterparty_id === 'number') {
-        if (!counterpartyIds.has(row.counterparty_id)) {
+      if ('counterparty_id' in row && row.counterparty_id != null) {
+        if (!counterpartyIds.has(String(row.counterparty_id))) {
           errors.push(`${td.schema}.${td.table}: counterparty_id ${row.counterparty_id} not in L1`);
           break;
         }
@@ -501,34 +502,34 @@ export function validateV2Output(
 
   // ── 2b. Inter-L2 FK References ──
 
-  const creditEventIds = new Set<number>();
-  const amendmentEventIds = new Set<number>();
-  const positionIds = new Set<number>();
-  const collateralAssetIds = new Set<number>();
-  const limitRuleIds = new Set<number>();
+  const creditEventIds = new Set<string>();
+  const amendmentEventIds = new Set<string>();
+  const positionIds = new Set<string>();
+  const collateralAssetIds = new Set<string>();
+  const limitRuleIds = new Set<string>();
 
   for (const td of output.tables) {
     if (td.table === 'credit_event') {
-      for (const r of td.rows) creditEventIds.add(r.credit_event_id as number);
+      for (const r of td.rows) creditEventIds.add(String(r.credit_event_id));
     }
     if (td.table === 'amendment_event') {
-      for (const r of td.rows) amendmentEventIds.add(r.amendment_id as number);
+      for (const r of td.rows) amendmentEventIds.add(String(r.amendment_id));
     }
     if (td.table === 'position') {
-      for (const r of td.rows) positionIds.add(r.position_id as number);
+      for (const r of td.rows) positionIds.add(String(r.position_id));
     }
   }
   if (chain.collateral_assets) {
-    for (const a of chain.collateral_assets) collateralAssetIds.add((a as any).collateral_asset_id);
+    for (const a of chain.collateral_assets) collateralAssetIds.add(String(a.collateral_asset_id));
   }
   if (chain.limit_rules) {
-    for (const r of chain.limit_rules) limitRuleIds.add(r.limit_rule_id);
+    for (const r of chain.limit_rules) limitRuleIds.add(String(r.limit_rule_id));
   }
 
   for (const td of output.tables) {
     if (td.table === 'credit_event_facility_link') {
       for (const row of td.rows) {
-        if (!creditEventIds.has(row.credit_event_id as number)) {
+        if (!creditEventIds.has(String(row.credit_event_id))) {
           errors.push(`credit_event_facility_link: credit_event_id ${row.credit_event_id} not in generated credit_events`);
           break;
         }
@@ -536,7 +537,7 @@ export function validateV2Output(
     }
     if (td.table === 'amendment_change_detail') {
       for (const row of td.rows) {
-        if (!amendmentEventIds.has(row.amendment_id as number)) {
+        if (!amendmentEventIds.has(String(row.amendment_id))) {
           errors.push(`amendment_change_detail: amendment_id ${row.amendment_id} not in generated amendment_events`);
           break;
         }
@@ -544,7 +545,7 @@ export function validateV2Output(
     }
     if (td.table === 'collateral_snapshot' && collateralAssetIds.size > 0) {
       for (const row of td.rows) {
-        if ('collateral_asset_id' in row && !collateralAssetIds.has(row.collateral_asset_id as number)) {
+        if ('collateral_asset_id' in row && !collateralAssetIds.has(String(row.collateral_asset_id))) {
           warnings.push(`collateral_snapshot: collateral_asset_id ${row.collateral_asset_id} not in L1 collateral_asset_master`);
           break;
         }
@@ -552,7 +553,7 @@ export function validateV2Output(
     }
     if (td.table === 'limit_contribution_snapshot' && limitRuleIds.size > 0) {
       for (const row of td.rows) {
-        if ('limit_rule_id' in row && !limitRuleIds.has(row.limit_rule_id as number)) {
+        if ('limit_rule_id' in row && !limitRuleIds.has(String(row.limit_rule_id))) {
           errors.push(`limit_contribution_snapshot: limit_rule_id ${row.limit_rule_id} not in L1 limit_rules`);
           break;
         }
@@ -560,10 +561,22 @@ export function validateV2Output(
     }
     if (td.table === 'position_detail') {
       for (const row of td.rows) {
-        if ('position_id' in row && !positionIds.has(row.position_id as number)) {
+        if ('position_id' in row && !positionIds.has(String(row.position_id))) {
           errors.push(`position_detail: position_id ${row.position_id} not in generated positions`);
           break;
         }
+      }
+    }
+  }
+
+  // ── 2c. Inverse Completeness: every L1 facility must have L2 exposure rows ──
+
+  const exposureTableForInverse = output.tables.find(t => t.table === 'facility_exposure_snapshot');
+  if (exposureTableForInverse) {
+    const exposedFacilityIds = new Set(exposureTableForInverse.rows.map(r => String(r.facility_id)));
+    for (const fac of chain.facilities) {
+      if (!exposedFacilityIds.has(String(fac.facility_id))) {
+        errors.push(`Facility ${fac.facility_id} in L1 chain has NO exposure rows in L2 data`);
       }
     }
   }
@@ -744,7 +757,7 @@ export function validateV2Output(
     if (!VALID_ENTITY_TYPE_CODES.has(cp.entity_type_code)) {
       errors.push(
         `Counterparty ${cp.counterparty_id} (${cp.legal_name}): entity_type_code '${cp.entity_type_code}' not in entity_type_dim — ` +
-        `likely a NAICS code leak. Valid codes: ${[...VALID_ENTITY_TYPE_CODES].join(', ')}`
+        `likely a NAICS code leak. Valid codes: ${Array.from(VALID_ENTITY_TYPE_CODES).join(', ')}`
       );
     }
   }
@@ -843,8 +856,8 @@ export function validateV2Output(
     }
     if (invalidDpdCodes.size > 0) {
       errors.push(
-        `DPD bucket codes not in FFIEC standard: [${[...invalidDpdCodes].join(', ')}]. ` +
-        `Valid codes: ${[...VALID_DPD_CODES].join(', ')}. Old codes like '0-30', '31-60', '61-90' are no longer valid.`
+        `DPD bucket codes not in FFIEC standard: [${Array.from(invalidDpdCodes).join(', ')}]. ` +
+        `Valid codes: ${Array.from(VALID_DPD_CODES).join(', ')}. Old codes like '0-30', '31-60', '61-90' are no longer valid.`
       );
     }
   }

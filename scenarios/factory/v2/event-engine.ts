@@ -63,7 +63,7 @@ export class EventCooldownTracker {
   private lastEvents = new Map<string, string>();
 
   /** Check if enough time has passed since last event of this type. */
-  canFire(facilityId: number, eventType: string, date: string, cooldownDays: number): boolean {
+  canFire(facilityId: string | number, eventType: string, date: string, cooldownDays: number): boolean {
     const key = `${facilityId}|${eventType}`;
     const lastDate = this.lastEvents.get(key);
     if (!lastDate) return true;
@@ -75,7 +75,7 @@ export class EventCooldownTracker {
   }
 
   /** Record an event firing. */
-  recordEvent(facilityId: number, eventType: string, date: string): void {
+  recordEvent(facilityId: string | number, eventType: string, date: string): void {
     const key = `${facilityId}|${eventType}`;
     this.lastEvents.set(key, date);
   }
@@ -289,8 +289,8 @@ export function categorizeEvents(
  * Process all facilities for a date and collect categorized events.
  */
 export function processAllEvents(
-  states: Map<number, FacilityState>,
-  prevStates: Map<number, FacilityState> | null,
+  states: Map<string, FacilityState>,
+  prevStates: Map<string, FacilityState> | null,
   date: string,
   cooldowns: EventCooldownTracker,
 ): {

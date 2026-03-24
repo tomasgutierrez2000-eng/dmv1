@@ -93,7 +93,7 @@ function auditFields(): Record<string, unknown> {
 
 // ─── Loans Generators ───────────────────────────────────────────────────
 
-function loansIndicative(state: FacilityState, positionId: number, date: string): SqlRow {
+function loansIndicative(state: FacilityState, positionId: string, date: string): SqlRow {
   const rng = seededRng(`li-${state.facility_id}-${date}`);
   return {
     position_id: positionId,
@@ -116,7 +116,7 @@ function loansIndicative(state: FacilityState, positionId: number, date: string)
   };
 }
 
-function loansAccounting(state: FacilityState, positionId: number, date: string): SqlRow {
+function loansAccounting(state: FacilityState, positionId: string, date: string): SqlRow {
   const accruedInterest = round(state.drawn_amount * state.all_in_rate_pct / 12, 4);
   const allowance = round(state.ecl_12m, 4);
   return {
@@ -137,140 +137,127 @@ function loansAccounting(state: FacilityState, positionId: number, date: string)
     allowance_for_credit_losses_amount: allowance,
     charge_off_amount: state.credit_status === 'DEFAULT' ? round(state.drawn_amount * state.lgd_current, 4) : 0,
     recovery_amount: 0,
-    net_charge_off_amount: state.credit_status === 'DEFAULT' ? round(state.drawn_amount * state.lgd_current, 4) : 0,
-    fair_value: round(state.drawn_amount * (1 - state.pd_annual * state.lgd_current), 4),
+    fair_value_amount: round(state.drawn_amount * (1 - state.pd_annual * state.lgd_current), 4),
     lendable_value: round(state.collateral_value, 4),
     monthly_draw_amount: round(state.drawn_amount - state.prior_drawn_amount, 4),
-    interest_income_amount: accruedInterest,
-    fee_income_amount: round(state.undrawn_amount * state.fee_rate_pct / 12, 4),
-    currency_code: state.currency_code,
     ...auditFields(),
   };
 }
 
-function loansClassification(state: FacilityState, positionId: number, date: string): SqlRow {
+function loansClassification(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     customer_id: `CUST-${state.counterparty_id}`,
     facility_id: state.facility_id,
-    counterparty_id: state.counterparty_id,
-    credit_agreement_id: state.credit_agreement_id,
-    product_code: state.product_type,
+    counterparty_type: ['CORPORATE', 'SME', 'SOVEREIGN', 'BANK'][parseInt(state.counterparty_id, 10) % 4],
+    product_category_code: state.product_type,
     industry_code: state.industry_id,
-    country_code: state.country_code,
-    currency_code: state.currency_code,
+    country: state.country_code,
     loan_status: state.credit_status,
-    collateral_type: state.collateral_type,
     gl_account_number: 1300,  // Typical loans receivable GL code
     ...auditFields(),
   };
 }
 
-function loansRisk(state: FacilityState, positionId: number, date: string): SqlRow {
+function loansRisk(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     probability_of_default_pd: round(state.pd_annual, 6),
     loss_given_default_lgd: round(state.lgd_current, 6),
-    exposure_at_default_ead: round(state.ead, 4),
-    expected_loss: round(state.expected_loss, 4),
-    risk_weight: round(state.risk_weight_pct, 6),
-    risk_weighted_asset: round(state.rwa, 4),
+    expected_loss_given_default_elgd: round(state.lgd_current * 0.9, 6),
+    two_year_probability_of_default: round(Math.min(state.pd_annual * 2, 1.0), 6),
+    maximum_probability_of_default: round(state.pd_annual * 1.5, 6),
+    minimum_probability_of_default: round(state.pd_annual * 0.5, 6),
     internal_risk_rating: state.internal_rating,
-    external_risk_rating: state.external_rating_sp,
-    days_past_due: state.days_past_due,
+    entity_internal_risk_rating: state.internal_rating,
     delinquency_status: state.days_past_due > 0 ? 'DELINQUENT' : 'CURRENT',
-    loan_to_value_ratio: round(state.ltv_ratio, 6),
-    debt_service_coverage_ratio: round(state.dscr, 6),
-    interest_coverage_ratio: round(state.icr, 6),
-    credit_conversion_factor: round(state.ccf, 6),
-    ifrs_stage: state.ifrs9_stage,
-    ecl_12_month: round(state.ecl_12m, 4),
-    ecl_lifetime: round(state.ecl_lifetime, 4),
+    collateral_type: state.collateral_type,
+    pledged_flag: parseInt(state.facility_id, 10) % 5 === 0,
+    secured_flag: state.collateral_value > 0 ? 'SECURED' : 'UNSECURED',
+    treasury_control_flag: false,
+    non_accrual_date: state.credit_status === 'DEFAULT' ? date : null,
     ...auditFields(),
   };
 }
 
 // ─── Off-BS Commitments Generators ──────────────────────────────────────
 
-function offbsIndicative(state: FacilityState, positionId: number, date: string): SqlRow {
+function offbsIndicative(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     effective_date: state.origination_date,
     maturity_date: state.maturity_date,
     currency_code: state.currency_code,
-    product_code: 'LETTER_OF_CREDIT',
     commitment_type: 'IRREVOCABLE',
     ...auditFields(),
   };
 }
 
-function offbsAccounting(state: FacilityState, positionId: number, date: string): SqlRow {
+function offbsAccounting(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     committed_exposure_global: round(state.committed_amount, 4),
     funded_committed_exposure: round(state.drawn_amount, 4),
-    unfunded_committed_exposure: round(state.undrawn_amount, 4),
+    unused_commitment_exposure: round(state.undrawn_amount, 4),
     counterparty_exposure_value: round(state.ead, 4),
     credit_conversion_factor: round(state.ccf, 6),
     allowance_for_credit_losses_amount: round(state.ecl_12m, 4),
-    fee_income_amount: round(state.committed_amount * state.fee_rate_pct / 12, 4),
-    currency_code: state.currency_code,
+    exposure_amount: round(state.drawn_amount, 4),
     ...auditFields(),
   };
 }
 
-function offbsClassification(state: FacilityState, positionId: number, date: string): SqlRow {
+function offbsClassification(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     customer_id: `CUST-${state.counterparty_id}`,
-    product_code: 'LETTER_OF_CREDIT',
     country_code: state.country_code,
-    currency_code: state.currency_code,
     gl_account_number: 9050,  // Off-balance-sheet commitments
     ...auditFields(),
   };
 }
 
-function offbsRisk(state: FacilityState, positionId: number, date: string): SqlRow {
+function offbsRisk(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     probability_of_default_pd: round(state.pd_annual, 6),
     loss_given_default_lgd: round(state.lgd_current, 6),
-    credit_conversion_factor: round(state.ccf, 6),
-    exposure_at_default_ead: round(state.ead, 4),
-    expected_loss: round(state.expected_loss, 4),
-    risk_weight: round(state.risk_weight_pct, 6),
+    expected_loss_given_default_elgd: round(state.lgd_current * 0.9, 6),
+    two_year_probability_of_default: round(Math.min(state.pd_annual * 2, 1.0), 6),
+    maximum_probability_of_default: round(state.pd_annual * 1.5, 6),
+    minimum_probability_of_default: round(state.pd_annual * 0.5, 6),
     unconditionally_cancellable_flag: false,
+    treasury_control_flag: false,
     ...auditFields(),
   };
 }
 
 // ─── Derivatives Generators ──────────────────────────────────────────────
 
-function derivativesIndicative(state: FacilityState, positionId: number, date: string): SqlRow {
+function derivativesIndicative(state: FacilityState, positionId: string, date: string): SqlRow {
   const rng = seededRng(`di-${state.facility_id}-${date}`);
-  const derivType = ['IRS', 'CDS', 'FX_FORWARD', 'FX_OPTION', 'EQUITY_SWAP', 'COMMODITY_FUT', 'SWAPTION', 'TRS'][state.facility_id % 8];
+  const derivType = ['IRS', 'CDS', 'FX_FORWARD', 'FX_OPTION', 'EQUITY_SWAP', 'COMMODITY_FUT', 'SWAPTION', 'TRS'][parseInt(state.facility_id, 10) % 8];
   return {
     position_id: positionId,
     as_of_date: date,
     derivative_type: derivType,
     derivative_instrument_type: derivType,
-    derivative_direction: state.facility_id % 2 === 0 ? 'PAY' : 'RECEIVE',
+    derivative_direction: parseInt(state.facility_id, 10) % 2 === 0 ? 'PAY' : 'RECEIVE',
     currency_code: state.currency_code,
     maturity_date: state.maturity_date,
     effective_maturity_date: state.maturity_date,
     interest_rate: round(state.base_rate_pct + rng() * 0.02, 6),
     interest_rate_type: derivType === 'IRS' ? 'FIXED' : 'FLOATING',
-    clearing_status: positionId % 3 === 0 ? 'CLEARED' : 'BILATERAL',
-    clearing_type_flag: positionId % 3 === 0 ? 'CCP_CLEARED' : 'OTC_BILATERAL',
+    clearing_status: parseInt(positionId, 10) % 3 === 0 ? 'CLEARED' : 'BILATERAL',
+    clearing_type_flag: parseInt(positionId, 10) % 3 === 0 ? 'CCP_CLEARED' : 'OTC_BILATERAL',
     is_hedge: !state.is_revolving,
-    otc_trade_flag: positionId % 3 !== 0,
+    otc_trade_flag: parseInt(positionId, 10) % 3 !== 0,
     reporting_currency: 'USD',
     settlement_currency: state.currency_code,
     transaction_currency: state.currency_code,
@@ -288,7 +275,7 @@ function derivativesIndicative(state: FacilityState, positionId: number, date: s
   };
 }
 
-function derivativesAccounting(state: FacilityState, positionId: number, date: string): SqlRow {
+function derivativesAccounting(state: FacilityState, positionId: string, date: string): SqlRow {
   const rng = seededRng(`da-${state.facility_id}-${date}`);
   const mtm = round(state.committed_amount * (rng() * 0.1 - 0.05), 4); // ±5% of notional
   const notional = round(state.committed_amount, 4);
@@ -317,30 +304,30 @@ function derivativesAccounting(state: FacilityState, positionId: number, date: s
   };
 }
 
-function derivativesClassification(state: FacilityState, positionId: number, date: string): SqlRow {
+function derivativesClassification(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     customer_id: `CUST-${state.counterparty_id}`,
     gl_account_number: state.is_revolving ? 4100 : 4200,
-    counterparty_type: ['BANK', 'CORPORATE', 'SOVEREIGN', 'FUND'][state.counterparty_id % 4],
+    counterparty_type: ['BANK', 'CORPORATE', 'SOVEREIGN', 'FUND'][parseInt(state.counterparty_id, 10) % 4],
     isda_id: `ISDA-${String(state.counterparty_id).padStart(6, '0')}`,
-    legal_entity_id: String((state.facility_id % 10) + 1),
+    legal_entity_id: String((parseInt(state.facility_id, 10) % 10) + 1),
     source_system_id: String(FACTORY_SOURCE_SYSTEM_ID),
     source_system_name: 'MUREX',
-    internal_transaction_flag: state.counterparty_id % 20 === 0 ? 'Y' : 'N',
+    internal_transaction_flag: parseInt(state.counterparty_id, 10) % 20 === 0 ? 'Y' : 'N',
     usd_conversion_rate: state.currency_code === 'USD' ? 1.0 :
       state.currency_code === 'EUR' ? 1.08 :
       state.currency_code === 'GBP' ? 1.27 :
       state.currency_code === 'JPY' ? 0.0067 : 1.12,
-    qmna: positionId % 3 === 0,
+    qmna: parseInt(positionId, 10) % 3 === 0,
     ...auditFields(),
   };
 }
 
-function derivativesRisk(state: FacilityState, positionId: number, date: string): SqlRow {
+function derivativesRisk(state: FacilityState, positionId: string, date: string): SqlRow {
   const rng = seededRng(`dr-${state.facility_id}-${date}`);
-  const pfeMultiplier = state.facility_id % 8 < 2 ? 0.005 : state.facility_id % 8 < 4 ? 0.05 : 0.03;
+  const pfeMultiplier = parseInt(state.facility_id, 10) % 8 < 2 ? 0.005 : parseInt(state.facility_id, 10) % 8 < 4 ? 0.05 : 0.03;
   return {
     position_id: positionId,
     as_of_date: date,
@@ -350,13 +337,13 @@ function derivativesRisk(state: FacilityState, positionId: number, date: string)
     two_year_probability_of_default: round(Math.min(state.pd_annual * 2, 1.0), 6),
     potential_future_exposure_amount: round(state.committed_amount * (pfeMultiplier + rng() * 0.01), 4),
     potential_future_exposure_adjustment: round(state.committed_amount * 0.005, 4),
-    eligible_collateral: positionId % 3 === 0 ? round(state.collateral_value * 0.8, 4) : 0,
-    eligible_im_cash: positionId % 3 === 0 ? round(state.collateral_value * 0.3, 4) : 0,
-    eligible_vm_cash: positionId % 2 === 0 ? round(state.collateral_value * 0.5, 4) : 0,
-    collateralization_type: positionId % 3 === 0 ? 'FULLY_COLLATERALIZED' :
-      positionId % 3 === 1 ? 'PARTIALLY_COLLATERALIZED' : 'UNCOLLATERALIZED',
-    pledged_flag: positionId % 4 === 0,
-    secured_flag: positionId % 3 === 0 ? 'SECURED' : 'UNSECURED',
+    eligible_collateral: parseInt(positionId, 10) % 3 === 0 ? round(state.collateral_value * 0.8, 4) : 0,
+    eligible_im_cash: parseInt(positionId, 10) % 3 === 0 ? round(state.collateral_value * 0.3, 4) : 0,
+    eligible_vm_cash: parseInt(positionId, 10) % 2 === 0 ? round(state.collateral_value * 0.5, 4) : 0,
+    collateralization_type: parseInt(positionId, 10) % 3 === 0 ? 'FULLY_COLLATERALIZED' :
+      parseInt(positionId, 10) % 3 === 1 ? 'PARTIALLY_COLLATERALIZED' : 'UNCOLLATERALIZED',
+    pledged_flag: parseInt(positionId, 10) % 4 === 0,
+    secured_flag: parseInt(positionId, 10) % 3 === 0 ? 'SECURED' : 'UNSECURED',
     treasury_control_flag: false,
     maximum_probability_of_default: round(state.pd_annual * 1.5, 6),
     minimum_probability_of_default: round(state.pd_annual * 0.5, 6),
@@ -366,8 +353,8 @@ function derivativesRisk(state: FacilityState, positionId: number, date: string)
 
 // ─── SFT Generators ─────────────────────────────────────────────────────
 
-function sftIndicative(state: FacilityState, positionId: number, date: string): SqlRow {
-  const sftType = ['REPO', 'REVERSE_REPO', 'SEC_LENDING', 'SEC_BORROWING', 'MARGIN_LOAN'][state.facility_id % 5];
+function sftIndicative(state: FacilityState, positionId: string, date: string): SqlRow {
+  const sftType = ['REPO', 'REVERSE_REPO', 'SEC_LENDING', 'SEC_BORROWING', 'MARGIN_LOAN'][parseInt(state.facility_id, 10) % 5];
   return {
     position_id: positionId,
     as_of_date: date,
@@ -382,13 +369,13 @@ function sftIndicative(state: FacilityState, positionId: number, date: string): 
     settlement_currency: state.currency_code,
     transaction_currency: state.currency_code,
     asset_liability_indicator: ['REPO', 'SEC_LENDING'].includes(sftType) ? 'LIABILITY' : 'ASSET',
-    principal_agent: positionId % 3 === 0 ? 'PRINCIPAL' : 'AGENT',
-    qmna_flag: positionId % 4 === 0,
+    principal_agent: parseInt(positionId, 10) % 3 === 0 ? 'PRINCIPAL' : 'AGENT',
+    qmna_flag: parseInt(positionId, 10) % 4 === 0,
     ...auditFields(),
   };
 }
 
-function sftAccounting(state: FacilityState, positionId: number, date: string): SqlRow {
+function sftAccounting(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
@@ -412,23 +399,23 @@ function sftAccounting(state: FacilityState, positionId: number, date: string): 
   };
 }
 
-function sftClassification(state: FacilityState, positionId: number, date: string): SqlRow {
+function sftClassification(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     customer_id: `CUST-${state.counterparty_id}`,
-    gl_account_number: [2100, 2200, 2300, 2400, 2500][state.facility_id % 5],
-    counterparty_type: ['BANK', 'BROKER_DEALER', 'FUND'][state.counterparty_id % 3],
-    legal_entity_id: String((state.facility_id % 10) + 1),
+    gl_account_number: [2100, 2200, 2300, 2400, 2500][parseInt(state.facility_id, 10) % 5],
+    counterparty_type: ['BANK', 'BROKER_DEALER', 'FUND'][parseInt(state.counterparty_id, 10) % 3],
+    legal_entity_id: String((parseInt(state.facility_id, 10) % 10) + 1),
     source_system_id: String(FACTORY_SOURCE_SYSTEM_ID),
     source_system_name: 'CALYPSO',
-    internal_transaction_flag: state.counterparty_id % 15 === 0 ? 'Y' : 'N',
-    transaction_type: ['REPO', 'REVERSE_REPO', 'SECURITIES_LENDING', 'SECURITIES_BORROWING', 'MARGIN_LENDING'][state.facility_id % 5],
+    internal_transaction_flag: parseInt(state.counterparty_id, 10) % 15 === 0 ? 'Y' : 'N',
+    transaction_type: ['REPO', 'REVERSE_REPO', 'SECURITIES_LENDING', 'SECURITIES_BORROWING', 'MARGIN_LENDING'][parseInt(state.facility_id, 10) % 5],
     ...auditFields(),
   };
 }
 
-function sftRisk(state: FacilityState, positionId: number, date: string): SqlRow {
+function sftRisk(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
@@ -436,12 +423,12 @@ function sftRisk(state: FacilityState, positionId: number, date: string): SqlRow
     loss_given_default_lgd: round(state.lgd_current * 0.5, 6), // Lower LGD for secured
     expected_loss_given_default_elgd: round(state.lgd_current * 0.4, 6),
     two_year_probability_of_default: round(Math.min(state.pd_annual * 2, 1.0), 6),
-    pledged_flag: state.facility_id % 5 < 2,
+    pledged_flag: parseInt(state.facility_id, 10) % 5 < 2,
     secured_flag: 'SECURED',
-    encumbered_flag: state.facility_id % 5 === 0,
+    encumbered_flag: parseInt(state.facility_id, 10) % 5 === 0,
     treasury_control_flag: false,
-    rehypothecated: state.facility_id % 5 === 2 && positionId % 3 === 0 ? 'Y' : 'N',
-    liquid_assets_collateral_level: ['LEVEL_1', 'LEVEL_2A', 'LEVEL_2B'][positionId % 3],
+    rehypothecated: parseInt(state.facility_id, 10) % 5 === 2 && parseInt(positionId, 10) % 3 === 0 ? 'Y' : 'N',
+    liquid_assets_collateral_level: ['LEVEL_1', 'LEVEL_2A', 'LEVEL_2B'][parseInt(positionId, 10) % 3],
     maximum_probability_of_default: round(state.pd_annual * 1.5, 6),
     minimum_probability_of_default: round(state.pd_annual * 0.5, 6),
     ...auditFields(),
@@ -450,9 +437,9 @@ function sftRisk(state: FacilityState, positionId: number, date: string): SqlRow
 
 // ─── Securities Generators ──────────────────────────────────────────────
 
-function securitiesIndicative(state: FacilityState, positionId: number, date: string): SqlRow {
+function securitiesIndicative(state: FacilityState, positionId: string, date: string): SqlRow {
   const rng = seededRng(`si-${state.facility_id}-${date}`);
-  const secType = ['GOVT_BOND', 'CORP_BOND', 'MBS', 'ABS', 'CLO', 'MUNI', 'AGENCY'][state.facility_id % 7];
+  const secType = ['GOVT_BOND', 'CORP_BOND', 'MBS', 'ABS', 'CLO', 'MUNI', 'AGENCY'][parseInt(state.facility_id, 10) % 7];
   return {
     position_id: positionId,
     as_of_date: date,
@@ -463,9 +450,9 @@ function securitiesIndicative(state: FacilityState, positionId: number, date: st
     maturity_date: state.maturity_date,
     issue_date: state.origination_date,
     interest_rate: round(state.all_in_rate_pct, 6),
-    interest_rate_type: positionId % 4 === 0 ? 'FLOATING' : 'FIXED',
+    interest_rate_type: parseInt(positionId, 10) % 4 === 0 ? 'FLOATING' : 'FIXED',
     coupon_dividend_rate: round(state.base_rate_pct + 0.005 + rng() * 0.03, 6),
-    coupon_int_pmt_periodicity: ['QUARTERLY', 'SEMI_ANNUAL', 'ANNUAL'][positionId % 3],
+    coupon_int_pmt_periodicity: ['QUARTERLY', 'SEMI_ANNUAL', 'ANNUAL'][parseInt(positionId, 10) % 3],
     reporting_currency: 'USD',
     settlement_currency: state.currency_code,
     transaction_currency: state.currency_code,
@@ -475,13 +462,13 @@ function securitiesIndicative(state: FacilityState, positionId: number, date: st
   };
 }
 
-function securitiesAccounting(state: FacilityState, positionId: number, date: string): SqlRow {
+function securitiesAccounting(state: FacilityState, positionId: string, date: string): SqlRow {
   const rng = seededRng(`sa-${state.facility_id}-${date}`);
   const accrued = round(state.drawn_amount * state.all_in_rate_pct / 12, 4);
   return {
     position_id: positionId,
     as_of_date: date,
-    accounting_intent: ['HTM', 'AFS', 'TRADING'][positionId % 3],
+    accounting_intent: ['HTM', 'AFS', 'TRADING'][parseInt(positionId, 10) % 3],
     balance_sheet_amount: round(state.drawn_amount, 4),
     carrying_value: round(state.drawn_amount * 0.985, 4),
     amortized_cost: round(state.drawn_amount * 0.985, 4),
@@ -490,7 +477,7 @@ function securitiesAccounting(state: FacilityState, positionId: number, date: st
     accrued_interest_amount: accrued,
     accrued_interest_dividend_amount: accrued,
     original_face_value: round(state.committed_amount, 4),
-    current_face_value: round(state.committed_amount * (1 - state.facility_id % 100 * 0.0001), 4),
+    current_face_value: round(state.committed_amount * (1 - parseInt(state.facility_id, 10) % 100 * 0.0001), 4),
     counterparty_exposure_value: round(state.drawn_amount, 4),
     exposure_amount: round(state.drawn_amount, 4),
     unrealized_gain_loss: round(state.drawn_amount * (rng() * 0.04 - 0.02), 4),
@@ -499,20 +486,20 @@ function securitiesAccounting(state: FacilityState, positionId: number, date: st
     purchase_price: round(state.drawn_amount * 0.99, 4),
     price: round(100 + (rng() * 5 - 2.5), 4),
     usd_equivalent_amounts: round(state.drawn_amount, 4),
-    fair_value_measurement_level: ['Level_1', 'Level_2', 'Level_3'][positionId % 3],
+    fair_value_measurement_level: ['Level_1', 'Level_2', 'Level_3'][parseInt(positionId, 10) % 3],
     settlement_date: state.origination_date,
     trade_date: state.origination_date,
     ...auditFields(),
   };
 }
 
-function securitiesClassification(state: FacilityState, positionId: number, date: string): SqlRow {
-  const secType = ['GOVT_BOND', 'CORP_BOND', 'MBS', 'ABS', 'CLO', 'MUNI', 'AGENCY'][state.facility_id % 7];
+function securitiesClassification(state: FacilityState, positionId: string, date: string): SqlRow {
+  const secType = ['GOVT_BOND', 'CORP_BOND', 'MBS', 'ABS', 'CLO', 'MUNI', 'AGENCY'][parseInt(state.facility_id, 10) % 7];
   return {
     position_id: positionId,
     as_of_date: date,
-    cusip: String(positionId % 999999).padStart(9, '0'),
-    isin: `US${String(positionId % 9999999999).padStart(10, '0')}0`,
+    cusip: String(parseInt(positionId, 10) % 999999).padStart(9, '0'),
+    isin: `US${String(parseInt(positionId, 10) % 9999999999).padStart(10, '0')}0`,
     security_name: `${secType} Position ${positionId}`,
     security_description: `${secType} security`,
     security_status: 'ACTIVE',
@@ -523,7 +510,7 @@ function securitiesClassification(state: FacilityState, positionId: number, date
     customer_id: `CUST-${state.counterparty_id}`,
     gl_account_number: ['GOVT_BOND', 'AGENCY'].includes(secType) ? 1500 : ['MBS', 'ABS', 'CLO'].includes(secType) ? 1600 : 1700,
     counterparty_type: ['GOVT_BOND'].includes(secType) ? 'SOVEREIGN' : ['AGENCY', 'MBS'].includes(secType) ? 'GSE' : 'CORPORATE',
-    legal_entity_id: String((state.facility_id % 10) + 1),
+    legal_entity_id: String((parseInt(state.facility_id, 10) % 10) + 1),
     sector: ['GOVT_BOND'].includes(secType) ? 'GOVERNMENT' : secType === 'MUNI' ? 'MUNICIPAL' : 'FINANCIAL',
     country_code: state.country_code,
     source_system_id: String(FACTORY_SOURCE_SYSTEM_ID),
@@ -534,29 +521,29 @@ function securitiesClassification(state: FacilityState, positionId: number, date
   };
 }
 
-function securitiesRisk(state: FacilityState, positionId: number, date: string): SqlRow {
-  const secType = ['GOVT_BOND', 'CORP_BOND', 'MBS', 'ABS', 'CLO', 'MUNI', 'AGENCY'][state.facility_id % 7];
+function securitiesRisk(state: FacilityState, positionId: string, date: string): SqlRow {
+  const secType = ['GOVT_BOND', 'CORP_BOND', 'MBS', 'ABS', 'CLO', 'MUNI', 'AGENCY'][parseInt(state.facility_id, 10) % 7];
   return {
     position_id: positionId,
     as_of_date: date,
-    pledged_flag: positionId % 5 === 0,
-    encumbered_flag: positionId % 7 === 0,
+    pledged_flag: parseInt(positionId, 10) % 5 === 0,
+    encumbered_flag: parseInt(positionId, 10) % 7 === 0,
     performing_flag: true,
     non_accrual_status: false,
     secured_flag: ['MBS', 'ABS', 'CLO'].includes(secType) ? 'SECURED' : 'UNSECURED',
-    treasury_control_flag: positionId % 8 === 0,
+    treasury_control_flag: parseInt(positionId, 10) % 8 === 0,
     liquid_assets_collateral_level: ['GOVT_BOND', 'AGENCY'].includes(secType) ? 'LEVEL_1' :
       ['CORP_BOND', 'MBS'].includes(secType) ? 'LEVEL_2A' : 'LEVEL_2B',
     trade_long_short_flag: 'LONG',
-    private_placement_flag: secType === 'CLO' && positionId % 3 === 0,
+    private_placement_flag: secType === 'CLO' && parseInt(positionId, 10) % 3 === 0,
     ...auditFields(),
   };
 }
 
 // ─── Deposits Generators ────────────────────────────────────────────────
 
-function depositsIndicative(state: FacilityState, positionId: number, date: string): SqlRow {
-  const depType = ['DEMAND_DEP', 'SAVINGS', 'TIME_DEP', 'MMDA'][state.facility_id % 4];
+function depositsIndicative(state: FacilityState, positionId: string, date: string): SqlRow {
+  const depType = ['DEMAND_DEP', 'SAVINGS', 'TIME_DEP', 'MMDA'][parseInt(state.facility_id, 10) % 4];
   return {
     position_id: positionId,
     as_of_date: date,
@@ -575,7 +562,7 @@ function depositsIndicative(state: FacilityState, positionId: number, date: stri
   };
 }
 
-function depositsAccounting(state: FacilityState, positionId: number, date: string): SqlRow {
+function depositsAccounting(state: FacilityState, positionId: string, date: string): SqlRow {
   const accrued = round(state.drawn_amount * state.base_rate_pct * 0.9 / 12, 4);
   return {
     position_id: positionId,
@@ -598,40 +585,40 @@ function depositsAccounting(state: FacilityState, positionId: number, date: stri
   };
 }
 
-function depositsClassification(state: FacilityState, positionId: number, date: string): SqlRow {
+function depositsClassification(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     customer_id: `CUST-${state.counterparty_id}`,
-    gl_account_number: [6100, 6200, 6300, 6400][state.facility_id % 4],
-    counterparty_type: ['CORPORATE', 'SME', 'RETAIL', 'GOVERNMENT', 'INSTITUTIONAL'][state.counterparty_id % 5],
-    legal_entity_id: String((state.facility_id % 10) + 1),
+    gl_account_number: [6100, 6200, 6300, 6400][parseInt(state.facility_id, 10) % 4],
+    counterparty_type: ['CORPORATE', 'SME', 'RETAIL', 'GOVERNMENT', 'INSTITUTIONAL'][parseInt(state.counterparty_id, 10) % 5],
+    legal_entity_id: String((parseInt(state.facility_id, 10) % 10) + 1),
     source_system_id: String(FACTORY_SOURCE_SYSTEM_ID),
     source_system_name: 'CORE_BANKING',
     account_status: 'ACTIVE',
-    internal_transaction_flag: state.counterparty_id % 25 === 0 ? 'Y' : 'N',
-    geographic_code: positionId % 4 === 0 ? 'DOMESTIC' : 'FOREIGN',
+    internal_transaction_flag: parseInt(state.counterparty_id, 10) % 25 === 0 ? 'Y' : 'N',
+    geographic_code: parseInt(positionId, 10) % 4 === 0 ? 'DOMESTIC' : 'FOREIGN',
     insurance_provider: 'FDIC',
-    fdic_ownership_code: ['SINGLE', 'JOINT', 'REVOCABLE_TRUST', 'BUSINESS'][positionId % 4],
-    stability: state.facility_id % 4 < 3 ? 'STABLE' : 'LESS_STABLE',
+    fdic_ownership_code: ['SINGLE', 'JOINT', 'REVOCABLE_TRUST', 'BUSINESS'][parseInt(positionId, 10) % 4],
+    stability: parseInt(state.facility_id, 10) % 4 < 3 ? 'STABLE' : 'LESS_STABLE',
     ...auditFields(),
   };
 }
 
-function depositsRisk(state: FacilityState, positionId: number, date: string): SqlRow {
-  const depType = ['DEMAND_DEP', 'SAVINGS', 'TIME_DEP', 'MMDA'][state.facility_id % 4];
+function depositsRisk(state: FacilityState, positionId: string, date: string): SqlRow {
+  const depType = ['DEMAND_DEP', 'SAVINGS', 'TIME_DEP', 'MMDA'][parseInt(state.facility_id, 10) % 4];
   return {
     position_id: positionId,
     as_of_date: date,
     operational_flag: depType === 'DEMAND_DEP',
-    brokered_flag: depType === 'MMDA' && positionId % 5 === 0,
-    reciprocal_flag: positionId % 10 === 0,
-    sweep_flag: depType === 'MMDA' && positionId % 3 === 0,
-    relationship_flag: positionId % 3 === 0,
+    brokered_flag: depType === 'MMDA' && parseInt(positionId, 10) % 5 === 0,
+    reciprocal_flag: parseInt(positionId, 10) % 10 === 0,
+    sweep_flag: depType === 'MMDA' && parseInt(positionId, 10) % 3 === 0,
+    relationship_flag: parseInt(positionId, 10) % 3 === 0,
     transactional_flag: depType === 'DEMAND_DEP',
     stable_vs_less_stable_flag: ['DEMAND_DEP', 'SAVINGS', 'TIME_DEP'].includes(depType) ? 'STABLE' : 'LESS_STABLE',
     treasury_control_flag: false,
-    negotiable_flag: depType === 'TIME_DEP' && positionId % 8 === 0,
+    negotiable_flag: depType === 'TIME_DEP' && parseInt(positionId, 10) % 8 === 0,
     automated_renewal_flag: depType === 'TIME_DEP',
     tradable_flag: false,
     ...auditFields(),
@@ -640,8 +627,8 @@ function depositsRisk(state: FacilityState, positionId: number, date: string): S
 
 // ─── Borrowings Generators ──────────────────────────────────────────────
 
-function borrowingsIndicative(state: FacilityState, positionId: number, date: string): SqlRow {
-  const borrowType = ['FED_FUNDS', 'FHLB_ADV', 'BROKERED_DEP'][state.facility_id % 3];
+function borrowingsIndicative(state: FacilityState, positionId: string, date: string): SqlRow {
+  const borrowType = ['FED_FUNDS', 'FHLB_ADV', 'BROKERED_DEP'][parseInt(state.facility_id, 10) % 3];
   return {
     position_id: positionId,
     as_of_date: date,
@@ -660,7 +647,7 @@ function borrowingsIndicative(state: FacilityState, positionId: number, date: st
   };
 }
 
-function borrowingsAccounting(state: FacilityState, positionId: number, date: string): SqlRow {
+function borrowingsAccounting(state: FacilityState, positionId: string, date: string): SqlRow {
   const accrued = round(state.drawn_amount * state.base_rate_pct / 12, 4);
   return {
     position_id: positionId,
@@ -679,35 +666,35 @@ function borrowingsAccounting(state: FacilityState, positionId: number, date: st
     funded_committed_exposure: round(state.drawn_amount, 4),
     settlement_date: state.origination_date,
     borrowing_date: state.origination_date,
-    borrowing_term: ['OVERNIGHT', 'TERM', '30_DAY'][state.facility_id % 3],
+    borrowing_term: ['OVERNIGHT', 'TERM', '30_DAY'][parseInt(state.facility_id, 10) % 3],
     ...auditFields(),
   };
 }
 
-function borrowingsClassification(state: FacilityState, positionId: number, date: string): SqlRow {
+function borrowingsClassification(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     customer_id: `CUST-${state.counterparty_id}`,
-    gl_account_number: [3100, 3200, 3300][state.facility_id % 3],
-    counterparty_type: ['BANK', 'GSE', 'BROKER_DEALER'][state.facility_id % 3],
-    legal_entity_id: String((state.facility_id % 10) + 1),
+    gl_account_number: [3100, 3200, 3300][parseInt(state.facility_id, 10) % 3],
+    counterparty_type: ['BANK', 'GSE', 'BROKER_DEALER'][parseInt(state.facility_id, 10) % 3],
+    legal_entity_id: String((parseInt(state.facility_id, 10) % 10) + 1),
     source_system_id: String(FACTORY_SOURCE_SYSTEM_ID),
     source_system_name: 'TREASURY_SYSTEM',
-    internal_transaction_flag: state.counterparty_id % 20 === 0 ? 'Y' : 'N',
+    internal_transaction_flag: parseInt(state.counterparty_id, 10) % 20 === 0 ? 'Y' : 'N',
     ...auditFields(),
   };
 }
 
-function borrowingsRisk(state: FacilityState, positionId: number, date: string): SqlRow {
+function borrowingsRisk(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     probability_of_default_pd: 0.001,
-    loss_given_default_lgd: state.facility_id % 3 === 1 ? 0.10 : 0.25,
+    loss_given_default_lgd: parseInt(state.facility_id, 10) % 3 === 1 ? 0.10 : 0.25,
     internal_risk_rating: '2',
-    pledged_flag: state.facility_id % 3 === 1,
-    secured_flag: state.facility_id % 3 === 1 ? 'SECURED' : 'UNSECURED',
+    pledged_flag: parseInt(state.facility_id, 10) % 3 === 1,
+    secured_flag: parseInt(state.facility_id, 10) % 3 === 1 ? 'SECURED' : 'UNSECURED',
     treasury_control_flag: true,
     non_accrual_status: false,
     ...auditFields(),
@@ -716,8 +703,8 @@ function borrowingsRisk(state: FacilityState, positionId: number, date: string):
 
 // ─── Debt Generators ────────────────────────────────────────────────────
 
-function debtIndicative(state: FacilityState, positionId: number, date: string): SqlRow {
-  const debtType = ['SENIOR_NOTE', 'SUBORD_NOTE', 'COVERED_BOND'][state.facility_id % 3];
+function debtIndicative(state: FacilityState, positionId: string, date: string): SqlRow {
+  const debtType = ['SENIOR_NOTE', 'SUBORD_NOTE', 'COVERED_BOND'][parseInt(state.facility_id, 10) % 3];
   return {
     position_id: positionId,
     as_of_date: date,
@@ -728,7 +715,7 @@ function debtIndicative(state: FacilityState, positionId: number, date: string):
     maturity_date: state.maturity_date,
     issue_date: state.origination_date,
     interest_rate: round(debtType === 'SUBORD_NOTE' ? state.all_in_rate_pct + 0.01 : state.all_in_rate_pct, 6),
-    interest_rate_type: positionId % 3 === 0 ? 'FLOATING' : 'FIXED',
+    interest_rate_type: parseInt(positionId, 10) % 3 === 0 ? 'FLOATING' : 'FIXED',
     reporting_currency: 'USD',
     settlement_currency: state.currency_code,
     transaction_currency: state.currency_code,
@@ -737,7 +724,7 @@ function debtIndicative(state: FacilityState, positionId: number, date: string):
   };
 }
 
-function debtAccounting(state: FacilityState, positionId: number, date: string): SqlRow {
+function debtAccounting(state: FacilityState, positionId: string, date: string): SqlRow {
   const accrued = round(state.drawn_amount * state.all_in_rate_pct / 12, 4);
   return {
     position_id: positionId,
@@ -762,16 +749,16 @@ function debtAccounting(state: FacilityState, positionId: number, date: string):
   };
 }
 
-function debtClassification(state: FacilityState, positionId: number, date: string): SqlRow {
+function debtClassification(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
-    cusip: String(positionId % 999999).padStart(9, '0'),
-    isin: `US${String(positionId % 9999999999).padStart(10, '0')}1`,
+    cusip: String(parseInt(positionId, 10) % 999999).padStart(9, '0'),
+    isin: `US${String(parseInt(positionId, 10) % 9999999999).padStart(10, '0')}1`,
     customer_id: `CUST-${state.counterparty_id}`,
-    gl_account_number: [3400, 3500, 3600][state.facility_id % 3],
+    gl_account_number: [3400, 3500, 3600][parseInt(state.facility_id, 10) % 3],
     counterparty_type: 'INVESTOR',
-    legal_entity_id: String((state.facility_id % 10) + 1),
+    legal_entity_id: String((parseInt(state.facility_id, 10) % 10) + 1),
     source_system_id: String(FACTORY_SOURCE_SYSTEM_ID),
     source_system_name: 'DEBT_MANAGEMENT',
     internal_transaction_flag: 'N',
@@ -779,8 +766,8 @@ function debtClassification(state: FacilityState, positionId: number, date: stri
   };
 }
 
-function debtRisk(state: FacilityState, positionId: number, date: string): SqlRow {
-  const debtType = ['SENIOR_NOTE', 'SUBORD_NOTE', 'COVERED_BOND'][state.facility_id % 3];
+function debtRisk(state: FacilityState, positionId: string, date: string): SqlRow {
+  const debtType = ['SENIOR_NOTE', 'SUBORD_NOTE', 'COVERED_BOND'][parseInt(state.facility_id, 10) % 3];
   return {
     position_id: positionId,
     as_of_date: date,
@@ -796,11 +783,11 @@ function debtRisk(state: FacilityState, positionId: number, date: string): SqlRo
 
 // ─── Equities Generators ────────────────────────────────────────────────
 
-function equitiesIndicative(state: FacilityState, positionId: number, date: string): SqlRow {
+function equitiesIndicative(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
-    equity_type: state.facility_id % 2 === 0 ? 'COMMON' : 'PREFERRED',
+    equity_type: parseInt(state.facility_id, 10) % 2 === 0 ? 'COMMON' : 'PREFERRED',
     currency_code: state.currency_code,
     reporting_currency: 'USD',
     settlement_currency: state.currency_code,
@@ -809,7 +796,7 @@ function equitiesIndicative(state: FacilityState, positionId: number, date: stri
   };
 }
 
-function equitiesAccounting(state: FacilityState, positionId: number, date: string): SqlRow {
+function equitiesAccounting(state: FacilityState, positionId: string, date: string): SqlRow {
   const rng = seededRng(`ea-${state.facility_id}-${date}`);
   const mktValue = round(state.drawn_amount * (1 + rng() * 0.1 - 0.05), 4);
   return {
@@ -822,8 +809,8 @@ function equitiesAccounting(state: FacilityState, positionId: number, date: stri
     counterparty_exposure_value: round(state.drawn_amount, 4),
     face_value: round(state.committed_amount, 4),
     cash_dividends: round(state.drawn_amount * 0.025, 4),
-    ownership_percentage: round((state.facility_id % 40 + 1) * 1.0, 4),
-    number_of_shares: round(state.drawn_amount / (50 + state.facility_id % 200), 4),
+    ownership_percentage: round((parseInt(state.facility_id, 10) % 40 + 1) * 1.0, 4),
+    number_of_shares: round(state.drawn_amount / (50 + parseInt(state.facility_id, 10) % 200), 4),
     usd_equivalent_amount: round(state.drawn_amount, 4),
     accrued_interest_dividend_amount: round(state.drawn_amount * 0.005, 4),
     retained_earnings: round(state.drawn_amount * 0.15, 4),
@@ -833,45 +820,45 @@ function equitiesAccounting(state: FacilityState, positionId: number, date: stri
   };
 }
 
-function equitiesClassification(state: FacilityState, positionId: number, date: string): SqlRow {
+function equitiesClassification(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     customer_id: `CUST-${state.counterparty_id}`,
-    gl_account_number: state.facility_id % 2 === 0 ? 5100 : 5200,
-    legal_entity_id: String((state.facility_id % 10) + 1),
+    gl_account_number: parseInt(state.facility_id, 10) % 2 === 0 ? 5100 : 5200,
+    legal_entity_id: String((parseInt(state.facility_id, 10) % 10) + 1),
     source_system_id: String(FACTORY_SOURCE_SYSTEM_ID),
     source_system_name: 'EQUITY_PLATFORM',
-    stock_exchange_code: ['NYSE', 'NASDAQ', 'LSE', 'TSE'][positionId % 4],
+    stock_exchange_code: ['NYSE', 'NASDAQ', 'LSE', 'TSE'][parseInt(positionId, 10) % 4],
     ticker_symbol: `EQ-${String(positionId).padStart(5, '0')}`,
     internal_transaction_flag: 'N',
     ...auditFields(),
   };
 }
 
-function equitiesRisk(state: FacilityState, positionId: number, date: string): SqlRow {
+function equitiesRisk(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
-    treasury_control_flag: positionId % 6 === 0,
+    treasury_control_flag: parseInt(positionId, 10) % 6 === 0,
     ...auditFields(),
   };
 }
 
 // ─── Stock Generators ───────────────────────────────────────────────────
 
-function stockIndicative(state: FacilityState, positionId: number, date: string): SqlRow {
+function stockIndicative(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     currency_code: state.currency_code,
-    stock_type: state.facility_id % 2 === 0 ? 'COMMON' : 'PREFERRED',
+    stock_type: parseInt(state.facility_id, 10) % 2 === 0 ? 'COMMON' : 'PREFERRED',
     stock_position_id: `STK-${String(positionId).padStart(8, '0')}`,
     ...auditFields(),
   };
 }
 
-function stockAccounting(state: FacilityState, positionId: number, date: string): SqlRow {
+function stockAccounting(state: FacilityState, positionId: string, date: string): SqlRow {
   const rng = seededRng(`sta-${state.facility_id}-${date}`);
   const mktValue = round(state.drawn_amount * (1 + rng() * 0.08 - 0.04), 4);
   return {
@@ -881,31 +868,31 @@ function stockAccounting(state: FacilityState, positionId: number, date: string)
     carrying_value: round(state.drawn_amount * 0.97, 4),
     fair_value_amount: mktValue,
     market_value: mktValue,
-    number_of_shares: round(state.drawn_amount / (30 + state.facility_id % 150), 4),
+    number_of_shares: round(state.drawn_amount / (30 + parseInt(state.facility_id, 10) % 150), 4),
     unrealized_gain_loss: round(mktValue - state.drawn_amount * 0.97, 4),
-    accounting_method: ['EQUITY_METHOD', 'FAIR_VALUE', 'COST_METHOD'][positionId % 3],
-    investment_type: state.facility_id % 2 === 0 ? 'COMMON' : 'PREFERRED',
+    accounting_method: ['EQUITY_METHOD', 'FAIR_VALUE', 'COST_METHOD'][parseInt(positionId, 10) % 3],
+    investment_type: parseInt(state.facility_id, 10) % 2 === 0 ? 'COMMON' : 'PREFERRED',
     ...auditFields(),
   };
 }
 
-function stockClassification(state: FacilityState, positionId: number, date: string): SqlRow {
+function stockClassification(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
     customer_id: `CUST-${state.counterparty_id}`,
-    legal_entity_id: String((state.facility_id % 10) + 1),
+    legal_entity_id: String((parseInt(state.facility_id, 10) % 10) + 1),
     internal_transaction_flag: 'N',
-    investee_industry_type: ['TECHNOLOGY', 'FINANCIAL', 'HEALTHCARE', 'ENERGY', 'INDUSTRIAL', 'CONSUMER'][positionId % 6],
+    investee_industry_type: ['TECHNOLOGY', 'FINANCIAL', 'HEALTHCARE', 'ENERGY', 'INDUSTRIAL', 'CONSUMER'][parseInt(positionId, 10) % 6],
     ...auditFields(),
   };
 }
 
-function stockRisk(state: FacilityState, positionId: number, date: string): SqlRow {
+function stockRisk(state: FacilityState, positionId: string, date: string): SqlRow {
   return {
     position_id: positionId,
     as_of_date: date,
-    treasury_control_flag: positionId % 5 === 0,
+    treasury_control_flag: parseInt(positionId, 10) % 5 === 0,
     ...auditFields(),
   };
 }
@@ -920,9 +907,9 @@ function stockRisk(state: FacilityState, positionId: number, date: string): SqlR
  */
 export function generateProductTableRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
-  positionIdMap: Map<string, number>,
+  positionIdMap: Map<string, string>,
 ): ProductTableOutput {
   const tables = new Map<string, SqlRow[]>();
 

@@ -118,7 +118,7 @@ export class IDRegistry {
    * Returns an array of allocated IDs (inclusive).
    * Throws on collision with any existing allocation.
    */
-  allocate(table: string, count: number, scenarioId: string = 'v2'): number[] {
+  allocate(table: string, count: number, scenarioId: string = 'v2'): string[] {
     if (count <= 0) throw new Error(`IDRegistry: count must be positive, got ${count}`);
 
     const start = this.state.nextId[table] ?? DEFAULT_STARTS[table] ?? 10001;
@@ -139,7 +139,8 @@ export class IDRegistry {
     this.state.allocations.push({ table, scenarioId, startId: start, endId: end, count });
     this.state.nextId[table] = end + 1;
 
-    return Array.from({ length: count }, (_, i) => start + i);
+    // Return string IDs — internal math uses numbers, public API returns strings
+    return Array.from({ length: count }, (_, i) => String(start + i));
   }
 
   /** Get all allocations for a scenario */
@@ -153,9 +154,11 @@ export class IDRegistry {
   }
 
   /** Check if a specific ID is already allocated for a table */
-  isAllocated(table: string, id: number): boolean {
+  isAllocated(table: string, id: string | number): boolean {
+    const numId = typeof id === 'string' ? parseInt(id, 10) : id;
+    if (isNaN(numId)) return false;
     return this.state.allocations.some(
-      a => a.table === table && id >= a.startId && id <= a.endId
+      a => a.table === table && numId >= a.startId && numId <= a.endId
     );
   }
 

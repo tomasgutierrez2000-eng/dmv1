@@ -11,7 +11,7 @@ const PIPELINE_STAGES = ['ORIGINATION', 'UNDERWRITING', 'CREDIT_APPROVAL', 'DOCU
 
 export function generatePipelineRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
   registry: IDRegistry,
 ): SqlRow[] {

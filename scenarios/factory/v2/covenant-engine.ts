@@ -397,7 +397,7 @@ export function testCovenants(
  * other facilities under the same or related agreements may also default.
  */
 export function checkCrossDefault(
-  breachedFacilityId: number,
+  breachedFacilityId: string,
   counterpartyFacilities: FacilityState[],
   crossDefaultThreshold: number,
   currentDate?: string,

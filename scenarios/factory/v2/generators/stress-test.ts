@@ -16,7 +16,7 @@ export interface StressTestRows {
 
 export function generateStressTestRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
   registry: IDRegistry,
   market: MarketEnvironment,
@@ -40,7 +40,7 @@ export function generateStressTestRows(
   // Aggregate portfolio-level stress result
   let totalLoss = 0;
   let totalCapitalImpact = 0;
-  const breachedFacilities: { facilityId: number; loss: number; counterpartyId: number }[] = [];
+  const breachedFacilities: { facilityId: string; loss: number; counterpartyId: string }[] = [];
 
   for (const facId of facilityIds) {
     const state = stateMap.get(stateKey(facId, date));

@@ -9,10 +9,10 @@ import { round } from '../prng';
 
 export function generateLimitRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
   registry: IDRegistry,
-  limitRuleMap: Map<number, number>, // counterparty_id → limit_rule_id
+  limitRuleMap: Map<string, string>, // counterparty_id → limit_rule_id
 ): { contributions: SqlRow[]; utilizations: SqlRow[] } {
   const contributions: SqlRow[] = [];
   const utilizations: SqlRow[] = [];
@@ -22,8 +22,8 @@ export function generateLimitRows(
 
   for (const date of dates) {
     // Aggregate facility-level drawn amounts by counterparty
-    const cpDrawn = new Map<number, number>();
-    const cpCommitted = new Map<number, number>();
+    const cpDrawn = new Map<string, number>();
+    const cpCommitted = new Map<string, number>();
 
     for (const facId of facilityIds) {
       const state = stateMap.get(stateKey(facId, date));

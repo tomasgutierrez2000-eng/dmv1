@@ -9,7 +9,7 @@
 import type { FacilityState } from './types';
 
 export interface InvariantViolation {
-  facility_id: number;
+  facility_id: string;
   stage: string;
   field: string;
   message: string;

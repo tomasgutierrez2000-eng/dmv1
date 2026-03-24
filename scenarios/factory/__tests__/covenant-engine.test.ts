@@ -11,7 +11,7 @@ function makeRng(seed = 42) { return mulberry32(seed); }
 
 function makeFinancials(overrides: Partial<CounterpartyFinancials> = {}): CounterpartyFinancials {
   return {
-    counterparty_id: 1,
+    counterparty_id: '1',
     total_revenue: 100_000_000,
     ebitda: 30_000_000,
     net_income: 15_000_000,
@@ -31,9 +31,9 @@ function makeFinancials(overrides: Partial<CounterpartyFinancials> = {}): Counte
 
 function makeState(overrides: Partial<FacilityState> = {}): FacilityState {
   return {
-    facility_id: 1,
-    counterparty_id: 1,
-    credit_agreement_id: 1,
+    facility_id: '1',
+    counterparty_id: '1',
+    credit_agreement_id: '1',
     product_type: 'REVOLVING_CREDIT',
     currency_code: 'USD',
     facility_type_code: 'RC',
@@ -187,41 +187,41 @@ describe('checkCrossDefault', () => {
   it('triggers cross-default when breach facility is significant portion of agreement', () => {
     const facilities: FacilityState[] = [
       makeState({
-        facility_id: 1, credit_agreement_id: 100,
+        facility_id: '1', credit_agreement_id: '100',
         drawn_amount: 8_000_000,
         covenants: [{ covenant_type: 'MAX_LEVERAGE', threshold_value: 4.5,
           current_value: 5.0, headroom_pct: -0.11, is_breached: true,
           is_warning: false, waiver_active: false, last_test_date: '2025-06-30' }],
       }),
       makeState({
-        facility_id: 2, credit_agreement_id: 100,
+        facility_id: '2', credit_agreement_id: '100',
         drawn_amount: 2_000_000,
       }),
     ];
-    const events = checkCrossDefault(1, facilities, 0.50, '2025-06-30');
+    const events = checkCrossDefault('1', facilities, 0.50, '2025-06-30');
     expect(events.some(e => e.type === 'CROSS_DEFAULT')).toBe(true);
   });
 
   it('does not trigger when breached facility is small', () => {
     const facilities: FacilityState[] = [
       makeState({
-        facility_id: 1, credit_agreement_id: 100,
+        facility_id: '1', credit_agreement_id: '100',
         drawn_amount: 1_000_000,
         covenants: [{ covenant_type: 'MAX_LEVERAGE', threshold_value: 4.5,
           current_value: 5.0, headroom_pct: -0.11, is_breached: true,
           is_warning: false, waiver_active: false, last_test_date: '2025-06-30' }],
       }),
       makeState({
-        facility_id: 2, credit_agreement_id: 100,
+        facility_id: '2', credit_agreement_id: '100',
         drawn_amount: 9_000_000,
       }),
     ];
-    const events = checkCrossDefault(1, facilities, 0.50, '2025-06-30');
+    const events = checkCrossDefault('1', facilities, 0.50, '2025-06-30');
     expect(events.filter(e => e.type === 'CROSS_DEFAULT')).toHaveLength(0);
   });
 
   it('returns empty when facility not found', () => {
-    const events = checkCrossDefault(999, [], 0.50, '2025-06-30');
+    const events = checkCrossDefault('999', [], 0.50, '2025-06-30');
     expect(events).toEqual([]);
   });
 });

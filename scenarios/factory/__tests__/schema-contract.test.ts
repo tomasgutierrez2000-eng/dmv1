@@ -113,9 +113,9 @@ async function main() {
   registry.deallocate(config.scenario_id);
   const chain = buildL1Chain(config, registry);
 
-  const storyArcs = new Map<number, any>();
-  const ratingTiers = new Map<number, any>();
-  const sizeProfiles = new Map<number, any>();
+  const storyArcs = new Map<string, any>();
+  const ratingTiers = new Map<string, any>();
+  const sizeProfiles = new Map<string, any>();
   for (let i = 0; i < config.counterparties.length; i++) {
     const profile = config.counterparties[i];
     const cp = chain.counterparties[i];

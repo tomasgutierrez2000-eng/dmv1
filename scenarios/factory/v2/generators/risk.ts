@@ -8,7 +8,7 @@ import { round } from '../prng';
 
 export function generateRiskRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
 ): SqlRow[] {
   const rows: SqlRow[] = [];

@@ -79,7 +79,7 @@ const COMMITMENT_RANGES: Record<SizeProfile, [number, number]> = {
 
 export interface EnrichedCounterparty {
   // From profile
-  counterparty_id: number;
+  counterparty_id: string;
   legal_name: string;
   counterparty_type: string;
   country_code: string;
@@ -122,7 +122,7 @@ export interface EnrichedCounterparty {
  */
 export function enrichCounterparty(
   profile: CounterpartyProfile,
-  counterpartyId: number,
+  counterpartyId: string,
   scenarioSeed?: string,
 ): EnrichedCounterparty {
   const seedKey = scenarioSeed
@@ -247,9 +247,9 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export interface EnrichedFacility {
-  facility_id: number;
-  credit_agreement_id: number;
-  counterparty_id: number;
+  facility_id: string;
+  credit_agreement_id: string;
+  counterparty_id: string;
   facility_name: string;
   facility_type: string;
   facility_status: string;
@@ -288,8 +288,8 @@ export interface EnrichedFacility {
  */
 export function enrichFacilities(
   counterparty: EnrichedCounterparty,
-  agreementId: number,
-  facilityIds: number[],
+  agreementId: string,
+  facilityIds: string[],
   sizeProfile: SizeProfile,
   ratingTier: RatingTier,
   scenarioSeed?: string,
@@ -386,8 +386,8 @@ export function enrichFacilities(
 /* ────────────────── Agreement Enrichment ────────────────── */
 
 export interface EnrichedAgreement {
-  credit_agreement_id: number;
-  borrower_counterparty_id: number;
+  credit_agreement_id: string;
+  borrower_counterparty_id: string;
   lender_legal_entity_id: number;
   agreement_type: string;
   status_code: string;
@@ -403,7 +403,7 @@ export interface EnrichedAgreement {
 }
 
 export function enrichAgreement(
-  agreementId: number,
+  agreementId: string,
   counterparty: EnrichedCounterparty,
   sizeProfile: SizeProfile,
   scenarioSeed?: string,
@@ -440,8 +440,8 @@ export function enrichAgreement(
 /* ────────────────── Lender Allocation ────────────────── */
 
 export interface EnrichedAllocation {
-  lender_allocation_id: number;
-  facility_id: number;
+  lender_allocation_id: string;
+  facility_id: string;
   legal_entity_id: number;
   allocation_role: string;
   bank_share_pct: number;
@@ -457,7 +457,7 @@ export interface EnrichedAllocation {
  * @param facility  The enriched facility
  * @param allocationId  Pre-allocated ID from IDRegistry
  */
-export function enrichLenderAllocation(facility: EnrichedFacility, allocationId: number): EnrichedAllocation {
+export function enrichLenderAllocation(facility: EnrichedFacility, allocationId: string): EnrichedAllocation {
   return {
     lender_allocation_id: allocationId,
     facility_id: facility.facility_id,

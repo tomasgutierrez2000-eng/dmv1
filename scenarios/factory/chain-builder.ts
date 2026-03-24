@@ -35,19 +35,19 @@ export interface L1Chain {
 }
 
 export interface HierarchyRow {
-  counterparty_id: number;
+  counterparty_id: string;
   as_of_date: string;
-  immediate_parent_id: number;
-  ultimate_parent_id: number;
+  immediate_parent_id: string;
+  ultimate_parent_id: string;
   ownership_pct: number;
   record_source?: string;
   created_by?: string;
 }
 
 export interface CollateralAssetRow {
-  collateral_asset_id: number;
+  collateral_asset_id: string;
   collateral_type_id: number;
-  counterparty_id: number;
+  counterparty_id: string;
   country_code: string;
   currency_code: string;
   legal_entity_id: number;
@@ -62,10 +62,10 @@ export interface CollateralAssetRow {
 }
 
 export interface LimitRuleRow {
-  limit_rule_id: number;
+  limit_rule_id: string;
   limit_type: string;
   limit_amount_usd: number;
-  counterparty_id: number | null;
+  counterparty_id: string | null;
   record_source?: string;
   created_by?: string;
 }

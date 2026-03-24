@@ -9,7 +9,7 @@ import { round } from '../prng';
 
 export function generateCounterpartyFinancialRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
   financials: Map<string, CounterpartyFinancials>,
   registry: IDRegistry,

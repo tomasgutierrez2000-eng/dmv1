@@ -112,15 +112,15 @@ export interface V2GeneratorConfig {
   /** Default time frequency. */
   frequency?: TimeFrequency;
   /** Story arc assignments per counterparty. */
-  storyArcs: Map<number, StoryArc>;
+  storyArcs: Map<string, StoryArc>;
   /** Rating tier assignments per counterparty. */
-  ratingTiers: Map<number, RatingTier>;
+  ratingTiers: Map<string, RatingTier>;
   /** Size profile assignments per counterparty. */
-  sizeProfiles: Map<number, SizeProfile>;
+  sizeProfiles: Map<string, SizeProfile>;
   /** Backward-compat: explicit as_of_dates override. */
   snapshotDates?: string[];
   /** Limit rule map: counterparty_id → limit_rule_id. */
-  limitRules?: Map<number, number>;
+  limitRules?: Map<string, string>;
 }
 
 // ─── Output ────────────────────────────────────────────────────────────
@@ -219,7 +219,7 @@ export function generateV2Data(
   tableBreakdown['fx_rate'] = fxRateRows.length;
 
   // 1. Exposure — pass bank_share_pct from L1 lender allocations (syndicated facilities < 1.0)
-  const bankShareMap = new Map<number, number>();
+  const bankShareMap = new Map<string, number>();
   if (chain.facility_lender_allocations) {
     for (const alloc of chain.facility_lender_allocations) {
       bankShareMap.set(alloc.facility_id, alloc.bank_share_pct);
@@ -279,14 +279,14 @@ export function generateV2Data(
   tableBreakdown['counterparty_rating_observation'] = ratingRows.length;
 
   // 9. Collateral
-  const collateralAssetMap = new Map<number, number>();
+  const collateralAssetMap = new Map<string, string>();
   // Pre-populate from chain if available
   if (chain.collateral_assets) {
     for (const asset of chain.collateral_assets) {
       if ('facility_id' in asset && 'collateral_asset_id' in asset) {
         collateralAssetMap.set(
-          (asset as Record<string, number>).facility_id,
-          (asset as Record<string, number>).collateral_asset_id,
+          (asset as Record<string, string>).facility_id,
+          (asset as Record<string, string>).collateral_asset_id,
         );
       }
     }
@@ -333,7 +333,7 @@ export function generateV2Data(
   }
 
   // 12. Limits
-  const limitRules = config.limitRules ?? new Map<number, number>();
+  const limitRules = config.limitRules ?? new Map<string, string>();
   // Auto-assign limit rules if not provided
   if (limitRules.size === 0 && chain.limit_rules) {
     for (const rule of chain.limit_rules) {
@@ -381,6 +381,19 @@ export function generateV2Data(
   if (stressRows.breaches.length > 0) {
     tables.push({ schema: 'l2', table: 'stress_test_breach', rows: stressRows.breaches });
     tableBreakdown['stress_test_breach'] = stressRows.breaches.length;
+  }
+
+  // ── Facility coverage audit ──
+  const exposureTableForAudit = tables.find(t => t.table === 'facility_exposure_snapshot');
+  if (exposureTableForAudit) {
+    const exposedFacs = new Set(exposureTableForAudit.rows.map(r => String(r.facility_id)));
+    const missingFacs = facilityIds.filter(id => !exposedFacs.has(id));
+    if (missingFacs.length > 0) {
+      console.warn(
+        `[COMPLETENESS] ${missingFacs.length}/${facilityIds.length} facilities have NO exposure rows: ` +
+        `${missingFacs.slice(0, 5).join(', ')}${missingFacs.length > 5 ? '...' : ''}`
+      );
+    }
   }
 
   // ── Stats ──

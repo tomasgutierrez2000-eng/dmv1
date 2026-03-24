@@ -9,7 +9,7 @@ import { round } from '../prng';
 
 export function generateDelinquencyRows(
   stateMap: FacilityStateMap,
-  facilityIds: number[],
+  facilityIds: string[],
   dates: string[],
   registry: IDRegistry,
 ): SqlRow[] {

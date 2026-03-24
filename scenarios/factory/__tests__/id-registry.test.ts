@@ -24,8 +24,10 @@ describe('IDRegistry', () => {
       expect(ids).toHaveLength(5);
       // IDs should be contiguous
       for (let i = 1; i < ids.length; i++) {
-        expect(ids[i]).toBe(ids[i - 1] + 1);
+        expect(Number(ids[i])).toBe(Number(ids[i - 1]) + 1);
       }
+      // IDs should be strings
+      expect(typeof ids[0]).toBe('string');
     });
 
     it('does not overlap with previous allocations', () => {
@@ -57,7 +59,7 @@ describe('IDRegistry', () => {
       const ids = reg.allocate('unknown_new_table', 3, 'test');
       expect(ids).toHaveLength(3);
       // Default start is 10001
-      expect(ids[0]).toBe(10001);
+      expect(ids[0]).toBe('10001');
     });
   });
 
@@ -72,15 +74,15 @@ describe('IDRegistry', () => {
     it('returns false for unallocated IDs outside any range', () => {
       const reg = createRegistry();
       // Use an ID far above any allocation
-      expect(reg.isAllocated('counterparty', 999999)).toBe(false);
+      expect(reg.isAllocated('counterparty', '999999')).toBe(false);
     });
 
     it('returns true for seed-range IDs (reserved)', () => {
       const reg = createRegistry();
       // Seed counterparty range: 1-100
-      expect(reg.isAllocated('counterparty', 1)).toBe(true);
-      expect(reg.isAllocated('counterparty', 50)).toBe(true);
-      expect(reg.isAllocated('counterparty', 100)).toBe(true);
+      expect(reg.isAllocated('counterparty', '1')).toBe(true);
+      expect(reg.isAllocated('counterparty', '50')).toBe(true);
+      expect(reg.isAllocated('counterparty', '100')).toBe(true);
     });
   });
 

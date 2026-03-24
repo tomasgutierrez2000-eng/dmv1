@@ -9456,14 +9456,32 @@
           "description": "Primary counterparty / obligor",
           "category": "Exposure & Position",
           "why_required": "Core counterparty linkage",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "counterparty",
+              "field": "counterparty_id"
+            }
+          }
         },
         {
           "name": "credit_agreement_id",
           "description": "Credit agreement identifier",
           "category": "Exposure & Position",
           "why_required": "Links position to credit agreement",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "credit_agreement_master",
+              "field": "credit_agreement_id"
+            }
+          }
         },
         {
           "name": "credit_status_code",
@@ -9505,7 +9523,16 @@
           "description": "Reporting/booking legal entity",
           "category": "Exposure & Position",
           "why_required": "Legal entity aggregation (Page 4)",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "legal_entity",
+              "field": "legal_entity_id"
+            }
+          }
         },
         {
           "name": "lgd_estimate",
@@ -9527,7 +9554,16 @@
           "description": "Netting set identifier (nullable — derivatives/SFT only)",
           "category": "Exposure & Position",
           "why_required": "Links position to netting set for close-out netting",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "netting_set",
+              "field": "netting_set_id"
+            }
+          }
         },
         {
           "name": "notional_amount",
@@ -9571,7 +9607,16 @@
           "description": "Ultimate parent counterparty identifier",
           "category": "Exposure & Position",
           "why_required": "Concentration roll-up to parent level",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "counterparty",
+              "field": "counterparty_id"
+            }
+          }
         },
         {
           "name": "product_node_id",
@@ -10018,6 +10063,31 @@
           "description": "",
           "data_type": "VARCHAR(200)",
           "category": "Exposure & Position"
+        },
+        {
+          "name": "overdue_amt_current",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "overdue_amt_1_29",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "overdue_amt_30_59",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "overdue_amt_60_89",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "overdue_amt_90_plus",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
         }
       ]
     },
@@ -11171,6 +11241,31 @@
           "description": "",
           "data_type": "VARCHAR(200)",
           "category": "Financial Performance"
+        },
+        {
+          "name": "overdue_amt_current",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "overdue_amt_1_29",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "overdue_amt_30_59",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "overdue_amt_60_89",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "overdue_amt_90_plus",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
         }
       ]
     },
@@ -34679,6 +34774,31 @@
           "description": "",
           "data_type": "VARCHAR(64)",
           "category": "Business Segment & Dashboard"
+        },
+        {
+          "name": "overdue_amt_current",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "overdue_amt_1_29",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "overdue_amt_30_59",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "overdue_amt_60_89",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "overdue_amt_90_plus",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
         }
       ]
     },
@@ -45520,6 +45640,22 @@
     {
       "from_layer": "L2",
       "from_table": "position",
+      "from_field": "counterparty_id",
+      "to_layer": "L2",
+      "to_table": "counterparty",
+      "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "position",
+      "from_field": "credit_agreement_id",
+      "to_layer": "L2",
+      "to_table": "credit_agreement_master",
+      "to_field": "credit_agreement_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "position",
       "from_field": "currency_code",
       "to_layer": "L1",
       "to_table": "currency_dim",
@@ -45532,6 +45668,22 @@
       "to_layer": "L2",
       "to_table": "facility_master",
       "to_field": "facility_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "position",
+      "from_field": "legal_entity_id",
+      "to_layer": "L2",
+      "to_table": "legal_entity",
+      "to_field": "legal_entity_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "position",
+      "from_field": "netting_set_id",
+      "to_layer": "L2",
+      "to_table": "netting_set",
+      "to_field": "netting_set_id"
     },
     {
       "from_layer": "L2",
@@ -45556,6 +45708,14 @@
       "to_layer": "L1",
       "to_table": "product_subtype_dim",
       "to_field": "product_subtype_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "position",
+      "from_field": "ultimate_parent_id",
+      "to_layer": "L2",
+      "to_table": "counterparty",
+      "to_field": "counterparty_id"
     },
     {
       "from_layer": "L2",

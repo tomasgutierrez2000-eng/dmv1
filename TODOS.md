@@ -24,10 +24,8 @@ _Last reviewed: 2026-03-24. 13 items completed and removed, 2 downscoped, 2 mark
 
 ## Phase 2: Infrastructure
 
-### 4. Regenerate DDL from Data Dictionary
-**What:** Bring 3 DDL files (01-l1-ddl, 02-l2-ddl, 03-l3-ddl) into alignment with golden-source data dictionary.
-**Why:** 9 orphaned tables cause confusion for offline users and make DDL files unreliable as fallback.
-**Depends on:** Item 1 (drop legacy column first so regenerated DDL is clean).
+### ~~4. Regenerate DDL from Data Dictionary~~ DONE
+Regenerated via `npm run db:export-ddl` — all 3 DDL files now match golden-source DD (75/100/83 tables).
 
 ### 5. Middleware security hardening
 **What:** Add CORS headers, `Strict-Transport-Security`, tighten CSP (remove `unsafe-eval` if possible).
@@ -35,10 +33,8 @@ _Last reviewed: 2026-03-24. 13 items completed and removed, 2 downscoped, 2 mark
 **Status:** Partially done. Auth tokens and distributed rate limiting deferred (need architecture decisions).
 **Effort:** Medium.
 
-### 6. Incremental introspection
-**What:** Parse DDL commands to identify affected tables, only re-introspect those instead of all 211. Fallback: add a `--table` flag for single-table introspection.
-**Why:** `db:introspect` takes 10-30 seconds over GCP Cloud SQL network. PostToolUse hook blocks dev on every DDL change.
-**Effort:** Medium.
+### ~~6. Incremental introspection~~ DONE
+Already implemented: `--tables=` flag in `scripts/introspect-db.ts`, `lib/introspect.ts` filters SQL queries by table name, PostToolUse hook extracts table names from DDL commands and passes them automatically.
 
 ---
 

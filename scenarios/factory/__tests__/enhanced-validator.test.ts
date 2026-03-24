@@ -136,6 +136,81 @@ describe('PKRegistry', () => {
   });
 });
 
+/* ────────────────── Tier 4: Data Quality (CLAUDE.md Lessons) ────────────────── */
+
+describe('CLAUDE.md lessons learned checks', () => {
+  it('should detect NULL sparsity (>90% NULL)', () => {
+    const validator = new EnhancedValidator();
+    const rows = Array.from({ length: 20 }, (_, i) => ({
+      facility_id: i + 1,
+      as_of_date: '2025-01-31',
+      pd_pct: i === 0 ? 0.5 : null,  // 95% NULL
+    }));
+    const report = validator.runPreFlightChecklist([{
+      schema: 'l2', table: 'facility_risk_snapshot', rows,
+    }]);
+    const nullCheck = report.checks.find(c => c.name === 'NULL_SPARSITY');
+    expect(nullCheck).toBeDefined();
+    expect(nullCheck!.passed).toBe(false);
+  });
+
+  it('should detect homogeneous dimension columns', () => {
+    const validator = new EnhancedValidator();
+    const rows = Array.from({ length: 15 }, (_, i) => ({
+      facility_id: i + 1, as_of_date: '2025-01-31',
+      currency_code: 'USD',  // All same value
+    }));
+    const report = validator.runPreFlightChecklist([{
+      schema: 'l2', table: 'facility_exposure_snapshot', rows,
+    }]);
+    const divCheck = report.checks.find(c => c.name === 'DIM_DIVERSITY');
+    expect(divCheck).toBeDefined();
+    expect(divCheck!.passed).toBe(false);
+  });
+
+  it('should detect single-value boolean flags', () => {
+    const validator = new EnhancedValidator();
+    const rows = Array.from({ length: 15 }, () => ({
+      facility_id: 1, as_of_date: '2025-01-31',
+      is_active_flag: 'Y',  // All same
+    }));
+    const report = validator.runPreFlightChecklist([{
+      schema: 'l2', table: 'facility_risk_snapshot', rows,
+    }]);
+    const boolCheck = report.checks.find(c => c.name === 'BOOL_BALANCE');
+    expect(boolCheck).toBeDefined();
+    expect(boolCheck!.passed).toBe(false);
+  });
+
+  it('should detect placeholder values (field_name_N pattern)', () => {
+    const validator = new EnhancedValidator();
+    const rows = Array.from({ length: 10 }, (_, i) => ({
+      facility_id: i + 1, as_of_date: '2025-01-31',
+      limit_status: `limit_status_${i}`,  // Placeholder pattern
+    }));
+    const report = validator.runPreFlightChecklist([{
+      schema: 'l2', table: 'limit_utilization_event', rows,
+    }]);
+    const phCheck = report.checks.find(c => c.name === 'PLACEHOLDER_VALUES');
+    expect(phCheck).toBeDefined();
+    expect(phCheck!.passed).toBe(false);
+  });
+
+  it('should detect NULL weight columns (>5% NULL)', () => {
+    const validator = new EnhancedValidator();
+    const rows = Array.from({ length: 20 }, (_, i) => ({
+      facility_id: i + 1, as_of_date: '2025-01-31',
+      gross_exposure_usd: i < 5 ? null : 1000000,  // 25% NULL weight
+    }));
+    const report = validator.runPreFlightChecklist([{
+      schema: 'l2', table: 'facility_exposure_snapshot', rows,
+    }]);
+    const weightCheck = report.checks.find(c => c.name === 'WEIGHT_COVERAGE');
+    expect(weightCheck).toBeDefined();
+    expect(weightCheck!.passed).toBe(false);
+  });
+});
+
 /* ────────────────── Story Coherence Checks ────────────────── */
 
 describe('runStoryCoherenceChecks', () => {

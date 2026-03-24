@@ -88,6 +88,15 @@ export class EnhancedValidator {
     this.checkTemporalAlignment(tables);
     this.checkAmountNonNegative(tables);
 
+    // ── Tier 4: Data Quality (CLAUDE.md Lessons Learned) ──
+    this.checkNullSparsity(tables, allContracts);
+    this.checkDimensionDiversity(tables);
+    this.checkBooleanBalance(tables);
+    this.checkWeightColumnCoverage(tables);
+    this.checkPlaceholderValues(tables);
+    this.checkLoadOrder(tables, allContracts);
+    this.checkNumericRangeRealism(tables, allContracts);
+
     return this.buildReport();
   }
 
@@ -376,6 +385,209 @@ export class EnhancedValidator {
             this.addCheck('NON_NEGATIVE_AMT', `${td.schema}.${td.table}.${col}`, 'MEDIUM',
               false, `${negatives} rows with negative amounts`);
           }
+        }
+      }
+    }
+  }
+
+  /* ────────────────── Tier 4: Data Quality (CLAUDE.md Lessons) ────────────────── */
+
+  /**
+   * Check for columns where >90% of values are NULL.
+   * CLAUDE.md: "NULL sparsity — Metric-critical fields have >10% non-null values"
+   */
+  private checkNullSparsity(
+    tables: Array<{ schema: string; table: string; rows: Record<string, unknown>[] }>,
+    contracts: Map<string, SchemaContract>,
+  ): void {
+    for (const td of tables) {
+      if (td.rows.length < 5) continue; // need enough rows to measure
+      const qn = `${td.schema}.${td.table}`;
+      const contract = contracts.get(qn);
+      if (!contract) continue;
+
+      for (const col of Object.keys(td.rows[0] ?? {})) {
+        // Skip PK and timestamp columns
+        if (col.endsWith('_ts') || col === 'as_of_date') continue;
+        const contractCol = contract.columns.find(c => c.name === col);
+        if (contractCol?.isPK) continue;
+
+        const nullCount = td.rows.filter(r => r[col] === null || r[col] === undefined).length;
+        const nullPct = (nullCount / td.rows.length) * 100;
+
+        if (nullPct > 90) {
+          this.addCheck('NULL_SPARSITY', `${qn}.${col}`, 'HIGH',
+            false, `${nullPct.toFixed(0)}% NULL (${nullCount}/${td.rows.length}) — metric may appear broken`, 'null_sparsity');
+        }
+      }
+    }
+  }
+
+  /**
+   * Check that categorical/dimension columns have diverse values.
+   * CLAUDE.md: "Dimension diversity — Multiple distinct values for categorical fields"
+   * Catches homogeneous seed arrays (all rows same value → COUNT(DISTINCT) always 1)
+   */
+  private checkDimensionDiversity(
+    tables: Array<{ schema: string; table: string; rows: Record<string, unknown>[] }>,
+  ): void {
+    for (const td of tables) {
+      if (td.rows.length < 5) continue;
+      for (const col of Object.keys(td.rows[0] ?? {})) {
+        if (!col.endsWith('_code') && !col.endsWith('_type') && !col.endsWith('_status')) continue;
+
+        const distinctValues = new Set(td.rows.map(r => String(r[col] ?? 'NULL')));
+        if (distinctValues.size === 1 && td.rows.length >= 10) {
+          this.addCheck('DIM_DIVERSITY', `${td.schema}.${td.table}.${col}`, 'HIGH',
+            false, `Only 1 distinct value across ${td.rows.length} rows — metrics will return identical results`, 'homogeneous_seed_arrays');
+        }
+      }
+    }
+  }
+
+  /**
+   * Check that boolean flag columns have both TRUE and FALSE values.
+   * CLAUDE.md: "Boolean diversity — Both TRUE and FALSE values for flag fields"
+   */
+  private checkBooleanBalance(
+    tables: Array<{ schema: string; table: string; rows: Record<string, unknown>[] }>,
+  ): void {
+    for (const td of tables) {
+      if (td.rows.length < 10) continue;
+      for (const col of Object.keys(td.rows[0] ?? {})) {
+        if (!col.endsWith('_flag')) continue;
+
+        const values = new Set(td.rows.map(r => String(r[col])));
+        // Remove NULL from consideration
+        values.delete('null');
+        values.delete('undefined');
+
+        if (values.size === 1) {
+          const onlyValue = [...values][0];
+          this.addCheck('BOOL_BALANCE', `${td.schema}.${td.table}.${col}`, 'MEDIUM',
+            false, `All ${td.rows.length} rows have ${col}='${onlyValue}' — metric always 0% or 100%`, 'boolean_diversity');
+        }
+      }
+    }
+  }
+
+  /**
+   * Check that weight columns used in weighted averages have sufficient non-NULL coverage.
+   * CLAUDE.md: "NULL weight propagation — COALESCE(weight_field, 0) needed"
+   * Weight columns: *_amt (amounts used as weights in SUM(x * weight) / SUM(weight))
+   */
+  private checkWeightColumnCoverage(
+    tables: Array<{ schema: string; table: string; rows: Record<string, unknown>[] }>,
+  ): void {
+    const weightColumns = ['outstanding_balance_amt', 'gross_exposure_usd', 'committed_amount',
+      'drawn_amount', 'exposure_amount', 'collateral_value'];
+
+    for (const td of tables) {
+      if (td.rows.length < 5) continue;
+      for (const col of weightColumns) {
+        if (!(col in (td.rows[0] ?? {}))) continue;
+
+        const nullCount = td.rows.filter(r => r[col] === null || r[col] === undefined).length;
+        const nullPct = (nullCount / td.rows.length) * 100;
+
+        if (nullPct > 5) {
+          this.addCheck('WEIGHT_COVERAGE', `${td.schema}.${td.table}.${col}`, 'HIGH',
+            false, `Weight column ${nullPct.toFixed(0)}% NULL (${nullCount}/${td.rows.length}) — weighted avg returns NULL for affected segments`, 'null_weight_propagation');
+        }
+      }
+    }
+  }
+
+  /**
+   * Detect placeholder/junk values from seed generator fallback.
+   * CLAUDE.md: "Placeholder detection — No auto-generated field_name_123 values"
+   */
+  private checkPlaceholderValues(
+    tables: Array<{ schema: string; table: string; rows: Record<string, unknown>[] }>,
+  ): void {
+    const placeholderPattern = /^[a-z_]+_\d+$/; // e.g., "limit_status_code_1"
+
+    for (const td of tables) {
+      if (td.rows.length === 0) continue;
+      for (const col of Object.keys(td.rows[0] ?? {})) {
+        if (col.endsWith('_id') || col.endsWith('_ts') || col === 'as_of_date') continue;
+
+        let placeholders = 0;
+        for (const row of td.rows.slice(0, 50)) { // sample first 50
+          const val = row[col];
+          if (typeof val === 'string' && placeholderPattern.test(val)) {
+            placeholders++;
+          }
+        }
+
+        if (placeholders > 3) {
+          this.addCheck('PLACEHOLDER_VALUES', `${td.schema}.${td.table}.${col}`, 'HIGH',
+            false, `${placeholders} placeholder values detected (pattern: field_name_N) — seed generator fallback`, 'placeholder_seed_values');
+        }
+      }
+    }
+  }
+
+  /**
+   * Validate that parent tables appear before child tables in the data.
+   * CLAUDE.md: Rule 11 — "Parent table INSERTs must appear BEFORE child table INSERTs"
+   */
+  private checkLoadOrder(
+    tables: Array<{ schema: string; table: string; rows: Record<string, unknown>[] }>,
+    contracts: Map<string, SchemaContract>,
+  ): void {
+    const tableOrder = new Map<string, number>();
+    tables.forEach((td, idx) => tableOrder.set(`${td.schema}.${td.table}`, idx));
+
+    let violations = 0;
+    for (const td of tables) {
+      const qn = `${td.schema}.${td.table}`;
+      const contract = contracts.get(qn);
+      if (!contract) continue;
+
+      const myOrder = tableOrder.get(qn) ?? 999;
+      for (const dep of contract.dependsOn) {
+        const depOrder = tableOrder.get(dep);
+        if (depOrder !== undefined && depOrder > myOrder) {
+          violations++;
+        }
+      }
+    }
+
+    if (violations > 0) {
+      this.addCheck('LOAD_ORDER', 'Parent tables before child tables', 'CRITICAL',
+        false, `${violations} tables appear before their FK parents — will cause FK constraint violations`, 'parent_before_child');
+    }
+  }
+
+  /**
+   * Check that numeric values fall within GSIB-realistic ranges.
+   * CLAUDE.md: "Numeric range realism — NUMERIC fields have values in GSIB-realistic ranges"
+   */
+  private checkNumericRangeRealism(
+    tables: Array<{ schema: string; table: string; rows: Record<string, unknown>[] }>,
+    contracts: Map<string, SchemaContract>,
+  ): void {
+    for (const td of tables) {
+      if (td.rows.length === 0) continue;
+      const qn = `${td.schema}.${td.table}`;
+      const contract = contracts.get(qn);
+      if (!contract) continue;
+
+      for (const col of contract.columns) {
+        if (!col.gsibRange) continue;
+        if (!(col.name in (td.rows[0] ?? {}))) continue;
+
+        let outOfRange = 0;
+        for (const row of td.rows) {
+          const val = Number(row[col.name]);
+          if (isNaN(val) || val === null) continue;
+          if (val < col.gsibRange.min || val > col.gsibRange.max) outOfRange++;
+        }
+
+        if (outOfRange > 0) {
+          this.addCheck('GSIB_RANGE', `${qn}.${col.name}`, 'MEDIUM',
+            false, `${outOfRange}/${td.rows.length} values outside GSIB range [${col.gsibRange.min}-${col.gsibRange.max}]`, 'numeric_range_realism');
         }
       }
     }

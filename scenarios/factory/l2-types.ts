@@ -7,12 +7,12 @@
  */
 
 export interface AmendmentChangeDetailRow {
-  change_detail_id: number;
-  amendment_id: number | null;
+  change_detail_id: string;
+  amendment_id: string | null;
   change_type: string | null;
   old_value: string | null;
   new_value: string | null;
-  amendment_event_id: number | null;
+  amendment_event_id: string | null;
   change_currency_code: string | null;
   change_field_name: string | null;
   change_seq: number | null;
@@ -22,27 +22,27 @@ export interface AmendmentChangeDetailRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
   event_ts: string | null;
 }
 
 export interface AmendmentEventRow {
-  amendment_id: number;
-  facility_id: number | null;
-  credit_agreement_id: number | null;
+  amendment_id: string;
+  facility_id: string | null;
+  credit_agreement_id: string | null;
   amendment_type_code: string | null;
   amendment_status_code: string | null;
   effective_date: string | null;
   event_ts: string | null;
   amendment_description: string | null;
-  amendment_event_id: number | null;
+  amendment_event_id: string | null;
   amendment_status: string | null;
   amendment_subtype: string | null;
   amendment_type: string | null;
   as_of_date: string | null;
   completed_date: string | null;
-  counterparty_id: number | null;
+  counterparty_id: string | null;
   identified_date: string | null;
   last_updated_ts: string | null;
   updated_ts: string | null;
@@ -51,12 +51,12 @@ export interface AmendmentEventRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface BorrowingsAccountingSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   accounting_intent: string | null;
   accrued_interest_dividend_amount: number | null;
@@ -118,7 +118,7 @@ export interface BorrowingsAccountingSnapshotRow {
 }
 
 export interface BorrowingsClassificationSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   call_report_code: string | null;
   cost_center_id: number | null;
@@ -147,7 +147,7 @@ export interface BorrowingsClassificationSnapshotRow {
 }
 
 export interface BorrowingsIndicativeSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   borrowing_id: string | null;
   borrowing_type: string | null;
@@ -175,7 +175,7 @@ export interface BorrowingsIndicativeSnapshotRow {
 }
 
 export interface BorrowingsRiskSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   charge_off_due_to_bankruptcy_flag: string | null;
   entity_internal_risk_rating: string | null;
@@ -200,7 +200,7 @@ export interface BorrowingsRiskSnapshotRow {
 }
 
 export interface CapitalPositionSnapshotRow {
-  legal_entity_id: number;
+  legal_entity_id: string;
   as_of_date: string;
   currency_code: string | null;
   cet1_ratio_pct: number | null;
@@ -225,15 +225,15 @@ export interface CapitalPositionSnapshotRow {
 }
 
 export interface CollateralAssetMasterRow {
-  collateral_asset_id: number;
-  collateral_type_id: number | null;
-  counterparty_id: number | null;
+  collateral_asset_id: string;
+  collateral_type_id: string | null;
+  counterparty_id: string | null;
   country_code: string | null;
   currency_code: string | null;
-  legal_entity_id: number | null;
+  legal_entity_id: string | null;
   charge_type: string | null;
   collateral_asset_type: string | null;
-  collateral_id: number | null;
+  collateral_id: string | null;
   collateral_status: string | null;
   description: string | null;
   insurance_expiry_date: string | null;
@@ -245,7 +245,7 @@ export interface CollateralAssetMasterRow {
   original_cost: number | null;
   is_regulatory_eligible_flag: string | null;
   revaluation_frequency: string | null;
-  source_record_id: number | null;
+  source_record_id: string | null;
   updated_ts: string | null;
   valuation_currency_code: string | null;
   vintage_date: string | null;
@@ -257,17 +257,17 @@ export interface CollateralAssetMasterRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
   noi_at_origination_amt: number | null;
 }
 
 export interface CollateralLinkRow {
-  collateral_link_id: number;
-  collateral_asset_id: number | null;
-  anchor_id: number | null;
+  collateral_link_id: string;
+  collateral_asset_id: string | null;
+  anchor_id: string | null;
   anchor_type: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   link_type_code: string | null;
   pledged_amount: number | null;
   pledged_currency_code: string | null;
@@ -285,18 +285,18 @@ export interface CollateralLinkRow {
 }
 
 export interface CollateralSnapshotRow {
-  collateral_asset_id: number;
+  collateral_asset_id: string;
   as_of_date: string;
   valuation_amount: number | null;
   haircut_pct: number | null;
   eligible_collateral_amount: number | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   allocated_amount_usd: number | null;
-  collateral_snapshot_id: number | null;
-  counterparty_id: number | null;
+  collateral_snapshot_id: string | null;
+  counterparty_id: string | null;
   crm_type_code: string | null;
   current_valuation_usd: number | null;
-  facility_id: number | null;
+  facility_id: string | null;
   mitigant_group_code: string | null;
   mitigant_subtype: string | null;
   original_valuation_usd: number | null;
@@ -314,39 +314,39 @@ export interface CollateralSnapshotRow {
 }
 
 export interface ContractMasterRow {
-  contract_id: number;
+  contract_id: string;
   contract_type: string | null;
   contract_status: string | null;
   effective_start_date: string | null;
   contract_end_date: string | null;
   created_ts: string | null;
   updated_ts: string | null;
-  counterparty_id: number | null;
-  facility_id: number | null;
-  instrument_id: number | null;
-  legal_entity_id: number | null;
-  netting_set_id: number | null;
-  product_node_id: number | null;
-  source_record_id: number | null;
+  counterparty_id: string | null;
+  facility_id: string | null;
+  instrument_id: string | null;
+  legal_entity_id: string | null;
+  netting_set_id: string | null;
+  product_node_id: string | null;
+  source_record_id: string | null;
   effective_end_date: string | null;
   is_current_flag: string | null;
   created_by: string | null;
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface ControlRelationshipRow {
-  control_relationship_id: number;
-  parent_counterparty_id: number | null;
-  subsidiary_counterparty_id: number | null;
+  control_relationship_id: string;
+  parent_counterparty_id: string | null;
+  subsidiary_counterparty_id: string | null;
   control_type_code: string | null;
-  controlled_counterparty_id: number | null;
-  controller_counterparty_id: number | null;
+  controlled_counterparty_id: string | null;
+  controller_counterparty_id: string | null;
   ownership_pct: number | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
   is_current_flag: string | null;
@@ -360,12 +360,12 @@ export interface ControlRelationshipRow {
 }
 
 export interface CounterpartyRow {
-  counterparty_id: number;
+  counterparty_id: string;
   legal_name: string | null;
   counterparty_type: string | null;
   country_code: string | null;
   entity_type_code: string | null;
-  industry_id: number | null;
+  industry_id: string | null;
   basel_asset_class: string | null;
   basel_risk_grade: string | null;
   call_report_counterparty_type: string | null;
@@ -406,13 +406,13 @@ export interface CounterpartyRow {
   load_timestamp: string | null;
   pricing_tier_code: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface CounterpartyFinancialRow {
-  financial_snapshot_id: number;
-  counterparty_id: number | null;
+  financial_snapshot_id: string;
+  counterparty_id: string | null;
   as_of_date: string | null;
   reporting_period: string | null;
   currency_code: string | null;
@@ -435,16 +435,16 @@ export interface CounterpartyFinancialRow {
   load_timestamp: string | null;
   record_hash: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
   total_assets_amt: number | null;
 }
 
 export interface CounterpartyHierarchyRow {
-  counterparty_id: number;
+  counterparty_id: string;
   as_of_date: string;
-  immediate_parent_id: number | null;
-  ultimate_parent_id: number | null;
+  immediate_parent_id: string | null;
+  ultimate_parent_id: string | null;
   ownership_pct: number | null;
   created_ts: string | null;
   updated_ts: string | null;
@@ -455,16 +455,16 @@ export interface CounterpartyHierarchyRow {
   effective_end_date: string | null;
   is_current_flag: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface RatingObservationRow {
-  observation_id: number;
-  counterparty_id: number | null;
+  observation_id: string;
+  counterparty_id: string | null;
   as_of_date: string | null;
-  rating_grade_id: number | null;
-  rating_source_id: number | null;
+  rating_grade_id: string | null;
+  rating_source_id: string | null;
   is_internal_flag: string | null;
   pd_implied: string | null;
   prior_rating_value: string | null;
@@ -481,18 +481,18 @@ export interface RatingObservationRow {
   load_timestamp: string | null;
   record_hash: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface CreditAgreementCounterpartyParticipationRow {
-  agreement_participation_id: number;
-  credit_agreement_id: number | null;
-  counterparty_id: number | null;
+  agreement_participation_id: string;
+  credit_agreement_id: string | null;
+  counterparty_id: string | null;
   counterparty_role_code: string | null;
   is_primary_flag: string | null;
   participation_pct: number | null;
-  source_record_id: number | null;
+  source_record_id: string | null;
   role_priority_rank: string | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
@@ -503,14 +503,14 @@ export interface CreditAgreementCounterpartyParticipationRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface CreditAgreementMasterRow {
-  credit_agreement_id: number;
-  borrower_counterparty_id: number | null;
-  lender_legal_entity_id: number | null;
+  credit_agreement_id: string;
+  borrower_counterparty_id: string | null;
+  lender_legal_entity_id: string | null;
   currency_code: string | null;
   agreement_type: string | null;
   origination_date: string | null;
@@ -526,17 +526,17 @@ export interface CreditAgreementMasterRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface CreditEventRow {
-  credit_event_id: number;
-  counterparty_id: number | null;
+  credit_event_id: string;
+  counterparty_id: string | null;
   credit_event_type_code: string | null;
   event_date: string | null;
   event_ts: string | null;
-  default_definition_id: number | null;
+  default_definition_id: string | null;
   as_of_date: string | null;
   event_risk_rating: string | null;
   event_status: string | null;
@@ -550,14 +550,14 @@ export interface CreditEventRow {
   load_timestamp: string | null;
   currency_code: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface EventFacilityLinkRow {
-  link_id: number;
-  credit_event_id: number | null;
-  facility_id: number | null;
+  link_id: string;
+  credit_event_id: string | null;
+  facility_id: string | null;
   ead_amt: number | null;
   as_of_date: string | null;
   estimated_loss_usd: number | null;
@@ -569,22 +569,22 @@ export interface EventFacilityLinkRow {
   load_timestamp: string | null;
   currency_code: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
   event_ts: string | null;
 }
 
 export interface CrmProtectionMasterRow {
-  protection_id: number;
+  protection_id: string;
   crm_type_code: string | null;
-  beneficiary_legal_entity_id: number | null;
+  beneficiary_legal_entity_id: string | null;
   currency_code: string | null;
   notional_amount: number | null;
   maturity_date: string | null;
   is_enforceable_flag: string | null;
   coverage_pct: number | null;
-  governing_law_jurisdiction_id: number | null;
-  protection_provider_counterparty_id: number | null;
+  governing_law_jurisdiction_id: string | null;
+  protection_provider_counterparty_id: string | null;
   protection_reference: string | null;
   updated_ts: string | null;
   effective_start_date: string | null;
@@ -595,13 +595,13 @@ export interface CrmProtectionMasterRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface CsaMasterRow {
-  csa_id: number;
-  counterparty_id: number | null;
+  csa_id: string;
+  counterparty_id: string | null;
   csa_type: string | null;
   currency_code: string | null;
   eligible_collateral_desc: string | null;
@@ -609,7 +609,7 @@ export interface CsaMasterRow {
   independent_amount: number | null;
   margin_frequency: string | null;
   minimum_transfer_amount: number | null;
-  netting_set_id: number | null;
+  netting_set_id: string | null;
   threshold_amount: number | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
@@ -620,13 +620,13 @@ export interface CsaMasterRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface DealPipelineRow {
-  pipeline_id: number;
-  counterparty_id: number | null;
+  pipeline_id: string;
+  counterparty_id: string | null;
   as_of_date: string | null;
   stage_code: string | null;
   proposed_amount: number | null;
@@ -639,9 +639,9 @@ export interface DealPipelineRow {
   expected_internal_risk_grade: string | null;
   expected_spread_bps: number | null;
   expected_tenor_months: string | null;
-  facility_id: number | null;
-  lob_segment_id: number | null;
-  pipeline_deal_id: number | null;
+  facility_id: string | null;
+  lob_segment_id: string | null;
+  pipeline_deal_id: string | null;
   pipeline_stage: string | null;
   pipeline_status: string | null;
   record_level_code: string | null;
@@ -651,12 +651,12 @@ export interface DealPipelineRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface DebtAccountingSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   accounting_intent: string | null;
   accrued_interest_dividend_amount: number | null;
@@ -718,7 +718,7 @@ export interface DebtAccountingSnapshotRow {
 }
 
 export interface DebtClassificationSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   cusip: string | null;
   call_report_code: string | null;
@@ -744,7 +744,7 @@ export interface DebtClassificationSnapshotRow {
 }
 
 export interface DebtIndicativeSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   borrowing_type: string | null;
   call_date: string | null;
@@ -773,7 +773,7 @@ export interface DebtIndicativeSnapshotRow {
 }
 
 export interface DebtRiskSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   charge_off_due_to_bankruptcy_flag: string | null;
   entity_internal_risk_rating: string | null;
@@ -796,7 +796,7 @@ export interface DebtRiskSnapshotRow {
 }
 
 export interface DepositsAccountingSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   accounting_intent: string | null;
   accrued_dividend_amount: number | null;
@@ -830,7 +830,7 @@ export interface DepositsAccountingSnapshotRow {
 }
 
 export interface DepositsClassificationSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   account_status: string | null;
   account_status_description: string | null;
@@ -866,7 +866,7 @@ export interface DepositsClassificationSnapshotRow {
 }
 
 export interface DepositsIndicativeSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   currency_code: string | null;
   currency_type: string | null;
@@ -897,7 +897,7 @@ export interface DepositsIndicativeSnapshotRow {
 }
 
 export interface DepositsRiskSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   '2052a_insured': string | null;
   automated_renewal_flag: string | null;
@@ -928,7 +928,7 @@ export interface DepositsRiskSnapshotRow {
 }
 
 export interface DerivativesAccountingSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   accounting_intent: string | null;
   accounting_intent_description: string | null;
@@ -985,7 +985,7 @@ export interface DerivativesAccountingSnapshotRow {
 }
 
 export interface DerivativesClassificationSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   call_report_code: string | null;
   cost_center_id: number | null;
@@ -1012,7 +1012,7 @@ export interface DerivativesClassificationSnapshotRow {
 }
 
 export interface DerivativesIndicativeSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   asset_liability_indicator: string | null;
   clearing_status: string | null;
@@ -1069,7 +1069,7 @@ export interface DerivativesIndicativeSnapshotRow {
 }
 
 export interface DerivativesRiskSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   charge_off_due_to_bankruptcy_flag: string | null;
   collateralization_type: string | null;
@@ -1119,15 +1119,15 @@ export interface DunsEntityObservationRow {
   updated_ts: string | null;
   created_by: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
   record_source: string | null;
 }
 
 export interface EclStagingSnapshotRow {
-  ecl_staging_id: number;
-  facility_id: number | null;
-  counterparty_id: number | null;
+  ecl_staging_id: string;
+  facility_id: string | null;
+  counterparty_id: string | null;
   as_of_date: string | null;
   ecl_stage_code: string | null;
   prior_stage_code: string | null;
@@ -1143,15 +1143,15 @@ export interface EclStagingSnapshotRow {
   record_source: string | null;
   created_by: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface EconomicInterdependenceRelationshipRow {
-  econ_interdep_relationship_id: number;
+  econ_interdep_relationship_id: string;
   counterparty_id_1: number | null;
   counterparty_id_2: number | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   interdependence_strength_score: number | null;
   interdependence_type_code: string | null;
   rationale: string | null;
@@ -1168,7 +1168,7 @@ export interface EconomicInterdependenceRelationshipRow {
 }
 
 export interface EquitiesAccountingSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   accrued_interest_dividend_amount: number | null;
   bs_amount: number | null;
@@ -1197,7 +1197,7 @@ export interface EquitiesAccountingSnapshotRow {
 }
 
 export interface EquitiesClassificationSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   cusip: string | null;
   call_report_code: string | null;
@@ -1216,7 +1216,7 @@ export interface EquitiesClassificationSnapshotRow {
 }
 
 export interface EquitiesIndicativeSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   currency_code: string | null;
   equity_type: string | null;
@@ -1230,7 +1230,7 @@ export interface EquitiesIndicativeSnapshotRow {
 }
 
 export interface EquitiesRiskSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   treasury_control_flag: string | null;
   created_ts: string | null;
@@ -1238,11 +1238,11 @@ export interface EquitiesRiskSnapshotRow {
 }
 
 export interface ExceptionEventRow {
-  exception_id: number;
+  exception_id: string;
   as_of_date: string | null;
   exception_type: string | null;
-  facility_id: number | null;
-  counterparty_id: number | null;
+  facility_id: string | null;
+  counterparty_id: string | null;
   raised_ts: string | null;
   resolved_ts: string | null;
   actual_remediation_date: string | null;
@@ -1254,10 +1254,10 @@ export interface ExceptionEventRow {
   exception_status: string | null;
   exception_value: number | null;
   identified_date: string | null;
-  limit_rule_id: number | null;
-  lob_segment_id: number | null;
+  limit_rule_id: string | null;
+  lob_segment_id: string | null;
   lod_sponsor: string | null;
-  metric_threshold_id: number | null;
+  metric_threshold_id: string | null;
   remediation_plan: string | null;
   target_remediation_date: string | null;
   threshold_value: number | null;
@@ -1268,43 +1268,43 @@ export interface ExceptionEventRow {
   load_timestamp: string | null;
   currency_code: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
   event_ts: string | null;
 }
 
 export interface ExposureAttributionRow {
-  attribution_id: number;
+  attribution_id: string;
   as_of_date: string;
-  exposure_type_id: number | null;
-  counterparty_id: number | null;
+  exposure_type_id: string | null;
+  counterparty_id: string | null;
   exposure_amount: number | null;
   currency_code: string | null;
   attributed_exposure_usd: number | null;
   attribution_pct: number | null;
   counterparty_role_code: string | null;
-  facility_id: number | null;
+  facility_id: string | null;
   is_risk_shifted_flag: string | null;
-  risk_shifted_from_counterparty_id: number | null;
+  risk_shifted_from_counterparty_id: string | null;
   updated_ts: string | null;
   created_ts: string | null;
   created_by: string | null;
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface FacilityCounterpartyParticipationRow {
-  facility_participation_id: number;
-  facility_id: number | null;
-  counterparty_id: number | null;
+  facility_participation_id: string;
+  facility_id: string | null;
+  counterparty_id: string | null;
   counterparty_role_code: string | null;
   is_primary_flag: string | null;
   participation_pct: number | null;
   role_priority_rank: string | null;
-  source_record_id: number | null;
+  source_record_id: string | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
   is_current_flag: string | null;
@@ -1314,14 +1314,14 @@ export interface FacilityCounterpartyParticipationRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface FacilityCreditApprovalRow {
-  approval_id: number;
-  facility_id: number | null;
-  counterparty_id: number | null;
+  approval_id: string;
+  facility_id: string | null;
+  counterparty_id: string | null;
   as_of_date: string | null;
   approval_status: string | null;
   approval_date: string | null;
@@ -1340,21 +1340,21 @@ export interface FacilityCreditApprovalRow {
   load_timestamp: string | null;
   currency_code: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface DelinquencyRow {
-  facility_id: number;
+  facility_id: string;
   as_of_date: string;
   credit_status_code: string | null;
   days_past_due: number | null;
   is_watch_list_flag: string | null;
-  counterparty_id: number | null;
+  counterparty_id: string | null;
   currency_code: string | null;
   days_past_due_max: number | null;
   delinquency_bucket_code: string | null;
-  delinquency_snapshot_id: number | null;
+  delinquency_snapshot_id: string | null;
   delinquency_status_code: string | null;
   last_payment_received_date: string | null;
   overdue_interest_amt: number | null;
@@ -1371,27 +1371,32 @@ export interface DelinquencyRow {
   load_timestamp: string | null;
   record_hash: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
+  overdue_amt_current: number | null;
+  overdue_amt_1_29: number | null;
+  overdue_amt_30_59: number | null;
+  overdue_amt_60_89: number | null;
+  overdue_amt_90_plus: number | null;
 }
 
 export interface ExposureRow {
-  facility_id: number | null;
+  facility_id: string | null;
   as_of_date: string | null;
-  exposure_type_id: number | null;
+  exposure_type_id: string | null;
   drawn_amount: number | null;
   committed_amount: number | null;
   undrawn_amount: number | null;
-  source_system_id: number | null;
-  counterparty_id: number | null;
+  source_system_id: string | null;
+  counterparty_id: string | null;
   currency_code: string | null;
   exposure_amount_local: number | null;
-  facility_exposure_id: number;
+  facility_exposure_id: string;
   fr2590_category_code: string | null;
   gross_exposure_usd: number | null;
-  legal_entity_id: number | null;
-  lob_segment_id: number | null;
-  product_node_id: number | null;
+  legal_entity_id: string | null;
+  lob_segment_id: string | null;
+  product_node_id: string | null;
   outstanding_balance_amt: number | null;
   undrawn_commitment_amt: number | null;
   number_of_loans: number | null;
@@ -1411,16 +1416,16 @@ export interface ExposureRow {
 }
 
 export interface FacilityFinancialRow {
-  facility_id: number;
+  facility_id: string;
   as_of_date: string;
   operating_expense_amt: number | null;
   ebitda_amt: number | null;
   interest_expense_amt: number | null;
   principal_payment_amt: number | null;
-  counterparty_id: number | null;
+  counterparty_id: string | null;
   currency_code: string | null;
   reporting_period: string | null;
-  financial_snapshot_id: number | null;
+  financial_snapshot_id: string | null;
   updated_ts: string | null;
   created_ts: string | null;
   created_by: string | null;
@@ -1428,20 +1433,20 @@ export interface FacilityFinancialRow {
   load_timestamp: string | null;
   record_hash: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
   net_income_amt: number | null;
 }
 
 export interface FacilityLenderAllocationRow {
-  lender_allocation_id: number;
-  facility_id: number | null;
-  legal_entity_id: number | null;
+  lender_allocation_id: string;
+  facility_id: string | null;
+  legal_entity_id: string | null;
   bank_share_pct: number | null;
   bank_commitment_amt: number | null;
   allocation_role: string | null;
   is_lead_flag: string | null;
-  source_record_id: number | null;
+  source_record_id: string | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
   is_current_flag: string | null;
@@ -1452,20 +1457,20 @@ export interface FacilityLenderAllocationRow {
   load_timestamp: string | null;
   currency_code: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface FacilityLobAttributionRow {
-  attribution_id: number;
-  facility_id: number | null;
+  attribution_id: string;
+  facility_id: string | null;
   as_of_date: string | null;
-  lob_segment_id: number | null;
+  lob_segment_id: string | null;
   attribution_pct: number | null;
   attributed_amount: number | null;
   attribution_amount_usd: number | null;
   attribution_type: string | null;
-  lob_node_id: number | null;
+  lob_node_id: string | null;
   hierarchy_id: string | null;
   updated_ts: string | null;
   created_ts: string | null;
@@ -1473,14 +1478,14 @@ export interface FacilityLobAttributionRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface FacilityMasterRow {
-  facility_id: number;
-  credit_agreement_id: number | null;
-  counterparty_id: number | null;
+  facility_id: string;
+  credit_agreement_id: string | null;
+  counterparty_id: string | null;
   currency_code: string | null;
   facility_name: string | null;
   facility_type: string | null;
@@ -1488,12 +1493,12 @@ export interface FacilityMasterRow {
   committed_facility_amt: number | null;
   origination_date: string | null;
   maturity_date: string | null;
-  portfolio_id: number | null;
+  portfolio_id: string | null;
   industry_code: string | null;
-  lob_segment_id: number | null;
-  product_node_id: number | null;
-  rate_index_id: number | null;
-  ledger_account_id: number | null;
+  lob_segment_id: string | null;
+  product_node_id: string | null;
+  rate_index_id: string | null;
+  ledger_account_id: string | null;
   created_ts: string | null;
   updated_ts: string | null;
   all_in_rate_pct: number | null;
@@ -1507,7 +1512,7 @@ export interface FacilityMasterRow {
   next_repricing_date: string | null;
   payment_frequency: string | null;
   is_prepayment_penalty_flag: string | null;
-  product_id: number | null;
+  product_id: string | null;
   rate_cap_pct: number | null;
   rate_floor_pct: number | null;
   region_code: string | null;
@@ -1519,23 +1524,24 @@ export interface FacilityMasterRow {
   record_source: string | null;
   load_timestamp: string | null;
   facility_purpose_code: string | null;
-  legal_entity_id: number | null;
+  legal_entity_id: string | null;
   profit_center_code: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
+  facility_type_id: string | null;
 }
 
 export interface FacilityPricingRow {
-  facility_id: number;
+  facility_id: string;
   as_of_date: string;
   spread_bps: number | null;
-  rate_index_id: number | null;
+  rate_index_id: string | null;
   all_in_rate_pct: number | null;
   floor_pct: number | null;
   base_rate_pct: number | null;
   currency_code: string | null;
-  facility_pricing_id: number | null;
+  facility_pricing_id: string | null;
   min_spread_threshold_bps: number | null;
   payment_frequency: string | null;
   is_prepayment_penalty_flag: string | null;
@@ -1552,23 +1558,23 @@ export interface FacilityPricingRow {
   load_timestamp: string | null;
   record_hash: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface FacilityProfitabilityRow {
-  facility_id: number;
+  facility_id: string;
   as_of_date: string;
   nii_ytd: number | null;
   fee_income_ytd: number | null;
-  ledger_account_id: number | null;
+  ledger_account_id: string | null;
   allocated_equity_amt: number | null;
   avg_earning_assets_amt: number | null;
   base_currency_code: string | null;
   fee_income_amt: number | null;
   interest_expense_amt: number | null;
   interest_income_amt: number | null;
-  profitability_snapshot_id: number | null;
+  profitability_snapshot_id: string | null;
   updated_ts: string | null;
   created_ts: string | null;
   created_by: string | null;
@@ -1579,14 +1585,14 @@ export interface FacilityProfitabilityRow {
   avg_nonearning_assets_amt: number | null;
   equity_allocation_pct: number | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface FacilityRiskRow {
-  facility_id: number;
+  facility_id: string;
   as_of_date: string;
-  counterparty_id: number | null;
+  counterparty_id: string | null;
   pd_pct: number | null;
   lgd_pct: number | null;
   ccf: number | null;
@@ -1601,22 +1607,22 @@ export interface FacilityRiskRow {
   risk_weight_std_pct: number | null;
   risk_weight_erba_pct: number | null;
   is_defaulted_flag: string | null;
-  basel_exposure_type_id: number | null;
+  basel_exposure_type_id: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
   defaulted_flag: string | null;
 }
 
 export interface FinancialMetricObservationRow {
-  observation_id: number;
-  counterparty_id: number | null;
-  facility_id: number | null;
+  observation_id: string;
+  counterparty_id: string | null;
+  facility_id: string | null;
   as_of_date: string | null;
-  metric_definition_id: number | null;
+  metric_definition_id: string | null;
   value: number | null;
-  context_id: number | null;
-  credit_agreement_id: number | null;
+  context_id: string | null;
+  credit_agreement_id: string | null;
   metric_category: string | null;
   metric_code: string | null;
   metric_name: string | null;
@@ -1630,14 +1636,14 @@ export interface FinancialMetricObservationRow {
   load_timestamp: string | null;
   record_hash: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface ForbearanceEventRow {
-  forbearance_event_id: number;
-  facility_id: number | null;
-  counterparty_id: number | null;
+  forbearance_event_id: string;
+  facility_id: string | null;
+  counterparty_id: string | null;
   forbearance_type_code: string | null;
   event_date: string | null;
   original_maturity_date: string | null;
@@ -1655,12 +1661,12 @@ export interface ForbearanceEventRow {
   record_source: string | null;
   created_by: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface FxRateRow {
-  fx_rate_id: number;
+  fx_rate_id: string;
   as_of_date: string | null;
   from_currency_code: string | null;
   to_currency_code: string | null;
@@ -1678,12 +1684,12 @@ export interface FxRateRow {
   effective_end_date: string | null;
   is_current_flag: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface GlAccountBalanceSnapshotRow {
-  ledger_account_id: number;
+  ledger_account_id: string;
   as_of_date: string;
   begin_balance_dr_amt: number | null;
   begin_balance_cr_amt: number | null;
@@ -1693,9 +1699,9 @@ export interface GlAccountBalanceSnapshotRow {
   ending_balance_cr_amt: number | null;
   currency_code: string | null;
   reporting_currency_amt: number | null;
-  lob_segment_id: number | null;
-  org_unit_id: number | null;
-  source_system_id: number | null;
+  lob_segment_id: string | null;
+  org_unit_id: string | null;
+  source_system_id: string | null;
   created_ts: string | null;
   updated_ts: string | null;
   created_by: string | null;
@@ -1707,9 +1713,9 @@ export interface GlAccountBalanceSnapshotRow {
 }
 
 export interface GlJournalEntryRow {
-  journal_entry_id: number;
-  journal_batch_id: number | null;
-  ledger_account_id: number | null;
+  journal_entry_id: string;
+  journal_batch_id: string | null;
+  ledger_account_id: string | null;
   transaction_date: string | null;
   posting_date: string | null;
   transaction_code: string | null;
@@ -1718,13 +1724,13 @@ export interface GlJournalEntryRow {
   transaction_amt: number | null;
   transaction_currency_code: string | null;
   reporting_currency_amt: number | null;
-  position_id: number | null;
-  counterparty_id: number | null;
-  facility_id: number | null;
+  position_id: string | null;
+  counterparty_id: string | null;
+  facility_id: string | null;
   product_code: string | null;
-  lob_segment_id: number | null;
-  org_unit_id: number | null;
-  source_system_id: number | null;
+  lob_segment_id: string | null;
+  org_unit_id: string | null;
+  source_system_id: string | null;
   created_ts: string | null;
   updated_ts: string | null;
   created_by: string | null;
@@ -1735,7 +1741,7 @@ export interface GlJournalEntryRow {
 }
 
 export interface InstrumentMasterRow {
-  instrument_id: number;
+  instrument_id: string;
   country_code: string | null;
   currency_code: string | null;
   is_active_flag: string | null;
@@ -1746,9 +1752,9 @@ export interface InstrumentMasterRow {
   is_callable_flag: string | null;
   is_convertible_flag: string | null;
   issue_date: string | null;
-  issuer_counterparty_id: number | null;
+  issuer_counterparty_id: string | null;
   maturity_date: string | null;
-  product_id: number | null;
+  product_id: string | null;
   seniority: string | null;
   updated_ts: string | null;
   effective_start_date: string | null;
@@ -1759,25 +1765,25 @@ export interface InstrumentMasterRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface LegalEntityRow {
-  legal_entity_id: number;
+  legal_entity_id: string;
   legal_name: string | null;
   legal_entity_name: string | null;
   country_code: string | null;
   is_active_flag: string | null;
   entity_type_code: string | null;
   functional_currency_code: string | null;
-  institution_id: number | null;
+  institution_id: string | null;
   is_reporting_entity_flag: string | null;
   lei_code: string | null;
   primary_regulator: string | null;
-  rssd_id: number | null;
+  rssd_id: string | null;
   short_name: string | null;
-  tax_id: number | null;
+  tax_id: string | null;
   updated_ts: string | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
@@ -1787,20 +1793,20 @@ export interface LegalEntityRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface LegalEntityHierarchyRow {
-  hierarchy_id: number;
-  legal_entity_id: number | null;
-  parent_legal_entity_id: number | null;
+  hierarchy_id: string;
+  legal_entity_id: string | null;
+  parent_legal_entity_id: string | null;
   as_of_date: string | null;
   consolidation_method: string | null;
   hierarchy_level: string | null;
   hierarchy_path: string | null;
   ownership_pct: number | null;
-  ultimate_parent_legal_entity_id: number | null;
+  ultimate_parent_legal_entity_id: string | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
   is_current_flag: string | null;
@@ -1810,13 +1816,13 @@ export interface LegalEntityHierarchyRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface LimitAssignmentSnapshotRow {
-  facility_id: number;
-  limit_rule_id: number;
+  facility_id: string;
+  limit_rule_id: string;
   as_of_date: string;
   limit_amt: number | null;
   assigned_date: string | null;
@@ -1830,20 +1836,20 @@ export interface LimitAssignmentSnapshotRow {
   load_timestamp: string | null;
   record_hash: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface LimitContributionRow {
-  limit_rule_id: number;
-  counterparty_id: number;
+  limit_rule_id: string;
+  counterparty_id: string;
   as_of_date: string;
   contribution_amount: number | null;
   currency_code: string | null;
   contribution_amount_usd: number | null;
-  contribution_id: number | null;
+  contribution_id: string | null;
   contribution_pct: number | null;
-  facility_id: number | null;
+  facility_id: string | null;
   updated_ts: string | null;
   created_ts: string | null;
   created_by: string | null;
@@ -1851,18 +1857,18 @@ export interface LimitContributionRow {
   load_timestamp: string | null;
   record_hash: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface LimitUtilizationRow {
-  limit_rule_id: number;
+  limit_rule_id: string;
   as_of_date: string;
-  counterparty_id: number | null;
+  counterparty_id: string | null;
   utilized_amount: number | null;
   available_amount: number | null;
   reporting_ts: string | null;
-  utilization_event_id: number | null;
+  utilization_event_id: string | null;
   utilized_amount_usd: number | null;
   updated_ts: string | null;
   created_ts: string | null;
@@ -1871,13 +1877,13 @@ export interface LimitUtilizationRow {
   load_timestamp: string | null;
   currency_code: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
   event_ts: string | null;
 }
 
 export interface LoansAccountingSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   asc326_20: number | null;
   accounting_intent: string | null;
@@ -2038,7 +2044,7 @@ export interface LoansAccountingSnapshotRow {
 }
 
 export interface LoansClassificationSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   amortization: number | null;
   cusip: string | null;
@@ -2116,7 +2122,7 @@ export interface LoansClassificationSnapshotRow {
   mortgage_insurance_company: string | null;
   mortgage_insurance_company_description: string | null;
   mortgage_insurance_coverage_percent_at_origination: number | null;
-  national_bank_rssd_id: number | null;
+  national_bank_rssd_id: string | null;
   net_operating_income_at_origination: string | null;
   net_sales_current: number | null;
   net_sales_prior_year: number | null;
@@ -2191,7 +2197,7 @@ export interface LoansClassificationSnapshotRow {
 }
 
 export interface LoansIndicativeSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   arm_index: string | null;
   arm_index_description: string | null;
@@ -2292,7 +2298,7 @@ export interface LoansIndicativeSnapshotRow {
 }
 
 export interface LoansRiskSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   num_days_principal_or_interest_past_due: number | null;
   acl_flag: string | null;
@@ -2425,16 +2431,16 @@ export interface LoansRiskSnapshotRow {
 }
 
 export interface MarginAgreementRow {
-  margin_agreement_id: number;
-  counterparty_id: number | null;
+  margin_agreement_id: string;
+  counterparty_id: string | null;
   as_of_date: string | null;
-  csa_id: number | null;
+  csa_id: string | null;
   currency_code: string | null;
   im_amount: number | null;
   loaded_ts: string | null;
   margin_model: string | null;
-  netting_set_id: number | null;
-  source_system_id: number | null;
+  netting_set_id: string | null;
+  source_system_id: string | null;
   vm_amount: number | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
@@ -2449,17 +2455,17 @@ export interface MarginAgreementRow {
 }
 
 export interface NettingAgreementRow {
-  netting_agreement_id: number;
-  counterparty_id: number | null;
+  netting_agreement_id: string;
+  counterparty_id: string | null;
   governing_law: string | null;
   is_bankruptcy_remote_flag: string | null;
   is_enforceable_flag: string | null;
-  legal_entity_id: number | null;
+  legal_entity_id: string | null;
   margin_frequency: string | null;
   minimum_transfer_amount: number | null;
   netting_agreement_type: string | null;
-  netting_set_id: number | null;
-  source_system_id: number | null;
+  netting_set_id: string | null;
+  source_system_id: string | null;
   threshold_amount: number | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
@@ -2475,13 +2481,13 @@ export interface NettingAgreementRow {
 }
 
 export interface NettingSetRow {
-  netting_set_id: number;
-  netting_agreement_id: number | null;
+  netting_set_id: string;
+  netting_agreement_id: string | null;
   is_active_flag: string | null;
-  counterparty_id: number | null;
+  counterparty_id: string | null;
   governing_law: string | null;
   is_enforceable_flag: string | null;
-  legal_entity_id: number | null;
+  legal_entity_id: string | null;
   master_agreement_reference: string | null;
   netting_set_type: string | null;
   updated_ts: string | null;
@@ -2493,20 +2499,20 @@ export interface NettingSetRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface NettingSetExposureRow {
-  netting_set_id: number;
+  netting_set_id: string;
   as_of_date: string;
   gross_exposure_amount: number | null;
   currency_code: string | null;
   collateral_held_usd: number | null;
-  counterparty_id: number | null;
+  counterparty_id: string | null;
   gross_mtm_usd: number | null;
-  legal_entity_id: number | null;
-  netting_set_exposure_id: number | null;
+  legal_entity_id: string | null;
+  netting_set_exposure_id: string | null;
   pfe_usd: number | null;
   updated_ts: string | null;
   created_ts: string | null;
@@ -2515,17 +2521,17 @@ export interface NettingSetExposureRow {
   load_timestamp: string | null;
   record_hash: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface NettingSetLinkRow {
-  netting_set_link_id: number;
-  netting_set_id: number | null;
-  facility_id: number | null;
-  anchor_id: number | null;
+  netting_set_link_id: string;
+  netting_set_id: string | null;
+  facility_id: string | null;
+  anchor_id: string | null;
   anchor_type: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
   is_current_flag: string | null;
@@ -2539,7 +2545,7 @@ export interface NettingSetLinkRow {
 }
 
 export interface OffbsCommitmentsAccountingSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   allowance_balance: number | null;
   allowance_for_credit_losses_amount: number | null;
@@ -2582,7 +2588,7 @@ export interface OffbsCommitmentsAccountingSnapshotRow {
 }
 
 export interface OffbsCommitmentsClassificationSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   call_report_code: string | null;
   cost_center_id: number | null;
@@ -2600,7 +2606,7 @@ export interface OffbsCommitmentsClassificationSnapshotRow {
 }
 
 export interface OffbsCommitmentsIndicativeSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   commitment_id: string | null;
   commitment_type: string | null;
@@ -2619,7 +2625,7 @@ export interface OffbsCommitmentsIndicativeSnapshotRow {
 }
 
 export interface OffbsCommitmentsRiskSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   charge_off_due_to_bankruptcy_flag: string | null;
   entity_internal_risk_rating: string | null;
@@ -2640,11 +2646,11 @@ export interface OffbsCommitmentsRiskSnapshotRow {
 }
 
 export interface PaymentLedgerRow {
-  payment_id: number;
-  counterparty_id: number | null;
-  facility_id: number | null;
-  contract_id: number | null;
-  position_id: number | null;
+  payment_id: string;
+  counterparty_id: string | null;
+  facility_id: string | null;
+  contract_id: string | null;
+  position_id: string | null;
   payment_amount_due: number | null;
   payment_due_date: string | null;
   payment_amount_made: number | null;
@@ -2660,38 +2666,38 @@ export interface PaymentLedgerRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface PositionRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string | null;
-  facility_id: number | null;
-  instrument_id: number | null;
+  facility_id: string | null;
+  instrument_id: string | null;
   balance_amount: number | null;
   currency_code: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   accrued_interest_amt: number | null;
   book_value_amt: number | null;
   contractual_maturity_date: string | null;
-  counterparty_id: number | null;
-  credit_agreement_id: number | null;
+  counterparty_id: string | null;
+  credit_agreement_id: string | null;
   credit_status_code: string | null;
   effective_date: string | null;
   exposure_type_code: string | null;
   external_risk_rating: string | null;
   internal_risk_rating: string | null;
-  legal_entity_id: number | null;
+  legal_entity_id: string | null;
   lgd_estimate: string | null;
   market_value_amt: number | null;
-  netting_set_id: number | null;
+  netting_set_id: string | null;
   notional_amount: number | null;
   pd_estimate: string | null;
   position_currency: string | null;
   is_trading_banking_book_flag: string | null;
-  ultimate_parent_id: number | null;
-  product_node_id: number | null;
+  ultimate_parent_id: string | null;
+  product_node_id: string | null;
   product_code: string | null;
   updated_ts: string | null;
   created_ts: string | null;
@@ -2700,18 +2706,18 @@ export interface PositionRow {
   load_timestamp: string | null;
   load_batch_id: string | null;
   raw_record_id: string | null;
-  product_subtype_id: number | null;
+  product_subtype_id: string | null;
   customer_id: string | null;
   trade_date: string | null;
   settlement_date: string | null;
   is_hedging_flag: string | null;
   accounting_classification_code: string | null;
-  cost_center_id: number | null;
+  cost_center_id: string | null;
 }
 
 export interface PositionDetailRow {
-  position_detail_id: number;
-  position_id: number | null;
+  position_detail_id: string;
+  position_id: string | null;
   as_of_date: string | null;
   detail_type: string | null;
   amount: number | null;
@@ -2739,7 +2745,7 @@ export interface PositionDetailRow {
   total_commitment: number | null;
   unfunded_amount: number | null;
   unrealized_gain_loss: string | null;
-  product_node_id: number | null;
+  product_node_id: string | null;
   exposure_type_code: string | null;
   notional_amount: number | null;
   credit_conversion_factor: number | null;
@@ -2756,20 +2762,25 @@ export interface PositionDetailRow {
   load_timestamp: string | null;
   currency_code: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
+  overdue_amt_current: number | null;
+  overdue_amt_1_29: number | null;
+  overdue_amt_30_59: number | null;
+  overdue_amt_60_89: number | null;
+  overdue_amt_90_plus: number | null;
 }
 
 export interface ProtectionLinkRow {
-  protection_link_id: number;
-  protection_id: number | null;
-  facility_id: number | null;
+  protection_link_id: string;
+  protection_id: string | null;
+  facility_id: string | null;
   allocated_amount: number | null;
   allocated_currency_code: string | null;
   allocation_pct: number | null;
-  anchor_id: number | null;
+  anchor_id: string | null;
   anchor_type: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
   is_current_flag: string | null;
@@ -2784,9 +2795,9 @@ export interface ProtectionLinkRow {
 }
 
 export interface RiskFlagRow {
-  risk_flag_id: number;
-  facility_id: number | null;
-  counterparty_id: number | null;
+  risk_flag_id: string;
+  facility_id: string | null;
+  counterparty_id: string | null;
   flag_type: string | null;
   as_of_date: string | null;
   raised_ts: string | null;
@@ -2802,17 +2813,17 @@ export interface RiskFlagRow {
   record_source: string | null;
   load_timestamp: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface RiskMitigantLinkRow {
-  risk_mitigant_link_id: number;
-  risk_mitigant_id: number | null;
-  facility_id: number | null;
-  anchor_id: number | null;
+  risk_mitigant_link_id: string;
+  risk_mitigant_id: string | null;
+  facility_id: string | null;
+  anchor_id: string | null;
   anchor_type: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
   is_current_flag: string | null;
@@ -2826,17 +2837,17 @@ export interface RiskMitigantLinkRow {
 }
 
 export interface RiskMitigantMasterRow {
-  risk_mitigant_id: number;
-  counterparty_id: number | null;
+  risk_mitigant_id: string;
+  counterparty_id: string | null;
   risk_mitigant_subtype_code: string | null;
-  collateral_asset_id: number | null;
+  collateral_asset_id: string | null;
   description: string | null;
   is_active_flag: string | null;
   mitigant_source_type: string | null;
-  protection_id: number | null;
-  provider_counterparty_id: number | null;
-  source_record_id: number | null;
-  source_system_id: number | null;
+  protection_id: string | null;
+  provider_counterparty_id: string | null;
+  source_record_id: string | null;
+  source_system_id: string | null;
   updated_ts: string | null;
   effective_start_date: string | null;
   effective_end_date: string | null;
@@ -2850,7 +2861,7 @@ export interface RiskMitigantMasterRow {
 }
 
 export interface SecuritiesAccountingSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   asu_2017_12_hedge_designations: string | null;
   accounting_intent: string | null;
@@ -2917,7 +2928,7 @@ export interface SecuritiesAccountingSnapshotRow {
 }
 
 export interface SecuritiesClassificationSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   cusip: string | null;
   call_report_code: string | null;
@@ -2985,7 +2996,7 @@ export interface SecuritiesClassificationSnapshotRow {
 }
 
 export interface SecuritiesIndicativeSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   activity_type: string | null;
   amortization_type: string | null;
@@ -3040,7 +3051,7 @@ export interface SecuritiesIndicativeSnapshotRow {
 }
 
 export interface SecuritiesRiskSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   '144a_flag': string | null;
   direct_encumbrance_type: string | null;
@@ -3066,7 +3077,7 @@ export interface SecuritiesRiskSnapshotRow {
 }
 
 export interface SftAccountingSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   accounting_intent: string | null;
   accrued_interest_dividend_amount: number | null;
@@ -3133,7 +3144,7 @@ export interface SftAccountingSnapshotRow {
 }
 
 export interface SftClassificationSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   call_report_code: string | null;
   conduit_transaction_flag: string | null;
@@ -3153,7 +3164,7 @@ export interface SftClassificationSnapshotRow {
 }
 
 export interface SftIndicativeSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   asset_liability_indicator: string | null;
   contract_initiation_date: string | null;
@@ -3185,7 +3196,7 @@ export interface SftIndicativeSnapshotRow {
 }
 
 export interface SftRiskSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   charge_off_due_to_bankruptcy_flag: string | null;
   converted: string | null;
@@ -3213,7 +3224,7 @@ export interface SftRiskSnapshotRow {
 }
 
 export interface StockAccountingSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   accounting_method: string | null;
   bs_amount: number | null;
@@ -3229,7 +3240,7 @@ export interface StockAccountingSnapshotRow {
 }
 
 export interface StockClassificationSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   call_report_code: string | null;
   cost_center_id: number | null;
@@ -3243,7 +3254,7 @@ export interface StockClassificationSnapshotRow {
 }
 
 export interface StockIndicativeSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   currency_code: string | null;
   maturity_date: string | null;
@@ -3254,7 +3265,7 @@ export interface StockIndicativeSnapshotRow {
 }
 
 export interface StockRiskSnapshotRow {
-  position_id: number;
+  position_id: string;
   as_of_date: string;
   treasury_control_flag: string | null;
   created_ts: string | null;
@@ -3262,19 +3273,19 @@ export interface StockRiskSnapshotRow {
 }
 
 export interface StressTestBreachRow {
-  breach_id: number;
-  scenario_id: number | null;
+  breach_id: string;
+  scenario_id: string | null;
   as_of_date: string | null;
-  limit_rule_id: number | null;
-  counterparty_id: number | null;
+  limit_rule_id: string | null;
+  counterparty_id: string | null;
   breach_amount: number | null;
   breach_amount_usd: number | null;
   breach_severity: string | null;
   control_description: string | null;
   control_owner: string | null;
   failure_description: string | null;
-  lob_segment_id: number | null;
-  stress_test_result_id: number | null;
+  lob_segment_id: string | null;
+  stress_test_result_id: string | null;
   updated_ts: string | null;
   created_ts: string | null;
   created_by: string | null;
@@ -3282,14 +3293,14 @@ export interface StressTestBreachRow {
   load_timestamp: string | null;
   currency_code: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 
 export interface WatchlistEntryRow {
-  watchlist_entry_id: number;
-  counterparty_id: number | null;
-  facility_id: number | null;
+  watchlist_entry_id: string;
+  counterparty_id: string | null;
+  facility_id: string | null;
   watchlist_category_code: string | null;
   entry_date: string | null;
   exit_date: string | null;
@@ -3305,7 +3316,7 @@ export interface WatchlistEntryRow {
   record_source: string | null;
   created_by: string | null;
   load_batch_id: string | null;
-  source_system_id: number | null;
+  source_system_id: string | null;
   raw_record_id: string | null;
 }
 

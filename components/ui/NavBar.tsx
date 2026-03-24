@@ -19,6 +19,9 @@ import {
   GitBranch,
   Sun,
   Moon,
+  Bot,
+  BarChart3,
+  Package,
 } from 'lucide-react';
 
 // Pages where the global nav should be hidden (they have their own chrome)
@@ -162,6 +165,21 @@ export default function NavBar() {
             { href: '/data-elements', icon: Columns3, label: 'Data Elements' },
             { href: '/db-status', icon: Database, label: 'DB Status' },
             { href: '/taxonomy', icon: GitBranch, label: 'Enterprise Taxonomy' },
+          ]}
+        />
+
+        {/* Agent Library dropdown */}
+        <NavDropdown
+          label="Agents"
+          icon={Bot}
+          bg="bg-emerald-600"
+          hoverBg="bg-emerald-500"
+          accentColor="text-emerald-400"
+          isActive={isActive('/agents')}
+          items={[
+            { href: '/agents', icon: Bot, label: 'Agent Catalog' },
+            { href: '/agents/artifacts', icon: Package, label: 'Artifact Explorer' },
+            { href: '/agents/metrics', icon: BarChart3, label: 'Performance' },
           ]}
         />
 

@@ -93,12 +93,13 @@
 - **Rules:** Never animate data table rendering. Never add entrance animations to metric values. Never use spring/bounce physics.
 
 ## Navigation
-- **Persistent top nav:** Compact horizontal bar, sticky, 6 sections with color-coded pills
+- **Persistent top nav:** Compact horizontal bar, sticky, 7 sections with color-coded pills
 - **Section colors:**
   - Executive Summary: `#D04A02` (PwC orange)
   - Architecture: `#0d9488` (teal-600)
   - Metrics: `#7c3aed` (violet-600)
   - Data Elements: `#0891b2` (cyan-600)
+  - Agents: `#059669` (emerald-600) — agent governance, observatory
   - Ask AI: `#475569` (slate-600)
   - Playbook: `#2563eb` (blue-600)
 - **Active state:** `ring-1 ring-white/30` on current section
@@ -115,3 +116,4 @@
 | 2026-03-20 | L1/L2/L3 color coding as navigation language | Unique differentiator — teal/violet/rose consistently signal which data layer the user is in |
 | 2026-03-20 | Restrained color approach | Orange accent on dark is the Bloomberg-established pattern; PwC brand reinforces it |
 | 2026-03-20 | Dark mode as default | Every data platform in this category uses dark backgrounds; users expect it |
+| 2026-03-24 | Added Agents section (emerald-600) to nav | Agent Library observatory added as 7th nav section — emerald chosen for distinctness from existing teal (Architecture) and cyan (Data Elements) |

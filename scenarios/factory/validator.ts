@@ -221,20 +221,20 @@ export function validateScenario(
 
   // Credit approvals
   for (const ca of (l2Data.facility_credit_approval ?? [])) {
-    if (!facilityIds.has(ca.facility_id)) {
+    if (ca.facility_id != null && !facilityIds.has(ca.facility_id)) {
       errors.push(`Credit approval ${ca.approval_id}: facility_id ${ca.facility_id} not in L1`);
     }
-    if (!counterpartyIds.has(ca.counterparty_id)) {
+    if (ca.counterparty_id != null && !counterpartyIds.has(ca.counterparty_id)) {
       errors.push(`Credit approval ${ca.approval_id}: counterparty_id ${ca.counterparty_id} not in L1`);
     }
   }
 
   // Financial metric observations
   for (const fmo of (l2Data.financial_metric_observation ?? [])) {
-    if (!counterpartyIds.has(fmo.counterparty_id)) {
+    if (fmo.counterparty_id != null && !counterpartyIds.has(fmo.counterparty_id)) {
       errors.push(`Metric observation ${fmo.observation_id}: counterparty_id ${fmo.counterparty_id} not in L1`);
     }
-    if (!facilityIds.has(fmo.facility_id)) {
+    if (fmo.facility_id != null && !facilityIds.has(fmo.facility_id)) {
       errors.push(`Metric observation ${fmo.observation_id}: facility_id ${fmo.facility_id} not in L1`);
     }
   }
@@ -242,20 +242,22 @@ export function validateScenario(
   // ── 3. Financial Consistency ──
 
   for (const exp of (l2Data.facility_exposure_snapshot ?? [])) {
-    if (exp.drawn_amount > exp.committed_amount) {
+    const drawn = exp.drawn_amount ?? 0;
+    const committed = exp.committed_amount ?? 0;
+    if (drawn > committed) {
       errors.push(
-        `Facility ${exp.facility_id} on ${exp.as_of_date}: drawn (${exp.drawn_amount}) > committed (${exp.committed_amount})`
+        `Facility ${exp.facility_id} on ${exp.as_of_date}: drawn (${drawn}) > committed (${committed})`
       );
     }
-    if (exp.drawn_amount < 0) {
-      errors.push(`Facility ${exp.facility_id}: negative drawn_amount ${exp.drawn_amount}`);
+    if (drawn < 0) {
+      errors.push(`Facility ${exp.facility_id}: negative drawn_amount ${drawn}`);
     }
-    if (exp.committed_amount <= 0) {
-      errors.push(`Facility ${exp.facility_id}: non-positive committed_amount ${exp.committed_amount}`);
+    if (committed <= 0) {
+      errors.push(`Facility ${exp.facility_id}: non-positive committed_amount ${committed}`);
     }
 
     // Verify undrawn calculation
-    const expectedUndrawn = exp.committed_amount - exp.drawn_amount;
+    const expectedUndrawn = committed - drawn;
     if (Math.abs((exp.undrawn_amount ?? expectedUndrawn) - expectedUndrawn) > 1) {
       warnings.push(
         `Facility ${exp.facility_id}: undrawn mismatch: ${exp.undrawn_amount} vs expected ${expectedUndrawn}`
@@ -375,8 +377,8 @@ export function validateScenario(
     (l2Data.credit_event_facility_link?.length ?? 0) +
     (l2Data.risk_flag?.length ?? 0) +
     (l2Data.amendment_event?.length ?? 0) +
-    (l2Data.stress_test_result?.length ?? 0) +
-    (l2Data.stress_test_breach?.length ?? 0);
+    ((l2Data as Record<string, unknown[]>).stress_test_result?.length ?? 0) +
+    ((l2Data as Record<string, unknown[]>).stress_test_breach?.length ?? 0);
 
   const l2SnapshotRows = (l2Data.facility_exposure_snapshot?.length ?? 0) +
     (l2Data.counterparty_rating_observation?.length ?? 0) +
@@ -390,12 +392,12 @@ export function validateScenario(
     (l2Data.facility_lob_attribution?.length ?? 0) +
     (l2Data.position?.length ?? 0) +
     (l2Data.position_detail?.length ?? 0) +
-    (l2Data.cash_flow?.length ?? 0) +
-    (l2Data.netting_set_exposure_snapshot?.length ?? 0) +
+    ((l2Data as Record<string, unknown[]>).cash_flow?.length ?? 0) +
+    ((l2Data as Record<string, unknown[]>).netting_set_exposure_snapshot?.length ?? 0) +
     (l2Data.financial_metric_observation?.length ?? 0) +
-    (l2Data.metric_threshold?.length ?? 0) +
-    (l2Data.limit_contribution_snapshot?.length ?? 0) +
-    (l2Data.data_quality_score_snapshot?.length ?? 0);
+    ((l2Data as Record<string, unknown[]>).metric_threshold?.length ?? 0) +
+    ((l2Data as Record<string, unknown[]>).limit_contribution_snapshot?.length ?? 0) +
+    ((l2Data as Record<string, unknown[]>).data_quality_score_snapshot?.length ?? 0);
 
   const totalInserts = chain.counterparties.length +
     chain.agreements.length +

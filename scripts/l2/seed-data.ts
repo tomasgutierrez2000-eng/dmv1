@@ -1718,6 +1718,214 @@ export function getL2SeedValue(
       if (columnName === 'total_debt_service_amt') return intExp + Math.round(totalLiabilities * 0.10);
       break;
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // PRODUCT-SPECIFIC SNAPSHOT TABLES (40 tables)
+    // All keyed on (position_id, as_of_date) — share universal seed logic
+    // ═══════════════════════════════════════════════════════════════════
+
+    case 'loans_indicative_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'interest_rate') return allInRate(idx) / 100;
+      if (columnName === 'interest_rate_index') return 'SOFR';
+      if (columnName === 'interest_rate_spread') return spread(idx) / 10000;
+      if (columnName === 'interest_type_current') return 'FLOATING';
+      if (columnName === 'origination_date') return originationDate(idx);
+      if (columnName === 'maturity_date') return maturityDate(idx);
+      if (columnName === 'remaining_maturity_days') return 365 * (3 + (idx % 5));
+      if (columnName === 'currency_code') return 'USD';
+      if (columnName === 'loan_type') return idx % 3 === 0 ? 'REVOLVING' : 'TERM';
+      if (columnName === 'product_code') return 'TERM_LOAN';
+      if (columnName === 'commitment_type') return 'COMMITTED';
+      if (columnName === 'repayment_type') return idx % 3 === 0 ? 'BULLET' : 'AMORTIZING';
+      break;
+    }
+
+    case 'loans_accounting_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'accounting_intent') return 'HELD_FOR_INVESTMENT';
+      if (columnName === 'bs_amount') return drawn(idx);
+      if (columnName === 'carrying_value') return drawn(idx) * 0.98;
+      if (columnName === 'accrued_interest_amount') return drawn(idx) * allInRate(idx) / 1200;
+      if (columnName === 'accrued_interest_dividend_amount') return drawn(idx) * allInRate(idx) / 1200;
+      if (columnName === 'committed_exposure_global') return committed(idx);
+      if (columnName === 'funded_committed_exposure') return drawn(idx);
+      if (columnName === 'unfunded_committed_exposure') return Math.max(0, committed(idx) - drawn(idx));
+      if (columnName === 'counterparty_exposure_value') return drawn(idx);
+      if (columnName === 'exposure_amount') return drawn(idx);
+      if (columnName === 'allowance_balance') return drawn(idx) * pd(idx) * lgd(idx);
+      if (columnName === 'allowance_for_credit_losses_amount') return drawn(idx) * pd(idx) * lgd(idx);
+      if (columnName === 'charge_off_amount') return 0;
+      if (columnName === 'fair_value') return drawn(idx) * (1 - pd(idx) * lgd(idx));
+      if (columnName === 'lendable_value') return committed(idx);
+      if (columnName === 'currency_code') return 'USD';
+      break;
+    }
+
+    case 'loans_classification_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'customer_id') return `CUST-${cid(idx)}`;
+      if (columnName === 'facility_id') return fid(idx);
+      if (columnName === 'counterparty_id') return cid(idx);
+      if (columnName === 'product_code') return 'TERM_LOAN';
+      if (columnName === 'industry_code') return (idx % 10) + 11;
+      if (columnName === 'country_code') return 'US';
+      if (columnName === 'currency_code') return 'USD';
+      if (columnName === 'loan_status') return 'PERFORMING';
+      if (columnName === 'gl_account_number') return 1300;
+      break;
+    }
+
+    case 'loans_risk_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'probability_of_default_pd') return pd(idx);
+      if (columnName === 'loss_given_default_lgd') return lgd(idx);
+      if (columnName === 'exposure_at_default_ead') return drawn(idx) + Math.max(0, committed(idx) - drawn(idx)) * 0.4;
+      if (columnName === 'expected_loss') return drawn(idx) * pd(idx) * lgd(idx);
+      if (columnName === 'risk_weight') return riskWeight(idx);
+      if (columnName === 'risk_weighted_asset') return drawn(idx) * riskWeight(idx) / 100;
+      if (columnName === 'internal_risk_rating') return internalRating(idx);
+      if (columnName === 'days_past_due') return 0;
+      if (columnName === 'delinquency_status') return 'CURRENT';
+      if (columnName === 'credit_conversion_factor') return 1.0;
+      if (columnName === 'ifrs_stage') return 1;
+      break;
+    }
+
+    // ── Derivatives (skeleton — factory doesn't model derivatives yet) ──
+    case 'derivatives_indicative_snapshot':
+    case 'derivatives_accounting_snapshot':
+    case 'derivatives_classification_snapshot':
+    case 'derivatives_risk_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'currency_code') return 'USD';
+      break;
+    }
+
+    // ── Off-BS Commitments ──
+    case 'offbs_commitments_indicative_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'effective_date') return originationDate(idx);
+      if (columnName === 'maturity_date') return maturityDate(idx);
+      if (columnName === 'currency_code') return 'USD';
+      if (columnName === 'product_code') return 'LETTER_OF_CREDIT';
+      if (columnName === 'commitment_type') return 'IRREVOCABLE';
+      break;
+    }
+    case 'offbs_commitments_accounting_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'committed_exposure_global') return committed(idx);
+      if (columnName === 'funded_committed_exposure') return drawn(idx);
+      if (columnName === 'unfunded_committed_exposure') return Math.max(0, committed(idx) - drawn(idx));
+      if (columnName === 'counterparty_exposure_value') return drawn(idx) * 0.4;
+      if (columnName === 'credit_conversion_factor') return 0.4;
+      if (columnName === 'currency_code') return 'USD';
+      break;
+    }
+    case 'offbs_commitments_classification_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'customer_id') return `CUST-${cid(idx)}`;
+      if (columnName === 'product_code') return 'LETTER_OF_CREDIT';
+      if (columnName === 'country_code') return 'US';
+      if (columnName === 'currency_code') return 'USD';
+      if (columnName === 'gl_account_number') return 9050;
+      break;
+    }
+    case 'offbs_commitments_risk_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'probability_of_default_pd') return pd(idx);
+      if (columnName === 'loss_given_default_lgd') return lgd(idx);
+      if (columnName === 'credit_conversion_factor') return 0.4;
+      if (columnName === 'exposure_at_default_ead') return committed(idx) * 0.4;
+      if (columnName === 'expected_loss') return committed(idx) * 0.4 * pd(idx) * lgd(idx);
+      break;
+    }
+
+    // ── SFT (skeleton) ──
+    case 'sft_indicative_snapshot':
+    case 'sft_accounting_snapshot':
+    case 'sft_classification_snapshot':
+    case 'sft_risk_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'currency_code') return 'USD';
+      break;
+    }
+
+    // ── Securities (skeleton) ──
+    case 'securities_indicative_snapshot':
+    case 'securities_accounting_snapshot':
+    case 'securities_classification_snapshot':
+    case 'securities_risk_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'currency_code') return 'USD';
+      break;
+    }
+
+    // ── Deposits (skeleton) ──
+    case 'deposits_indicative_snapshot':
+    case 'deposits_accounting_snapshot':
+    case 'deposits_classification_snapshot':
+    case 'deposits_risk_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'currency_code') return 'USD';
+      break;
+    }
+
+    // ── Borrowings (skeleton) ──
+    case 'borrowings_indicative_snapshot':
+    case 'borrowings_accounting_snapshot':
+    case 'borrowings_classification_snapshot':
+    case 'borrowings_risk_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'currency_code') return 'USD';
+      break;
+    }
+
+    // ── Debt (skeleton) ──
+    case 'debt_indicative_snapshot':
+    case 'debt_accounting_snapshot':
+    case 'debt_classification_snapshot':
+    case 'debt_risk_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'currency_code') return 'USD';
+      break;
+    }
+
+    // ── Equities (skeleton) ──
+    case 'equities_indicative_snapshot':
+    case 'equities_accounting_snapshot':
+    case 'equities_classification_snapshot':
+    case 'equities_risk_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'currency_code') return 'USD';
+      break;
+    }
+
+    // ── Stock (skeleton) ──
+    case 'stock_indicative_snapshot':
+    case 'stock_accounting_snapshot':
+    case 'stock_classification_snapshot':
+    case 'stock_risk_snapshot': {
+      if (columnName === 'position_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'currency_code') return 'USD';
+      break;
+    }
   }
 
   return null;

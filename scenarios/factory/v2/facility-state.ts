@@ -22,7 +22,6 @@ import type { StoryArc, RatingTier, SizeProfile } from '../../../scripts/shared/
 import {
   STORY_PD_MULTIPLIERS,
   STORY_UTILIZATION,
-  STORY_SPREAD_MULTIPLIERS,
   STORY_CREDIT_STATUS,
   STORY_DPD,
   RATING_TIER_MAP,
@@ -33,29 +32,43 @@ import type {
   IFRS9Stage, CounterpartyFinancials, FacilityEvent, TimeFrequency,
   CovenantPackage,
 } from './types';
-import { stateKey, CREDIT_STATUS_CODE } from './types';
+import { stateKey } from './types';
 
-import { seededRng, pick, round, clamp } from './prng';
+import { seededRng, round, clamp } from './prng';
 
 import {
-  sampleCommittedAmount, sampleLGD, sampleSpread, evolveSpread,
-  sampleRiskWeight, sampleCollateralValue, evolveCollateralValue,
-  sampleFeeRate, boundedNormal, FINANCIAL_PARAMS,
+  sampleCommittedAmount, sampleLGD, sampleSpread,
+  sampleRiskWeight, sampleCollateralValue,
+  boundedNormal, FINANCIAL_PARAMS,
 } from './distributions';
 
 import { MarketEnvironment } from './market-environment';
-import { interpolateArcValue, frequencyToDt, getMonth, monthsBetween } from './time-series';
+import { frequencyToDt, monthsBetween } from './time-series';
 
 import {
-  applyDrawBehavior, calculateAllInRate, calculateEAD, calculateRWA,
+  calculateAllInRate, calculateEAD, calculateRWA,
   calculateExpectedLoss, calculateECL, calculateFeeRate,
   PRODUCT_CONFIGS, generateAmortizationSchedule,
 } from './product-models';
 
 import {
   getDefaultCovenantPackage, initializeCovenantStates,
-  testCovenants, checkCrossDefault, nextTestDate,
+  checkCrossDefault, nextTestDate,
 } from './covenant-engine';
+
+import type { StageContext } from './stage-types';
+import {
+  applyBaseRate,
+  applyDrawBehaviorStage,
+  applyCollateralRevaluation,
+  applyPDUpdate,
+  applySpreadUpdate,
+  applyPricing,
+  applyCovenantTest,
+  applyIFRS9Staging,
+  applyDerivedMetrics,
+  applyLifecycle,
+} from './stages';
 
 import type { EnrichedFacility, EnrichedCounterparty } from '../gsib-enrichment';
 import type { L1Chain } from '../chain-builder';
@@ -384,6 +397,12 @@ export function generateCounterpartyFinancials(
  *
  * This is the heart of the system — guaranteeing cross-table correlation
  * because ALL generators read from the SAME evolved state.
+ *
+ * Implemented as a typed 10-stage pipeline where each stage declares
+ * exactly which fields it reads (input) and writes (output). The compiler
+ * enforces that stages cannot silently depend on undeclared fields.
+ *
+ * See stage-types.ts for the contracts and stages/ for the implementations.
  */
 export function evolveFacilityState(
   rng: () => number,
@@ -397,296 +416,77 @@ export function evolveFacilityState(
 ): FacilityState {
   const state = structuredClone(prevState);
   state.events_this_period = [];
-  const dt = frequencyToDt(frequency);
-  const arc = state.story_arc;
 
-  // ── Step 1: Market rates ──
-  state.base_rate_pct = market.getBaseRate(date, state.currency_code);
-  state.cost_of_funds_pct = market.getCostOfFunds(date, state.currency_code);
+  const ctx: StageContext = {
+    date,
+    dates,
+    dateIdx,
+    dt: frequencyToDt(frequency),
+    rng,
+  };
 
-  // ── Step 2: Draw behavior (with seasonal overlay) ──
-  const storyUtilCurve = STORY_UTILIZATION[arc] ?? [0.50, 0.50, 0.50, 0.50, 0.50];
-  const drawResult = applyDrawBehavior(rng, state, date, dates, storyUtilCurve);
-  state.prior_drawn_amount = drawResult.prior_drawn_amount;
+  // ── Stage 1: Base Rate ──
+  const s1 = applyBaseRate(state, market, ctx);
+  state.base_rate_pct = s1.base_rate_pct;
+  state.cost_of_funds_pct = s1.cost_of_funds_pct;
 
-  // Track draw/repay dates
-  if (drawResult.drawn_amount > state.drawn_amount) {
-    state.last_draw_date = date;
-  } else if (drawResult.drawn_amount < state.drawn_amount) {
-    state.last_repay_date = date;
-  }
-  state.drawn_amount = drawResult.drawn_amount;
-  state.undrawn_amount = drawResult.undrawn_amount;
+  // ── Stage 2: Draw Behavior ──
+  const s2 = applyDrawBehaviorStage(state, ctx);
+  if (s2.last_draw_date) state.last_draw_date = s2.last_draw_date;
+  if (s2.last_repay_date) state.last_repay_date = s2.last_repay_date;
+  state.drawn_amount = s2.drawn_amount;
+  state.undrawn_amount = s2.undrawn_amount;
+  state.prior_drawn_amount = s2.prior_drawn_amount;
 
-  // ── Step 3: Collateral revaluation ──
-  state.collateral_value = evolveCollateralValue(rng, state.collateral_value, state.collateral_type, dt);
-  state.ltv_ratio = state.collateral_value > 0
-    ? round(state.drawn_amount / state.collateral_value, 4)
-    : 1.0;
+  // ── Stage 3: Collateral Revaluation ──
+  const s3 = applyCollateralRevaluation(state, ctx);
+  state.collateral_value = s3.collateral_value;
+  state.ltv_ratio = s3.ltv_ratio;
 
-  // ── Step 4: PD evolution ──
-  const pdMultCurve = STORY_PD_MULTIPLIERS[arc] ?? [1.0, 1.0, 1.0, 1.0, 1.0];
-  const pdMult = interpolateArcValue(date, dates, pdMultCurve);
-  const sectorCondition = market.getSectorCondition(state.industry_id, date);
-  const sectorPdMult = sectorCondition.pd_multiplier;
-  state.pd_annual = round(
-    clamp(state.pd_at_origination * pdMult * sectorPdMult, 0.0001, 0.9999),
-    6,
-  );
+  // ── Stage 4: PD Update ──
+  const s4 = applyPDUpdate(state, market, ctx);
+  state.pd_annual = s4.pd_annual;
 
-  // ── Step 5: Spread evolution ──
-  const spreadMultCurve = STORY_SPREAD_MULTIPLIERS[arc] ?? [1.0, 1.0, 1.0, 1.0, 1.0];
-  const spreadMult = interpolateArcValue(date, dates, spreadMultCurve);
-  state.spread_bps = evolveSpread(rng, state.spread_bps, state.rating_tier, spreadMult, dt);
+  // ── Stage 5: Spread Update ──
+  const s5 = applySpreadUpdate(state, ctx);
+  state.spread_bps = s5.spread_bps;
 
-  // ── Step 6: Pricing ──
-  // Apply sector stress adder only to the all-in rate, not to the base spread
-  const utilization = state.committed_amount > 0
-    ? state.drawn_amount / state.committed_amount : 0;
-  state.all_in_rate_pct = calculateAllInRate(
-    state.base_rate_pct, state.spread_bps + sectorCondition.spread_adder_bps, state.product_type, utilization,
-  );
-  state.last_rate_reset_date = date;
+  // ── Stage 6: Pricing ──
+  const s6 = applyPricing(state, market, ctx);
+  state.all_in_rate_pct = s6.all_in_rate_pct;
+  state.last_rate_reset_date = s6.last_rate_reset_date;
 
-  // ── Step 7: Credit status & DPD ──
-  const statusCurve = STORY_CREDIT_STATUS[arc];
-  if (statusCurve) {
-    const statusIdx = Math.min(
-      Math.floor((dateIdx / Math.max(dates.length - 1, 1)) * statusCurve.length),
-      statusCurve.length - 1,
-    );
-    state.credit_status = statusCurve[statusIdx] as CreditStatus;
-  }
-  const dpdCurve = STORY_DPD[arc];
-  if (dpdCurve) {
-    state.days_past_due = Math.round(interpolateArcValue(date, dates, dpdCurve));
-  }
+  // ── Stage 7: Credit Status, DPD & Covenant Testing ──
+  const s7 = applyCovenantTest(state, financials, ctx);
+  state.credit_status = s7.credit_status;
+  state.days_past_due = s7.days_past_due;
+  state.covenants = s7.covenants;
+  state.next_test_date = s7.next_test_date;
+  state.events_this_period.push(...s7.events);
 
-  // ── Step 8: Covenant testing ──
-  const previousDate = dateIdx > 0 ? dates[dateIdx - 1] : undefined;
-  const covResult = testCovenants(rng, state, financials, date, previousDate);
-  state.covenants = covResult.updatedStates;
-  state.events_this_period.push(...covResult.events);
-  if (state.covenant_package) {
-    state.next_test_date = nextTestDate(date, state.covenant_package.test_frequency);
-  }
+  // ── Stage 8: IFRS 9 Staging ──
+  const s8 = applyIFRS9Staging(state);
+  state.ifrs9_stage = s8.ifrs9_stage;
 
-  // ── Step 8b: Covenant-aware credit status adjustment ──
-  // An unwaived covenant breach should push status to at least WATCH
-  if (state.credit_status === 'PERFORMING' &&
-      state.covenants.some(c => c.is_breached && !c.waiver_active)) {
-    state.credit_status = 'WATCH';
-  }
+  // ── Stage 9: Derived Metrics (EAD, RWA, ECL, tenor, ratios) ──
+  const s9 = applyDerivedMetrics(state, financials, ctx);
+  state.ead = s9.ead;
+  state.ccf = s9.ccf;
+  state.rwa = s9.rwa;
+  state.expected_loss = s9.expected_loss;
+  state.ecl_12m = s9.ecl_12m;
+  state.ecl_lifetime = s9.ecl_lifetime;
+  state.remaining_tenor_months = s9.remaining_tenor_months;
+  state.dscr = s9.dscr;
+  state.icr = s9.icr;
+  state.leverage_ratio = s9.leverage_ratio;
 
-  // ── Step 9: IFRS 9 staging ──
-  state.ifrs9_stage = determineIFRS9Stage(state);
-
-  // ── Step 10: Remaining tenor ──
-  state.remaining_tenor_months = Math.max(0, monthsBetween(date, state.maturity_date));
-
-  // ── Step 11: Derived risk metrics ──
-  const ccf = PRODUCT_CONFIGS[state.product_type].ccf;
-  state.ccf = ccf;
-  state.ead = calculateEAD(state.drawn_amount, state.undrawn_amount, state.product_type);
-  state.rwa = calculateRWA(state.ead, state.risk_weight_pct);
-  state.expected_loss = calculateExpectedLoss(state.pd_annual, state.lgd_current, state.ead);
-  const ecl = calculateECL(
-    state.pd_annual, state.lgd_current, state.ead,
-    state.ifrs9_stage, state.remaining_tenor_months,
-  );
-  state.ecl_12m = ecl.ecl_12m;
-  state.ecl_lifetime = ecl.ecl_lifetime;
-
-  // ── Step 12: Financial ratios ──
-  const debtService = financials.interest_expense + financials.total_debt * 0.02;
-  state.dscr = debtService > 0 ? round(financials.ebitda / debtService, 4) : 0;
-  state.icr = financials.interest_expense > 0
-    ? round(financials.ebitda / financials.interest_expense, 4) : 0;
-  state.leverage_ratio = financials.ebitda > 0
-    ? round(financials.total_debt / financials.ebitda, 4) : 0;
-
-  // ── Step 13: Lifecycle transitions ──
-  applyLifecycleTransitions(state, date, rng);
-
-  // ── Step 14: Generate threshold-based events ──
-  generateThresholdEvents(state, date);
+  // ── Stage 10: Lifecycle Transitions + Threshold Events ──
+  const s10 = applyLifecycle(state, ctx);
+  state.lifecycle_stage = s10.lifecycle_stage;
+  state.events_this_period.push(...s10.events);
 
   return state;
-}
-
-// ─── IFRS 9 Staging ────────────────────────────────────────────────────
-
-function determineIFRS9Stage(state: FacilityState): IFRS9Stage {
-  // Stage 3 is sticky: once assigned, it persists until an explicit cure event
-  if (state.ifrs9_stage === 3) {
-    const hasCureEvent = state.events_this_period.some(
-      e => e.type === 'IFRS9_CURE' || e.type === 'RESTRUCTURE_CURE'
-    );
-    if (!hasCureEvent) return 3;
-  }
-
-  // Stage 3: DPD > 90 or DEFAULT status
-  if (state.days_past_due > 90 || state.credit_status === 'DEFAULT') {
-    return 3;
-  }
-  // Stage 2: Significant increase in credit risk (PD > 2x origination)
-  if (state.pd_annual > state.pd_at_origination * 2) {
-    return 2;
-  }
-  // Stage 2: DPD > 30
-  if (state.days_past_due > 30) {
-    return 2;
-  }
-  // Stage 2: Credit status is WATCH or worse
-  if (['WATCH', 'SPECIAL_MENTION', 'SUBSTANDARD', 'DOUBTFUL'].includes(state.credit_status)) {
-    const statusCode = CREDIT_STATUS_CODE[state.credit_status];
-    if (statusCode >= 4) return 2; // SPECIAL_MENTION or worse
-  }
-  // Stage 1: Performing
-  return 1;
-}
-
-// ─── Lifecycle Transitions ─────────────────────────────────────────────
-
-function applyLifecycleTransitions(state: FacilityState, date: string, rng: () => number): void {
-  const remainingMonths = state.remaining_tenor_months;
-
-  switch (state.lifecycle_stage) {
-    case 'COMMITMENT':
-      // Transition to FUNDED when first draw occurs
-      if (state.drawn_amount > 0) {
-        state.lifecycle_stage = 'FUNDED';
-        state.events_this_period.push({
-          type: 'LIFECYCLE_TRANSITION',
-          date,
-          description: `Facility ${state.facility_id} transitioned from COMMITMENT to FUNDED`,
-          severity: 'LOW',
-          triggered_by: 'first_draw',
-          facility_ids: [state.facility_id],
-          counterparty_id: state.counterparty_id,
-        });
-      }
-      break;
-
-    case 'FUNDED':
-      // Term loans transition to AMORTIZING after first amortization payment
-      if (PRODUCT_CONFIGS[state.product_type].amortizes && state.drawn_amount < state.original_committed) {
-        state.lifecycle_stage = 'AMORTIZING';
-      }
-      // Check for maturity proximity
-      if (remainingMonths <= 3 && remainingMonths > 0) {
-        state.lifecycle_stage = 'MATURING';
-        state.events_this_period.push({
-          type: 'MATURITY_APPROACHING',
-          date,
-          description: `Facility ${state.facility_id} matures in ${remainingMonths} months`,
-          severity: 'MEDIUM',
-          triggered_by: 'maturity_proximity',
-          facility_ids: [state.facility_id],
-          counterparty_id: state.counterparty_id,
-        });
-      }
-      break;
-
-    case 'AMORTIZING':
-      if (remainingMonths <= 3 && remainingMonths > 0) {
-        state.lifecycle_stage = 'MATURING';
-      }
-      break;
-
-    case 'MATURING':
-      if (remainingMonths <= 0) {
-        state.lifecycle_stage = 'MATURED';
-      }
-      break;
-
-    case 'MATURED':
-      // Already handled by lifecycle-engine (refinance or default)
-      break;
-
-    case 'RESTRUCTURED':
-    case 'DEFAULT':
-    case 'WORKOUT':
-    case 'WRITTEN_OFF':
-      // Terminal or near-terminal states — no automatic transitions
-      break;
-  }
-
-  // Default trigger: covenant breach without waiver, severe DPD
-  if (state.lifecycle_stage !== 'DEFAULT' && state.lifecycle_stage !== 'WORKOUT' &&
-      state.lifecycle_stage !== 'WRITTEN_OFF') {
-    if (state.days_past_due > 90 || state.credit_status === 'DEFAULT') {
-      state.lifecycle_stage = 'DEFAULT';
-      state.events_this_period.push({
-        type: 'FACILITY_DEFAULT',
-        date,
-        description: `Facility ${state.facility_id} entered DEFAULT (DPD=${state.days_past_due}, status=${state.credit_status})`,
-        severity: 'CRITICAL',
-        triggered_by: 'dpd_or_status',
-        facility_ids: [state.facility_id],
-        counterparty_id: state.counterparty_id,
-      });
-    }
-  }
-}
-
-// ─── Threshold-Based Events ────────────────────────────────────────────
-
-function generateThresholdEvents(state: FacilityState, date: string): void {
-  const events = state.events_this_period;
-  const util = state.committed_amount > 0 ? state.drawn_amount / state.committed_amount : 0;
-
-  // High utilization
-  if (util > 0.90) {
-    events.push({
-      type: 'HIGH_UTILIZATION',
-      date,
-      description: `Facility ${state.facility_id} utilization at ${(util * 100).toFixed(1)}%`,
-      severity: 'MEDIUM',
-      triggered_by: 'utilization_threshold',
-      facility_ids: [state.facility_id],
-      counterparty_id: state.counterparty_id,
-    });
-  }
-
-  // Collateral shortfall
-  if (state.ltv_ratio > 0.85 && state.collateral_type !== 'NONE') {
-    events.push({
-      type: 'COLLATERAL_SHORTFALL',
-      date,
-      description: `LTV ratio ${(state.ltv_ratio * 100).toFixed(1)}% exceeds 85% threshold`,
-      severity: 'HIGH',
-      triggered_by: 'ltv_threshold',
-      facility_ids: [state.facility_id],
-      counterparty_id: state.counterparty_id,
-    });
-  }
-
-  // Maturity concentration
-  if (state.remaining_tenor_months > 0 && state.remaining_tenor_months <= 6) {
-    events.push({
-      type: 'MATURITY_CONCENTRATION',
-      date,
-      description: `Facility ${state.facility_id} matures in ${state.remaining_tenor_months} months`,
-      severity: state.remaining_tenor_months <= 3 ? 'HIGH' : 'MEDIUM',
-      triggered_by: 'maturity_wall',
-      facility_ids: [state.facility_id],
-      counterparty_id: state.counterparty_id,
-    });
-  }
-
-  // Payment default
-  if (state.days_past_due > 30 && state.days_past_due <= 90) {
-    events.push({
-      type: 'PAYMENT_DELAY',
-      date,
-      description: `Facility ${state.facility_id}: ${state.days_past_due} days past due`,
-      severity: 'HIGH',
-      triggered_by: 'dpd_threshold',
-      facility_ids: [state.facility_id],
-      counterparty_id: state.counterparty_id,
-    });
-  }
 }
 
 // ─── State Manager ─────────────────────────────────────────────────────

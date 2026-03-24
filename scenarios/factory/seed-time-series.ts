@@ -22,16 +22,9 @@ import type { EnrichedCounterparty, EnrichedAgreement, EnrichedFacility } from '
 import type { TableData as V2TableData, TimeFrequency } from './v2/types';
 import type { StoryArc, RatingTier, SizeProfile } from '../../scripts/shared/mvp-config';
 import { SchemaRegistry, validateAgainstSchema } from './schema-validator';
-import { config as loadDotenv } from 'dotenv';
+import { loadEnv } from './load-env';
 
-// Load .env — try worktree root first, then main repo root
-const envPath1 = path.join(__dirname, '..', '..', '.env');
-const envPath2 = path.resolve('/Users/tomas/120/.env');
-if (existsSync(envPath1)) {
-  loadDotenv({ path: envPath1 });
-} else if (existsSync(envPath2)) {
-  loadDotenv({ path: envPath2 });
-}
+loadEnv();
 
 /* ────────────────── Configuration ────────────────── */
 

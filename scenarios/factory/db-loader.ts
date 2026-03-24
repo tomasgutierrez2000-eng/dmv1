@@ -11,26 +11,9 @@
 import pg from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
+import { loadEnvOrDie } from './load-env';
 
-// Load env from main repo or worktree
-const envPaths = [
-  path.resolve(process.cwd(), '.env.local'),
-  path.resolve(process.cwd(), '../../.env.local'),
-  '/Users/tomas/120/.env.local',
-];
-for (const p of envPaths) {
-  if (fs.existsSync(p)) {
-    dotenv.config({ path: p });
-    break;
-  }
-}
-
-const DATABASE_URL = process.env.DATABASE_URL;
-if (!DATABASE_URL) {
-  console.error('ERROR: DATABASE_URL not set. Check .env.local');
-  process.exit(1);
-}
+const DATABASE_URL = loadEnvOrDie();
 
 const args = process.argv.slice(2);
 const doCheck = args.includes('--check') || args.includes('--all');

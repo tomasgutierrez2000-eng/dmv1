@@ -72,6 +72,7 @@ import {
 
 import type { EnrichedFacility, EnrichedCounterparty } from '../gsib-enrichment';
 import type { L1Chain } from '../chain-builder';
+import { checkInvariants, type InvariantViolation } from './invariants';
 
 // ─── Initialization ────────────────────────────────────────────────────
 
@@ -174,7 +175,7 @@ export function initializeFacilityState(
   // Collateral
   const collateralType = inferCollateralType(counterparty.industry_id, productType);
   const collateralValue = sampleCollateralValue(rng, drawn > 0 ? drawn : committed, collateralType);
-  const ltvRatio = collateralValue > 0 ? drawn / collateralValue : 1.0;
+  const ltvRatio = collateralValue > 0 ? drawn / collateralValue : (drawn > 0 ? 999.0 : 0);
 
   // Base rate from market environment (use SOFR as default)
   const baseRatePct = 0.0533; // Will be overridden per step from MarketEnvironment
@@ -485,6 +486,12 @@ export function evolveFacilityState(
   const s10 = applyLifecycle(state, ctx);
   state.lifecycle_stage = s10.lifecycle_stage;
   state.events_this_period.push(...s10.events);
+
+  // ── Post-pipeline invariant check ──
+  const violations = checkInvariants(state, `step@${date}`);
+  if (violations.length > 0) {
+    state._invariantViolations = violations;
+  }
 
   return state;
 }

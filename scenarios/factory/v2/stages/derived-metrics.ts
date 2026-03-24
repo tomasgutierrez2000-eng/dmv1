@@ -31,13 +31,18 @@ export function applyDerivedMetrics(
     input.ifrs9_stage, remaining_tenor_months,
   );
 
-  // Financial ratios
+  // Financial ratios — clamp to [-10, 100] to prevent extreme outliers from skewing distributions
+  const RATIO_FLOOR = -10.0;
+  const RATIO_CEIL = 100.0;
   const debtService = financials.interest_expense + financials.total_debt * 0.02;
-  const dscr = debtService > 0 ? round(financials.ebitda / debtService, 4) : 0;
-  const icr = financials.interest_expense > 0
+  const rawDscr = debtService > 0 ? round(financials.ebitda / debtService, 4) : 0;
+  const dscr = Math.max(RATIO_FLOOR, Math.min(RATIO_CEIL, rawDscr));
+  const rawIcr = financials.interest_expense > 0
     ? round(financials.ebitda / financials.interest_expense, 4) : 0;
-  const leverage_ratio = financials.ebitda > 0
+  const icr = Math.max(RATIO_FLOOR, Math.min(RATIO_CEIL, rawIcr));
+  const rawLeverage = financials.ebitda > 0
     ? round(financials.total_debt / financials.ebitda, 4) : 0;
+  const leverage_ratio = Math.max(RATIO_FLOOR, Math.min(RATIO_CEIL, rawLeverage));
 
   return {
     ead,

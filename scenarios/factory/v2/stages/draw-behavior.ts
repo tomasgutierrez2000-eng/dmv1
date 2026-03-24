@@ -13,22 +13,9 @@ export function applyDrawBehaviorStage(
   const arc = input.story_arc;
   const storyUtilCurve = STORY_UTILIZATION[arc] ?? [0.50, 0.50, 0.50, 0.50, 0.50];
 
-  // applyDrawBehavior reads from state — build a minimal object that satisfies its reads.
-  // It accesses: product_type, lifecycle_stage, committed_amount, drawn_amount,
-  // original_committed, industry_id, facility_type_code
-  const stateSlice = {
-    product_type: input.product_type,
-    lifecycle_stage: input.lifecycle_stage,
-    committed_amount: input.committed_amount,
-    drawn_amount: input.drawn_amount,
-    original_committed: input.original_committed,
-    industry_id: input.industry_id,
-    facility_type_code: input.facility_type_code,
-  };
-
   const drawResult = applyDrawBehaviorModel(
     ctx.rng,
-    stateSlice as any, // applyDrawBehavior expects full FacilityState but only reads these fields
+    input, // DrawBehaviorInput matches applyDrawBehavior's Pick<> parameter type
     ctx.date,
     ctx.dates,
     storyUtilCurve,

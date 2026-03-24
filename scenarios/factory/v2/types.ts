@@ -272,6 +272,9 @@ export interface FacilityState {
 
   // ── Events This Period ──
   events_this_period: FacilityEvent[];
+
+  // ── Invariant Violations (populated by inter-stage checker) ──
+  _invariantViolations?: import('./invariants').InvariantViolation[];
 }
 
 // ─── Facility State History ─────────────────────────────────────────────

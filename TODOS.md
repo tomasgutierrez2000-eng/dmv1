@@ -177,3 +177,23 @@
 **What:** Investigate whether `components/lineage/LineageExplorer.tsx` (35KB) is dead code or used elsewhere. If dead, delete it. If used, either merge with LineageFlowView or extract shared layout engine.
 **Why:** Two lineage renderers with separate `computeLayout` functions will diverge after the Unified Lineage-Trace feature enhances LineageFlowView. Risk of stale/inconsistent rendering.
 **Depends on:** Best done after or alongside the Unified Lineage-Trace implementation.
+
+---
+
+## Deferred (from Factory Eng Review 2026-03-23)
+
+### 29. Extract CLAUDE.md lessons-learned into executable validation rules
+**What:** The 50+ rows in CLAUDE.md's "Common YAML Formula Bugs" and "PostgreSQL Seed Data Quality Checklist" tables are unimplemented validation rules. Extract the automatable ones (e.g., "SUM of dates", "WHERE before JOIN", "Missing COALESCE") into programmatic checks in the calc-engine validator or a new SQL linter.
+**Why:** Every new contributor will rediscover each bug independently. Prose documentation doesn't prevent recurrence. The outside voice flagged this as the review's biggest blind spot.
+**Pros:** Systematic prevention. New metric authors get immediate feedback instead of debugging for hours.
+**Cons:** Large scope — 50+ rules, each with different detection logic. Some are judgment calls ("wrong source layer") that can't be fully automated.
+**Context:** Start with the 10 most common bugs from the table (SUM of dates, WHERE before JOIN, missing COALESCE, missing NULLIF, wrong boolean compare, PG-only casts, FX at facility level, CTE in formula_sql, wrong field name, wrong source layer). Each becomes a regex or AST check in a new `lib/sql-linter.ts`.
+**Depends on:** Vitest migration (TODO #11) for test infrastructure.
+
+### 30. Pipeline resumption / idempotency for scenario-runner
+**What:** If `scenario-runner.ts` crashes mid-pipeline (e.g., scenario S35 of 38), add ability to resume from where it left off rather than re-generating all 38 scenarios.
+**Why:** Crash mid-run produces partial SQL file with no recovery. Re-running all 38 scenarios wastes time.
+**Pros:** Faster iteration when debugging single-scenario failures.
+**Cons:** Adds checkpoint logic and state persistence. May not be worth it if pipeline completes in <5 minutes.
+**Context:** Current mitigation: `--scenario S35` flag runs a single scenario. But doesn't help with partial SQL file from a crash. Approach: write per-scenario SQL files, then concatenate at the end. Crash = re-run only the missing scenario.
+**Depends on:** Nothing.

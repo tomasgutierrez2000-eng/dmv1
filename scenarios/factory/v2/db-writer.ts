@@ -22,22 +22,12 @@ import {
 
 // ─── Connection Helper ─────────────────────────────────────────────────
 
-function loadEnv(): string | undefined {
+function loadEnvAndGetDbUrl(): string | undefined {
   try {
-    const dotenv = require('dotenv');
-    const envPaths = [
-      path.resolve(process.cwd(), '.env.local'),
-      path.resolve(process.cwd(), '../../.env.local'),
-      '/Users/tomas/120/.env.local',
-    ];
-    for (const p of envPaths) {
-      if (fs.existsSync(p)) {
-        dotenv.config({ path: p });
-        break;
-      }
-    }
+    const { loadEnv } = require('../load-env');
+    loadEnv();
   } catch {
-    // dotenv not available — rely on environment variable
+    // load-env not available — rely on environment variable
   }
   return process.env.DATABASE_URL;
 }
@@ -74,7 +64,7 @@ export class DBWriter {
   private existingTables = new Set<string>(); // "l2.counterparty" format
 
   constructor(private databaseUrl?: string) {
-    this.databaseUrl = databaseUrl ?? loadEnv();
+    this.databaseUrl = databaseUrl ?? loadEnvAndGetDbUrl();
   }
 
   /** Check if database is available. */

@@ -39,23 +39,10 @@ export function applyCovenantTest(
     days_past_due = Math.round(interpolateArcValue(ctx.date, ctx.dates, dpdCurve));
   }
 
-  // Covenant testing — build a minimal state slice for testCovenants
-  const stateSlice = {
-    facility_id: input.facility_id,
-    counterparty_id: input.counterparty_id,
-    covenant_package: input.covenant_package,
-    covenants: input.covenants,
-    rating_tier: input.rating_tier,
-    drawn_amount: input.drawn_amount,
-    collateral_value: input.collateral_value,
-    credit_status,
-    days_past_due,
-  };
-
   const previousDate = ctx.dateIdx > 0 ? ctx.dates[ctx.dateIdx - 1] : undefined;
   const covResult = testCovenants(
     ctx.rng,
-    stateSlice as any, // testCovenants expects full FacilityState but only reads these fields
+    { ...input, credit_status, days_past_due },
     financials,
     ctx.date,
     previousDate,

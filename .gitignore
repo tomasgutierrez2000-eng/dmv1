@@ -41,3 +41,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# agent suite audit logs (session JSON files, not the DDL or logger)
+.claude/audit/sessions/*.json
+.claude/audit/schema-changes/*.json
+.claude/config/schema-manifest.yaml

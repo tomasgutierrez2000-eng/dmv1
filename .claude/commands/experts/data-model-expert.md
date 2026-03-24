@@ -202,7 +202,7 @@ If a proposed field conflicts with an existing field (same name, different type 
 
     CREATE TABLE l3.{table_name} (
         {table_name}_id        BIGSERIAL    PRIMARY KEY,
-        facility_id            BIGINT       NOT NULL REFERENCES l1.facility_master(facility_id),
+        facility_id            BIGINT       NOT NULL REFERENCES l2.facility_master(facility_id),
         as_of_date             DATE         NOT NULL,
         -- metric columns --
         {metric_field}_amt     NUMERIC(20,4),

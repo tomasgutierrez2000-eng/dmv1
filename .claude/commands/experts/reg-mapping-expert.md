@@ -53,10 +53,10 @@ The primary credit risk regulatory report for GSIBs. Filed quarterly.
 
 | Field Group | Required Fields | Typical Source Tables |
 |-------------|----------------|---------------------|
-| **Borrower ID** | Internal borrower ID, legal name, TIN/EIN, DUNS, LEI, CIK | l1.counterparty |
-| **Borrower Characteristics** | Industry (NAICS 6-digit), domicile country, public/private, entity type, revenue band | l1.counterparty, l1.industry_dim, l1.country_dim |
-| **Facility ID** | Internal facility ID, committed amount, drawn amount, facility type, origination date | l1.facility_master, l2.facility_exposure_snapshot |
-| **Credit Agreement** | Agreement ID, agreement date, maturity date, covenant package indicator | l1.credit_agreement_master |
+| **Borrower ID** | Internal borrower ID, legal name, TIN/EIN, DUNS, LEI, CIK | l2.counterparty |
+| **Borrower Characteristics** | Industry (NAICS 6-digit), domicile country, public/private, entity type, revenue band | l2.counterparty, l1.industry_dim, l1.country_dim |
+| **Facility ID** | Internal facility ID, committed amount, drawn amount, facility type, origination date | l2.facility_master, l2.facility_exposure_snapshot |
+| **Credit Agreement** | Agreement ID, agreement date, maturity date, covenant package indicator | l2.credit_agreement_master |
 | **Risk Ratings** | Internal rating (obligor + facility), PD, LGD, EAD, EL | l2.facility_risk_snapshot, l1.rating_scale_dim |
 | **Collateral** | Collateral type, appraised value, LTV, lien position | l2.collateral_snapshot, l1.collateral_type_dim |
 | **Pricing** | Interest rate, spread, fee structure, benchmark rate | l2.facility_pricing_snapshot, l1.benchmark_rate_index |
@@ -131,7 +131,7 @@ Skip unless `operational_risk` is in `active_risk_stripes`.
 | Field Group | Required Fields | Typical Source Tables |
 |-------------|----------------|---------------------|
 | **Credit Risk** | FR2590 category codes (11 categories), exposure amounts, provision amounts | l1.fr2590_category_dim, l2.facility_exposure_snapshot |
-| **Concentration** | Top 20 counterparty exposures, industry concentration, geographic concentration | l1.counterparty, l2.facility_exposure_snapshot |
+| **Concentration** | Top 20 counterparty exposures, industry concentration, geographic concentration | l2.counterparty, l2.facility_exposure_snapshot |
 | **Criticized Assets** | Special mention, substandard, doubtful, loss — amounts by category | l2.facility_risk_snapshot (risk rating) |
 
 **Total field count:** ~30 data elements.
@@ -262,15 +262,15 @@ This helps the Data Model Expert prioritize schema additions that close the most
 
 | # | Regulatory Field | Data Model Field | Table | Type | Notes |
 |---|-----------------|-----------------|-------|------|-------|
-| 1 | Internal Borrower ID | counterparty_id | l1.counterparty | BIGINT | PK, exact match |
-| 2 | Legal Entity Name | legal_name | l1.counterparty | VARCHAR | Direct field |
+| 1 | Internal Borrower ID | counterparty_id | l2.counterparty | BIGINT | PK, exact match |
+| 2 | Legal Entity Name | legal_name | l2.counterparty | VARCHAR | Direct field |
 | ... | ... | ... | ... | ... | ... |
 
 ### Partial Matches (12/120)
 
 | # | Regulatory Field | Closest Match | Table | Issue | Remediation |
 |---|-----------------|--------------|-------|-------|-------------|
-| 1 | NAICS 6-digit | industry_id | l1.counterparty | FK to industry_dim; need NAICS mapping | Add naics_6digit_code to industry_dim or counterparty |
+| 1 | NAICS 6-digit | industry_id | l2.counterparty | FK to industry_dim; need NAICS mapping | Add naics_6digit_code to industry_dim or counterparty |
 | ... | ... | ... | ... | ... | ... |
 
 ### Gaps (13/120)
@@ -308,7 +308,7 @@ This helps the Data Model Expert prioritize schema additions that close the most
 | committed_facility_amt | l2.facility_exposure_snapshot | Y-14Q, FR 2052a, FR 2590, Basel III | P0 |
 | drawn_amount | l2.facility_exposure_snapshot | Y-14Q, FR 2052a, FR 2590, Basel III | P0 |
 | internal_risk_rating | l2.facility_risk_snapshot | Y-14Q, FFIEC 101, FR 2590 | P0 |
-| maturity_date | l1.facility_master | Y-14Q, FR 2052a, Basel III | P0 |
+| maturity_date | l2.facility_master | Y-14Q, FR 2052a, Basel III | P0 |
 | ... | ... | ... | ... |
 
 ### Highest-Value Gaps (closing these improves coverage across multiple frameworks)

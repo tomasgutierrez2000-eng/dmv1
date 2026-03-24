@@ -173,7 +173,7 @@ If a proposed field conflicts with an existing field (same name, different type 
 
     CREATE TABLE l2.facility_risk_snapshot (
         facility_risk_snapshot_id  BIGSERIAL    PRIMARY KEY,
-        facility_id                BIGINT       NOT NULL REFERENCES l1.facility_master(facility_id),
+        facility_id                BIGINT       NOT NULL REFERENCES l2.facility_master(facility_id),
         as_of_date                 DATE         NOT NULL,
         -- ... existing columns ...
         pd_pct                     NUMERIC(10,6),
@@ -224,7 +224,7 @@ If a proposed field conflicts with an existing field (same name, different type 
 {ingredient_2} ──→ l2.table.field (FOUND)
 {ingredient_3} ──→ l2.table.new_field (PROPOSED) ──→ requires ALTER
 {ingredient_4} ──→ l3.new_table.field (PROPOSED) ──→ requires CREATE
-                     └── FK → l1.facility_master.facility_id
+                     └── FK → l2.facility_master.facility_id
                      └── FK → l2.facility_risk_snapshot.facility_id
 ```
 

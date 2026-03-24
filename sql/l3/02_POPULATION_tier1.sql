@@ -524,7 +524,8 @@ GROUP BY str.scenario_id, sd.scenario_name, sd.scenario_type, sd.scenario_descri
 $$;
 
 -- ============================================================
--- Remaining Tier 1 tables: T7, T9, T13, T14, T15, T20, T35, T37, T38, T40, T42, T43, T44
+-- Remaining Tier 1 tables: T7, T9, T13, T14, T15, T20, T35, T37, T38, T40, T43, T44
+-- (T42 facility_timeline_summary: REMOVED — subsumed by *_derived tables)
 -- These follow the same stored procedure pattern.
 -- Population logic for each is documented in 09_GLOBAL_CONVENTIONS.md Key Formulas section.
 -- Cursor should generate these using the field list from 01_DDL_all_tables.sql

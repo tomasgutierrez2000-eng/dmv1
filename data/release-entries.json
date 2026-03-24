@@ -1,5 +1,141 @@
 [
   {
+    "date": "2026-03-24",
+    "layer": "L2",
+    "table": "position_detail",
+    "field": "overdue_amt_current",
+    "changeType": "Added",
+    "rationale": "Field added to L2.position_detail"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L2",
+    "table": "position_detail",
+    "field": "overdue_amt_1_29",
+    "changeType": "Added",
+    "rationale": "Field added to L2.position_detail"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L2",
+    "table": "position_detail",
+    "field": "overdue_amt_30_59",
+    "changeType": "Added",
+    "rationale": "Field added to L2.position_detail"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L2",
+    "table": "position_detail",
+    "field": "overdue_amt_60_89",
+    "changeType": "Added",
+    "rationale": "Field added to L2.position_detail"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L2",
+    "table": "position_detail",
+    "field": "overdue_amt_90_plus",
+    "changeType": "Added",
+    "rationale": "Field added to L2.position_detail"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L2",
+    "table": "facility_delinquency_snapshot",
+    "field": "overdue_amt_current",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_delinquency_snapshot"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L2",
+    "table": "facility_delinquency_snapshot",
+    "field": "overdue_amt_1_29",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_delinquency_snapshot"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L2",
+    "table": "facility_delinquency_snapshot",
+    "field": "overdue_amt_30_59",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_delinquency_snapshot"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L2",
+    "table": "facility_delinquency_snapshot",
+    "field": "overdue_amt_60_89",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_delinquency_snapshot"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L2",
+    "table": "facility_delinquency_snapshot",
+    "field": "overdue_amt_90_plus",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_delinquency_snapshot"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L3",
+    "table": "lob_delinquency_summary",
+    "field": "overdue_amt_current",
+    "changeType": "Added",
+    "rationale": "Field added to L3.lob_delinquency_summary"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L3",
+    "table": "lob_delinquency_summary",
+    "field": "overdue_amt_1_29",
+    "changeType": "Added",
+    "rationale": "Field added to L3.lob_delinquency_summary"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L3",
+    "table": "lob_delinquency_summary",
+    "field": "overdue_amt_30_59",
+    "changeType": "Added",
+    "rationale": "Field added to L3.lob_delinquency_summary"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L3",
+    "table": "lob_delinquency_summary",
+    "field": "overdue_amt_60_89",
+    "changeType": "Added",
+    "rationale": "Field added to L3.lob_delinquency_summary"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L3",
+    "table": "lob_delinquency_summary",
+    "field": "overdue_amt_90_plus",
+    "changeType": "Added",
+    "rationale": "Field added to L3.lob_delinquency_summary"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L1",
+    "table": "enterprise_business_taxonomy",
+    "field": "parent_leaf",
+    "changeType": "Removed",
+    "rationale": "Field removed from L1.enterprise_business_taxonomy"
+  },
+  {
+    "date": "2026-03-24",
+    "layer": "L1",
+    "table": "enterprise_product_taxonomy",
+    "field": "parent_leaf",
+    "changeType": "Removed",
+    "rationale": "Field removed from L1.enterprise_product_taxonomy"
+  },
+  {
     "date": "2026-03-18",
     "layer": "L2",
     "table": "collateral_snapshot",

@@ -175,6 +175,8 @@ CREATE INDEX idx_review_findings_open ON audit.review_findings (status)
 -- ============================================================================
 CREATE TABLE audit.data_lineage (
     lineage_id          UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
+    run_id              UUID
+                        REFERENCES audit.agent_runs(run_id),
     metric_id           VARCHAR(50)     NOT NULL,
     ingredient_name     VARCHAR(200)    NOT NULL,
     source_system       VARCHAR(100),
@@ -195,6 +197,7 @@ COMMENT ON TABLE audit.data_lineage IS
     'Tracks ingredient-level data lineage with BCBS 239 principle references '
     'and data quality tiering. Supports end-to-end traceability audits.';
 
+CREATE INDEX idx_data_lineage_run_id ON audit.data_lineage (run_id);
 CREATE INDEX idx_data_lineage_metric_id ON audit.data_lineage (metric_id);
 CREATE INDEX idx_data_lineage_source ON audit.data_lineage (source_table, source_field);
 CREATE INDEX idx_data_lineage_target ON audit.data_lineage (target_table, target_field);

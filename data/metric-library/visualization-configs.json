@@ -1689,7 +1689,8 @@
       ],
       "per_level_tables": {
         "facility": [
-          "frs"
+          "frs",
+          "fm"
         ],
         "counterparty": [
           "frs",
@@ -6602,7 +6603,8 @@
       "per_level_tables": {
         "facility": [
           "fes",
-          "frs"
+          "frs",
+          "fm"
         ],
         "counterparty": [
           "fes",
@@ -6878,7 +6880,8 @@
       ],
       "per_level_tables": {
         "facility": [
-          "fes"
+          "fes",
+          "fm"
         ],
         "counterparty": [
           "fes",
@@ -7904,7 +7907,9 @@
       ],
       "per_level_tables": {
         "facility": [
-          "ffs"
+          "ffs",
+          "fm",
+          "ebt"
         ],
         "counterparty": [
           "ffs",
@@ -9337,7 +9342,9 @@
       "per_level_tables": {
         "facility": [
           "ffs",
-          "fes"
+          "fes",
+          "fm",
+          "ebt"
         ],
         "counterparty": [
           "cfs"
@@ -9695,7 +9702,9 @@
       "per_level_tables": {
         "facility": [
           "ffs",
-          "fes"
+          "fes",
+          "fm",
+          "ebt"
         ],
         "counterparty": [
           "cfs"
@@ -9927,7 +9936,9 @@
       ],
       "per_level_tables": {
         "facility": [
-          "ffs"
+          "ffs",
+          "fm",
+          "ebt"
         ],
         "counterparty": [
           "ffs",
@@ -10257,7 +10268,9 @@
       ],
       "per_level_tables": {
         "facility": [
-          "lue"
+          "lue",
+          "fm",
+          "ebt"
         ],
         "counterparty": [
           "lue",
@@ -10946,7 +10959,9 @@
       ],
       "per_level_tables": {
         "facility": [
-          "fprs"
+          "fprs",
+          "fm",
+          "ebt"
         ],
         "counterparty": [
           "fprs",
@@ -11317,7 +11332,9 @@
       ],
       "per_level_tables": {
         "facility": [
-          "fes"
+          "fes",
+          "fm",
+          "ebt"
         ],
         "counterparty": [
           "fes",
@@ -11692,7 +11709,9 @@
       ],
       "per_level_tables": {
         "facility": [
-          "ffs"
+          "ffs",
+          "fm",
+          "ebt"
         ],
         "counterparty": [
           "ffs",
@@ -13084,6 +13103,14 @@
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "rate",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -13108,6 +13135,12 @@
         "field": "bank_share_pct",
         "header": "Bank Share (%)",
         "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
         "subtotal_fn": "none"
       }
     ],
@@ -13197,6 +13230,22 @@
           "purpose": "Links to counterparty, lob segment for rollup grouping"
         },
         {
+          "alias": "fx",
+          "qualified_name": "l2.fx_rate",
+          "table_name": "fx_rate",
+          "layer": "L2",
+          "join_type": "LEFT",
+          "join_on": "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date",
+          "fields": [
+            {
+              "name": "rate",
+              "role": "MEASURE",
+              "description": "rate"
+            }
+          ],
+          "purpose": "Converts local currency amounts to USD reporting currency for cross-currency aggregation"
+        },
+        {
           "alias": "ebt",
           "qualified_name": "l1.enterprise_business_taxonomy",
           "table_name": "enterprise_business_taxonomy",
@@ -13225,18 +13274,21 @@
         "counterparty": [
           "fps",
           "fm",
-          "fes"
+          "fes",
+          "fx"
         ],
         "desk": [
           "fps",
           "fm",
           "fes",
+          "fx",
           "ebt"
         ],
         "portfolio": [
           "fps",
           "fm",
           "fes",
+          "fx",
           "ebt_l3",
           "ebt_l2"
         ],
@@ -13244,6 +13296,7 @@
           "fps",
           "fm",
           "fes",
+          "fx",
           "ebt_l3",
           "ebt_l2",
           "ebt_l1"

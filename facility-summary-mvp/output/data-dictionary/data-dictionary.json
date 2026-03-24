@@ -1,385 +1,6 @@
 {
   "L1": [
     {
-      "name": "enterprise_business_taxonomy",
-      "layer": "L1",
-      "category": "Counterparty & Entity",
-      "fields": [
-        {
-          "name": "managed_segment_id",
-          "description": "PK — unique identifier for the managed segment node",
-          "category": "Counterparty & Entity",
-          "why_required": "Unique node identifier for LoB hierarchy resolution",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          },
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "segment_code",
-          "description": "",
-          "category": "Counterparty & Entity",
-          "data_type": "VARCHAR(50)"
-        },
-        {
-          "name": "segment_name",
-          "description": "",
-          "category": "Counterparty & Entity",
-          "data_type": "VARCHAR(200)"
-        },
-        {
-          "name": "parent_segment_id",
-          "description": "",
-          "category": "Counterparty & Entity",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
-        },
-        {
-          "name": "created_ts",
-          "description": "",
-          "category": "Counterparty & Entity",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "updated_ts",
-          "description": "",
-          "category": "Counterparty & Entity",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "change_event",
-          "description": "Event code describing last change (e.g., SPLIT, MERGE, RENAME)",
-          "category": "Counterparty & Entity",
-          "why_required": "Audit and change-impact analysis",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "comments",
-          "description": "Free-text governance or context notes",
-          "category": "Counterparty & Entity",
-          "why_required": "Supports taxonomy review and approval workflow",
-          "data_type": "VARCHAR(2000)"
-        },
-        {
-          "name": "create_update_date",
-          "description": "Timestamp of last create or update",
-          "category": "Counterparty & Entity",
-          "why_required": "Audit trail for taxonomy governance",
-          "data_type": "DATE"
-        },
-        {
-          "name": "description",
-          "description": "Short name/label of the segment node",
-          "category": "Counterparty & Entity",
-          "why_required": "Display label for dashboards and filters",
-          "data_type": "VARCHAR(2000)"
-        },
-        {
-          "name": "effective_date",
-          "description": "Date the segment node became active",
-          "category": "Counterparty & Entity",
-          "why_required": "Temporal validity for hierarchy versioning",
-          "data_type": "DATE"
-        },
-        {
-          "name": "long_description",
-          "description": "Extended description of the segment",
-          "category": "Counterparty & Entity",
-          "why_required": "Detailed context for reporting and governance",
-          "data_type": "VARCHAR(2000)"
-        },
-        {
-          "name": "parent_leaf",
-          "description": "Flag: PARENT or LEAF",
-          "category": "Counterparty & Entity",
-          "why_required": "Distinguishes rollup nodes from terminal booking nodes",
-          "data_type": "VARCHAR(64)"
-        },
-        {
-          "name": "requestor",
-          "description": "Name or ID of person who requested the node or change",
-          "category": "Counterparty & Entity",
-          "why_required": "Governance accountability",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "status",
-          "description": "Active / Inactive / Pending",
-          "category": "Counterparty & Entity",
-          "why_required": "Controls which nodes are included in live reporting",
-          "data_type": "VARCHAR(30)"
-        },
-        {
-          "name": "substatus",
-          "description": "Refinement of status (e.g., Sunset, Migration)",
-          "category": "Counterparty & Entity",
-          "why_required": "Supports granular lifecycle tracking",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "substatus_effective_end_date",
-          "description": "",
-          "data_type": "DATE",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "tree_level",
-          "description": "Numeric level in hierarchy (1=Top/Org, 2=L1 LoB, 3=L2 LoB, etc.)",
-          "category": "Counterparty & Entity",
-          "why_required": "Drives aggregation level for dashboards (L1–L8+)",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "created_by",
-          "description": "",
-          "data_type": "VARCHAR(100)",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "record_source",
-          "description": "",
-          "data_type": "VARCHAR(100)",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "load_batch_id",
-          "description": "",
-          "data_type": "VARCHAR(100)",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "effective_start_date",
-          "description": "",
-          "data_type": "DATE",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "effective_end_date",
-          "description": "",
-          "data_type": "DATE",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "is_current_flag",
-          "description": "",
-          "data_type": "BOOLEAN",
-          "category": "Counterparty & Entity"
-        }
-      ]
-    },
-    {
-      "name": "enterprise_product_taxonomy",
-      "layer": "L1",
-      "category": "Counterparty & Entity",
-      "fields": [
-        {
-          "name": "product_node_id",
-          "description": "PK — unique identifier for the product taxonomy node",
-          "category": "Counterparty & Entity",
-          "why_required": "Unique node identifier for product hierarchy resolution",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          },
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "product_code",
-          "description": "",
-          "category": "Counterparty & Entity",
-          "data_type": "VARCHAR(50)"
-        },
-        {
-          "name": "product_name",
-          "description": "",
-          "category": "Counterparty & Entity",
-          "data_type": "VARCHAR(200)"
-        },
-        {
-          "name": "parent_node_id",
-          "description": "",
-          "category": "Counterparty & Entity",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "created_ts",
-          "description": "",
-          "category": "Counterparty & Entity",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "updated_ts",
-          "description": "",
-          "category": "Counterparty & Entity",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "change_event",
-          "description": "Event code describing last change (e.g., SPLIT, MERGE, RENAME)",
-          "category": "Counterparty & Entity",
-          "why_required": "Audit and change-impact analysis",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "comments",
-          "description": "Free-text governance or context notes",
-          "category": "Counterparty & Entity",
-          "why_required": "Supports taxonomy review and approval workflow",
-          "data_type": "VARCHAR(2000)"
-        },
-        {
-          "name": "create_update_date",
-          "description": "Timestamp of last create or update",
-          "category": "Counterparty & Entity",
-          "why_required": "Audit trail for taxonomy governance",
-          "data_type": "DATE"
-        },
-        {
-          "name": "description",
-          "description": "Short name/label of the product node",
-          "category": "Counterparty & Entity",
-          "why_required": "Display label for dashboards and filters",
-          "data_type": "VARCHAR(2000)"
-        },
-        {
-          "name": "effective_date",
-          "description": "Date the product node became active",
-          "category": "Counterparty & Entity",
-          "why_required": "Temporal validity for hierarchy versioning",
-          "data_type": "DATE"
-        },
-        {
-          "name": "fr2590_category_code",
-          "description": "Maps product node to FR 2590 reporting category",
-          "category": "Counterparty & Entity",
-          "why_required": "Regulatory product grouping for FR 2590",
-          "data_type": "VARCHAR(20)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "fr2590_category_dim",
-              "field": "fr2590_category_code"
-            }
-          }
-        },
-        {
-          "name": "long_description",
-          "description": "Extended description of the product node",
-          "category": "Counterparty & Entity",
-          "why_required": "Detailed context for reporting and regulatory mapping",
-          "data_type": "VARCHAR(2000)"
-        },
-        {
-          "name": "parent_leaf",
-          "description": "Flag: PARENT or LEAF",
-          "category": "Counterparty & Entity",
-          "why_required": "Distinguishes rollup nodes from terminal booking nodes",
-          "data_type": "VARCHAR(64)"
-        },
-        {
-          "name": "requestor",
-          "description": "Name or ID of person who requested the node or change",
-          "category": "Counterparty & Entity",
-          "why_required": "Governance accountability",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "status",
-          "description": "Active / Inactive / Pending",
-          "category": "Counterparty & Entity",
-          "why_required": "Controls which nodes are included in live reporting",
-          "data_type": "VARCHAR(30)"
-        },
-        {
-          "name": "substatus",
-          "description": "Refinement of status (e.g., Sunset, Migration)",
-          "category": "Counterparty & Entity",
-          "why_required": "Supports granular lifecycle tracking",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "substatus_effective_end_date",
-          "description": "",
-          "data_type": "DATE",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "tree_level",
-          "description": "Numeric level in hierarchy (1=Top, 2=Product Family, 3=Product Type, etc.)",
-          "category": "Counterparty & Entity",
-          "why_required": "Drives aggregation level for product grouping",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "created_by",
-          "description": "",
-          "data_type": "VARCHAR(100)",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "record_source",
-          "description": "",
-          "data_type": "VARCHAR(100)",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "load_batch_id",
-          "description": "",
-          "data_type": "VARCHAR(100)",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "effective_start_date",
-          "description": "",
-          "data_type": "DATE",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "effective_end_date",
-          "description": "",
-          "data_type": "DATE",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "is_current_flag",
-          "description": "",
-          "data_type": "BOOLEAN",
-          "category": "Counterparty & Entity"
-        },
-        {
-          "name": "is_on_balance_sheet_flag",
-          "description": "",
-          "data_type": "BOOLEAN"
-        },
-        {
-          "name": "ccf_default_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "risk_weight_default_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "accounting_treatment_code",
-          "description": "",
-          "data_type": "VARCHAR(30)"
-        }
-      ]
-    },
-    {
       "name": "amendment_status_dim",
       "layer": "L1",
       "category": "Uncategorized",
@@ -2551,6 +2172,311 @@
           "name": "is_current_flag",
           "description": "",
           "data_type": "BOOLEAN"
+        }
+      ]
+    },
+    {
+      "name": "enterprise_business_taxonomy",
+      "layer": "L1",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "managed_segment_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "segment_code",
+          "description": "",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "segment_name",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "parent_segment_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "enterprise_business_taxonomy",
+              "field": "managed_segment_id"
+            }
+          }
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "change_event",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "comments",
+          "description": "",
+          "data_type": "VARCHAR(2000)"
+        },
+        {
+          "name": "create_update_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "description",
+          "description": "",
+          "data_type": "VARCHAR(2000)"
+        },
+        {
+          "name": "effective_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "long_description",
+          "description": "",
+          "data_type": "VARCHAR(2000)"
+        },
+        {
+          "name": "parent_leaf",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "requestor",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "status",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "substatus",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "substatus_effective_end_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "tree_level",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_batch_id",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "effective_start_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        }
+      ]
+    },
+    {
+      "name": "enterprise_product_taxonomy",
+      "layer": "L1",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "product_node_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "product_code",
+          "description": "",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "product_name",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "parent_node_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "change_event",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "comments",
+          "description": "",
+          "data_type": "VARCHAR(2000)"
+        },
+        {
+          "name": "create_update_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "description",
+          "description": "",
+          "data_type": "VARCHAR(2000)"
+        },
+        {
+          "name": "effective_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "fr2590_category_code",
+          "description": "",
+          "data_type": "VARCHAR(30)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "fr2590_category_dim",
+              "field": "fr2590_category_code"
+            }
+          }
+        },
+        {
+          "name": "long_description",
+          "description": "",
+          "data_type": "VARCHAR(2000)"
+        },
+        {
+          "name": "parent_leaf",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "requestor",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "status",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "substatus",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "substatus_effective_end_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "tree_level",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_batch_id",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "effective_start_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "is_on_balance_sheet_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "ccf_default_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "risk_weight_default_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "accounting_treatment_code",
+          "description": "",
+          "data_type": "VARCHAR(30)"
         }
       ]
     },
@@ -7780,6 +7706,272 @@
     }
   ],
   "L2": [
+    {
+      "name": "position",
+      "layer": "L2",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "position_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "facility_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
+        },
+        {
+          "name": "instrument_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "balance_amount",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "accrued_interest_amt",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "book_value_amt",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "contractual_maturity_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "credit_agreement_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "credit_status_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "effective_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "exposure_type_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "external_risk_rating",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "internal_risk_rating",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "legal_entity_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "lgd_estimate",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "market_value_amt",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "netting_set_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "notional_amount",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "pd_estimate",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "position_currency",
+          "description": "",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
+        },
+        {
+          "name": "is_trading_banking_book_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "ultimate_parent_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "product_node_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "enterprise_product_taxonomy",
+              "field": "product_node_id"
+            }
+          }
+        },
+        {
+          "name": "product_code",
+          "description": "",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "load_batch_id",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "product_subtype_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "product_subtype_dim",
+              "field": "product_subtype_id"
+            }
+          }
+        },
+        {
+          "name": "customer_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "trade_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "settlement_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_hedging_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "accounting_classification_code",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "cost_center_id",
+          "description": "",
+          "data_type": "BIGINT"
+        }
+      ]
+    },
     {
       "name": "amendment_change_detail",
       "layer": "L2",
@@ -15372,7 +15564,7 @@
         {
           "name": "fr2590_category_code",
           "description": "",
-          "data_type": "VARCHAR(20)",
+          "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -15436,7 +15628,7 @@
         {
           "name": "internal_risk_rating_bucket_code",
           "description": "",
-          "data_type": "VARCHAR(20)",
+          "data_type": "VARCHAR(50)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -17163,7 +17355,7 @@
         {
           "name": "currency_code",
           "description": "",
-          "data_type": "VARCHAR(30)",
+          "data_type": "VARCHAR(20)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -22262,272 +22454,6 @@
       ]
     },
     {
-      "name": "position",
-      "layer": "L2",
-      "category": "Uncategorized",
-      "fields": [
-        {
-          "name": "position_id",
-          "description": "",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "as_of_date",
-          "description": "",
-          "data_type": "DATE"
-        },
-        {
-          "name": "facility_id",
-          "description": "",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L2",
-              "table": "facility_master",
-              "field": "facility_id"
-            }
-          }
-        },
-        {
-          "name": "instrument_id",
-          "description": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "balance_amount",
-          "description": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "currency_code",
-          "description": "",
-          "data_type": "VARCHAR(20)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
-        },
-        {
-          "name": "source_system_id",
-          "description": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "accrued_interest_amt",
-          "description": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "book_value_amt",
-          "description": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "contractual_maturity_date",
-          "description": "",
-          "data_type": "DATE"
-        },
-        {
-          "name": "counterparty_id",
-          "description": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "credit_agreement_id",
-          "description": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "credit_status_code",
-          "description": "",
-          "data_type": "VARCHAR(20)"
-        },
-        {
-          "name": "effective_date",
-          "description": "",
-          "data_type": "DATE"
-        },
-        {
-          "name": "exposure_type_code",
-          "description": "",
-          "data_type": "VARCHAR(20)"
-        },
-        {
-          "name": "external_risk_rating",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "internal_risk_rating",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "legal_entity_id",
-          "description": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "lgd_estimate",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "market_value_amt",
-          "description": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "netting_set_id",
-          "description": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "notional_amount",
-          "description": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "pd_estimate",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "position_currency",
-          "description": "",
-          "data_type": "VARCHAR(100)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
-        },
-        {
-          "name": "is_trading_banking_book_flag",
-          "description": "",
-          "data_type": "BOOLEAN"
-        },
-        {
-          "name": "ultimate_parent_id",
-          "description": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "product_node_id",
-          "description": "",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_product_taxonomy",
-              "field": "product_node_id"
-            }
-          }
-        },
-        {
-          "name": "product_code",
-          "description": "",
-          "data_type": "VARCHAR(50)"
-        },
-        {
-          "name": "updated_ts",
-          "description": "",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "created_ts",
-          "description": "",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "created_by",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "record_source",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "load_timestamp",
-          "description": "",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "load_batch_id",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "raw_record_id",
-          "description": "",
-          "data_type": "VARCHAR(200)"
-        },
-        {
-          "name": "product_subtype_id",
-          "description": "",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "product_subtype_dim",
-              "field": "product_subtype_id"
-            }
-          }
-        },
-        {
-          "name": "customer_id",
-          "description": "",
-          "data_type": "VARCHAR(64)"
-        },
-        {
-          "name": "trade_date",
-          "description": "",
-          "data_type": "DATE"
-        },
-        {
-          "name": "settlement_date",
-          "description": "",
-          "data_type": "DATE"
-        },
-        {
-          "name": "is_hedging_flag",
-          "description": "",
-          "data_type": "BOOLEAN"
-        },
-        {
-          "name": "accounting_classification_code",
-          "description": "",
-          "data_type": "VARCHAR(30)"
-        },
-        {
-          "name": "cost_center_id",
-          "description": "",
-          "data_type": "BIGINT"
-        }
-      ]
-    },
-    {
       "name": "position_detail",
       "layer": "L2",
       "category": "Uncategorized",
@@ -27436,7 +27362,7 @@
         {
           "name": "risk_rating_tier_code",
           "description": "",
-          "data_type": "VARCHAR(30)",
+          "data_type": "VARCHAR(20)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -30497,7 +30423,7 @@
         {
           "name": "bank_share_pct",
           "description": "",
-          "data_type": "NUMERIC(10,4)"
+          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "base_currency_code",
@@ -30626,7 +30552,7 @@
         {
           "name": "utilization_status_code",
           "description": "",
-          "data_type": "VARCHAR(30)",
+          "data_type": "VARCHAR(20)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -39172,22 +39098,6 @@
       "to_layer": "L1",
       "to_table": "utilization_status_dim",
       "to_field": "utilization_status_code"
-    },
-    {
-      "from_table": "enterprise_business_taxonomy",
-      "from_field": "parent",
-      "to_table": "enterprise_business_taxonomy",
-      "to_field": "managed_segment_id",
-      "from_layer": "L1",
-      "to_layer": "L1"
-    },
-    {
-      "from_table": "enterprise_product_taxonomy",
-      "from_field": "parent",
-      "to_table": "enterprise_product_taxonomy",
-      "to_field": "product_node_id",
-      "from_layer": "L1",
-      "to_layer": "L1"
     }
   ],
   "derivation_dag": {},

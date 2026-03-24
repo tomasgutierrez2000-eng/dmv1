@@ -55,6 +55,9 @@ levels:
         SUM(ces.has_cross_entity_flag * ces.committed_amount)
           / NULLIF(SUM(ces.committed_amount), 0) AS metric_value
       FROM l3.counterparty_exposure_summary ces
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = ces.facility_id
+        AND fm.is_active_flag = 'Y'
       WHERE ces.as_of_date = :as_of_date
       GROUP BY ces.facility_id
   counterparty:

@@ -109,6 +109,7 @@ levels:
       FROM l2.counterparty cp
       INNER JOIN l1.industry_dim ind
         ON ind.industry_id = cp.industry_id
+      WHERE cp.is_active_flag = 'Y'
   desk:
     aggregation_type: CUSTOM
     formula_text: >

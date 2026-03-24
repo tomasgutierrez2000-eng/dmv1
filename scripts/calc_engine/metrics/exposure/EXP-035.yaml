@@ -115,6 +115,12 @@ levels:
       INNER JOIN l2.facility_exposure_snapshot fes
         ON fes.facility_id = ffs.facility_id
         AND fes.as_of_date = ffs.as_of_date
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = ffs.facility_id
+        AND fm.is_active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+          AND ebt.is_current_flag = 'Y'
       WHERE ffs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM
@@ -124,6 +130,7 @@ levels:
     formula_sql: |-
       SELECT
         cfs.counterparty_id AS dimension_key,
+        /* SCD2: is_active_flag / is_current_flag not applicable at counterparty-level direct query */
         (COALESCE(cfs.revenue_amt, 0) - COALESCE(cfs.operating_expense_amt, 0)
          - COALESCE(cfs.interest_expense_amt, 0) - COALESCE(cfs.tax_expense_amt, 0))
           / NULLIF(cfs.total_assets_amt, 0) * 100.0 AS metric_value

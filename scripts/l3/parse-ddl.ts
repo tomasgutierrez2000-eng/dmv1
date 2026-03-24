@@ -17,7 +17,7 @@ const FK_LINE = /^\s*--\s*FK:\s*(\w+)\s*→\s*(L\d)\.(\w+)\.(\w+)/;
 
 function parseDdl(content: string): TableFields[] {
   const result: TableFields[] = [];
-  const createRegex = /CREATE TABLE IF NOT EXISTS l3\.(\w+)\s*\(([\s\S]*?)\)\s*;/g;
+  const createRegex = /CREATE TABLE IF NOT EXISTS "?l3"?\."?(\w+)"?\s*\(([\s\S]*?)\)\s*;/g;
   let block: RegExpExecArray | null;
   while ((block = createRegex.exec(content)) !== null) {
     const tableName = block[1];
@@ -29,7 +29,7 @@ function parseDdl(content: string): TableFields[] {
     // Parse column lines: "col_name ... TYPE ..." or "col_name TYPE ..."
     const lines = body.split('\n').map((l) => l.trim()).filter(Boolean);
     for (const line of lines) {
-      const colMatch = line.match(/^(\w+)\s+(VARCHAR|NUMERIC|INTEGER|BIGINT|DATE|TIMESTAMP|BOOLEAN|TEXT|DECIMAL|SMALLINT)/i);
+      const colMatch = line.match(/^"?(\w+)"?\s+(VARCHAR|NUMERIC|INTEGER|BIGINT|BIGSERIAL|SERIAL|DATE|TIMESTAMP|BOOLEAN|TEXT|DECIMAL|SMALLINT)/i);
       if (colMatch) {
         const name = colMatch[1];
         const dataType = colMatch[2].toUpperCase();

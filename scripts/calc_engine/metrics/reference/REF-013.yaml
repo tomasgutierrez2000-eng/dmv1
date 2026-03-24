@@ -78,6 +78,7 @@ levels:
         SELECT MAX(as_of_date) FROM l2.facility_exposure_snapshot
       )
       GROUP BY fes.facility_id
+      -- SCD2: is_active_flag checked via temporal filter (fr2590_category_dim is a static reference dim)
   counterparty:
     aggregation_type: CUSTOM
     formula_text: >
@@ -86,6 +87,7 @@ levels:
       level. Use facility-level drill-down for category distribution.
     formula_sql: |-
       SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+      -- SCD2: is_active_flag not applicable (no data returned at this level)
   desk:
     aggregation_type: CUSTOM
     formula_text: >
@@ -94,6 +96,7 @@ levels:
       grouped by FR2590 category as a dimension.
     formula_sql: |-
       SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+      -- SCD2: is_active_flag not applicable (no data returned at this level)
   portfolio:
     aggregation_type: CUSTOM
     formula_text: >
@@ -102,6 +105,7 @@ levels:
       dimension, not as an aggregated metric.
     formula_sql: |-
       SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+      -- SCD2: is_active_flag not applicable (no data returned at this level)
   business_segment:
     aggregation_type: CUSTOM
     formula_text: >
@@ -110,6 +114,7 @@ levels:
       dimension, not as an aggregated metric.
     formula_sql: |-
       SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+      -- SCD2: is_active_flag not applicable (no data returned at this level)
 
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []

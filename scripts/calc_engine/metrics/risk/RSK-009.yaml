@@ -78,6 +78,7 @@ levels:
       INNER JOIN l2.collateral_snapshot cs
         ON cs.facility_id = fm.facility_id
         AND cs.as_of_date = :as_of_date
+      WHERE fm.is_active_flag = 'Y'
       GROUP BY fm.facility_id, fm.committed_facility_amt
   counterparty:
     aggregation_type: CUSTOM
@@ -101,6 +102,7 @@ levels:
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
+        AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: CUSTOM

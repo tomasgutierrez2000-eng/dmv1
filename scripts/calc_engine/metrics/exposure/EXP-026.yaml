@@ -73,6 +73,12 @@ levels:
         ffs.facility_id AS dimension_key,
         ffs.ltv_pct AS metric_value
       FROM l3.facility_financial_calc ffs
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = ffs.facility_id
+        AND fm.is_active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+          AND ebt.is_current_flag = 'Y'
       WHERE ffs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM

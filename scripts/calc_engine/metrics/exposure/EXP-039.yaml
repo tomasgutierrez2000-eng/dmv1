@@ -73,6 +73,12 @@ levels:
         lue.facility_id AS dimension_key,
         lue.utilized_amount_usd AS metric_value
       FROM l2.limit_utilization_event lue
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = lue.facility_id
+        AND fm.is_active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+          AND ebt.is_current_flag = 'Y'
       WHERE lue.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM

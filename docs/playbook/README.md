@@ -24,6 +24,6 @@ This playbook enables risk stripes beyond Credit Risk -- such as Market Risk, Op
 ## Getting Help
 
 - **AI Agent** -- Ask natural-language questions about the schema at `/agent`
-- **Data Model Visualizer** -- Browse all 259+ tables interactively at `/visualizer`
+- **Data Model Visualizer** -- Browse all 260+ tables interactively at `/visualizer`
 - **Metric Library** -- Explore existing metrics and their definitions at `/metrics/library`
 - **DB Status Dashboard** -- Check database sync status at `/db-status`

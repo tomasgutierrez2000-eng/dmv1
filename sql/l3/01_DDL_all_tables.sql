@@ -1735,22 +1735,6 @@ CREATE TABLE IF NOT EXISTS "l3"."collateral_calc" (
     PRIMARY KEY ("collateral_asset_id", "as_of_date")
 );
 
--- cash_flow_calc (Cash Flows)
--- Calculated overlay for l2.cash_flow
-CREATE TABLE IF NOT EXISTS "l3"."cash_flow_calc" (
-    "cash_flow_id" BIGINT NOT NULL,
-    "contractual_amt" NUMERIC(20,4),
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ("cash_flow_id")
-);
-
 -- data_quality_score_calc (Data Quality)
 CREATE TABLE IF NOT EXISTS "l3"."data_quality_score_calc" (
     "table_name" VARCHAR(100) NOT NULL,
@@ -1921,189 +1905,6 @@ CREATE TABLE IF NOT EXISTS "l3"."stress_test_result_calc" (
     PRIMARY KEY ("stress_test_result_id")
 );
 
--- facility_rwa_calc (Capital & Equity)
-CREATE TABLE IF NOT EXISTS "l3"."facility_rwa_calc" (
-    "facility_id" BIGINT NOT NULL,
-    "as_of_date" DATE NOT NULL,
-    "rwa_std_amt" NUMERIC(20,4),
-    "rwa_erba_amt" NUMERIC(20,4),
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ("facility_id", "as_of_date")
-);
-
--- capital_binding_constraint (Capital & Equity)
-CREATE TABLE IF NOT EXISTS "l3"."capital_binding_constraint" (
-    "legal_entity_id" BIGINT NOT NULL,
-    "as_of_date" DATE NOT NULL,
-    "cet1_binding_amt" NUMERIC(20,4),
-    "tier1_binding_amt" NUMERIC(20,4),
-    "total_capital_binding_amt" NUMERIC(20,4),
-    "tier1_leverage_binding_amt" NUMERIC(20,4),
-    "leverage_binding_amt" NUMERIC(20,4),
-    "slr_binding_amt" NUMERIC(20,4),
-    "tlac_binding_amt" NUMERIC(20,4),
-    "most_binding_constraint" VARCHAR(30),
-    "most_binding_ratio_pct" NUMERIC(10,6),
-    "most_binding_denominator" VARCHAR(30),
-    "binding_rwa_approach" VARCHAR(10),
-    "cet1_buffer_pct" NUMERIC(10,6),
-    "tier1_buffer_pct" NUMERIC(10,6),
-    "total_capital_buffer_pct" NUMERIC(10,6),
-    "tier1_leverage_buffer_pct" NUMERIC(10,6),
-    "leverage_buffer_pct" NUMERIC(10,6),
-    "slr_buffer_pct" NUMERIC(10,6),
-    "tlac_buffer_pct" NUMERIC(10,6),
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ("legal_entity_id", "as_of_date")
-);
-
--- facility_capital_consumption (Capital & Equity)
-CREATE TABLE IF NOT EXISTS "l3"."facility_capital_consumption" (
-    "facility_id" BIGINT NOT NULL,
-    "as_of_date" DATE NOT NULL,
-    "legal_entity_id" BIGINT,
-    "counterparty_id" BIGINT,
-    "min_capital_std_amt" NUMERIC(20,4),
-    "min_capital_erba_amt" NUMERIC(20,4),
-    "min_capital_delta_amt" NUMERIC(20,4),
-    "capital_consumption_amt" NUMERIC(20,4),
-    "rwa_binding_amt" NUMERIC(20,4),
-    "most_binding_constraint" VARCHAR(30),
-    "basel_exposure_type_id" BIGINT,
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ("facility_id", "as_of_date")
-);
-
--- counterparty_capital_consumption (Capital & Equity)
-CREATE TABLE IF NOT EXISTS "l3"."counterparty_capital_consumption" (
-    "counterparty_id" BIGINT NOT NULL,
-    "as_of_date" DATE NOT NULL,
-    "legal_entity_id" BIGINT NOT NULL,
-    "exposure_count" INTEGER,
-    "total_exposure_amt" NUMERIC(20,4),
-    "rwa_std_amt" NUMERIC(20,4),
-    "rwa_erba_amt" NUMERIC(20,4),
-    "rwa_binding_amt" NUMERIC(20,4),
-    "rwa_density_pct" NUMERIC(10,6),
-    "capital_consumption_amt" NUMERIC(20,4),
-    "capital_consumption_std_amt" NUMERIC(20,4),
-    "capital_consumption_erba_amt" NUMERIC(20,4),
-    "capital_delta_amt" NUMERIC(20,4),
-    "most_binding_constraint" VARCHAR(30),
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ("counterparty_id", "as_of_date", "legal_entity_id")
-);
-
--- desk_capital_consumption (Capital & Equity)
-CREATE TABLE IF NOT EXISTS "l3"."desk_capital_consumption" (
-    "org_unit_id" BIGINT NOT NULL,
-    "as_of_date" DATE NOT NULL,
-    "legal_entity_id" BIGINT NOT NULL,
-    "exposure_count" INTEGER,
-    "total_exposure_amt" NUMERIC(20,4),
-    "rwa_std_amt" NUMERIC(20,4),
-    "rwa_erba_amt" NUMERIC(20,4),
-    "rwa_binding_amt" NUMERIC(20,4),
-    "rwa_density_pct" NUMERIC(10,6),
-    "capital_consumption_amt" NUMERIC(20,4),
-    "capital_consumption_std_amt" NUMERIC(20,4),
-    "capital_consumption_erba_amt" NUMERIC(20,4),
-    "capital_delta_amt" NUMERIC(20,4),
-    "most_binding_constraint" VARCHAR(30),
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ("org_unit_id", "as_of_date", "legal_entity_id")
-);
-
--- portfolio_capital_consumption (Capital & Equity)
-CREATE TABLE IF NOT EXISTS "l3"."portfolio_capital_consumption" (
-    "portfolio_id" BIGINT NOT NULL,
-    "as_of_date" DATE NOT NULL,
-    "legal_entity_id" BIGINT NOT NULL,
-    "basel_exposure_type_id" BIGINT NOT NULL,
-    "exposure_count" INTEGER,
-    "total_exposure_amt" NUMERIC(20,4),
-    "rwa_std_amt" NUMERIC(20,4),
-    "rwa_erba_amt" NUMERIC(20,4),
-    "rwa_density_pct" NUMERIC(10,6),
-    "capital_consumption_amt" NUMERIC(20,4),
-    "capital_consumption_std_amt" NUMERIC(20,4),
-    "capital_consumption_erba_amt" NUMERIC(20,4),
-    "capital_delta_amt" NUMERIC(20,4),
-    "most_binding_constraint" VARCHAR(30),
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ("portfolio_id", "as_of_date", "legal_entity_id", "basel_exposure_type_id")
-);
-
--- segment_capital_consumption (Capital & Equity)
-CREATE TABLE IF NOT EXISTS "l3"."segment_capital_consumption" (
-    "lob_segment_id" BIGINT NOT NULL,
-    "as_of_date" DATE NOT NULL,
-    "legal_entity_id" BIGINT NOT NULL,
-    "basel_exposure_type_id" BIGINT NOT NULL,
-    "exposure_count" INTEGER,
-    "total_exposure_amt" NUMERIC(20,4),
-    "rwa_std_amt" NUMERIC(20,4),
-    "rwa_erba_amt" NUMERIC(20,4),
-    "rwa_density_pct" NUMERIC(10,6),
-    "capital_consumption_amt" NUMERIC(20,4),
-    "capital_consumption_std_amt" NUMERIC(20,4),
-    "capital_consumption_erba_amt" NUMERIC(20,4),
-    "capital_delta_amt" NUMERIC(20,4),
-    "most_binding_constraint" VARCHAR(30),
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ("lob_segment_id", "as_of_date", "legal_entity_id", "basel_exposure_type_id")
-);
-
-
 -- ── Layer Integrity Overlays (migration 011) ──
 
 -- capital_position_calc (Capital & Equity)
@@ -2174,3 +1975,145 @@ CREATE TABLE IF NOT EXISTS "l3"."exception_event_calc" (
     "load_batch_id" VARCHAR(64),
     PRIMARY KEY ("exception_id")
 );
+
+-- ════════════════════════════════════════════════════════════════
+-- Additional L3 tables (auto-generated from data dictionary)
+-- ════════════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS "l3"."cross_product_accounting_view" (
+    "position_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "product_type_code" VARCHAR(30),
+    "carrying_value_amt" NUMERIC(20,4),
+    "fair_value_amt" NUMERIC(20,4),
+    "bs_amount_amt" NUMERIC(20,4),
+    "accrued_interest_amt" NUMERIC(20,4),
+    "unrealized_gain_loss_amt" NUMERIC(20,4),
+    "allowance_amt" NUMERIC(20,4),
+    "charge_off_amt" NUMERIC(20,4),
+    "recovery_amt" NUMERIC(20,4),
+    "net_income_amt" NUMERIC(20,4),
+    "accounting_intent" VARCHAR(100),
+    "call_report_schedule" VARCHAR(30),
+    "call_report_line_code" VARCHAR(30),
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP,
+    PRIMARY KEY ("position_id", "as_of_date")
+);
+
+CREATE TABLE IF NOT EXISTS "l3"."cross_product_risk_view" (
+    "position_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "product_type_code" VARCHAR(30),
+    "counterparty_id" BIGINT,
+    "facility_id" BIGINT,
+    "legal_entity_id" BIGINT,
+    "pd_pct" NUMERIC(10,6),
+    "lgd_pct" NUMERIC(10,6),
+    "ead_amt" NUMERIC(20,4),
+    "expected_loss_amt" NUMERIC(20,4),
+    "risk_weight_pct" NUMERIC(10,6),
+    "rwa_amt" NUMERIC(20,4),
+    "days_past_due" INTEGER,
+    "delinquency_status_code" VARCHAR(30),
+    "credit_status_code" VARCHAR(30),
+    "internal_risk_rating" VARCHAR(100),
+    "external_risk_rating" VARCHAR(100),
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP,
+    PRIMARY KEY ("position_id", "as_of_date")
+);
+
+CREATE TABLE IF NOT EXISTS "l3"."facility_position_agg" (
+    "facility_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "total_drawn_amt" NUMERIC(20,4),
+    "total_committed_amt" NUMERIC(20,4),
+    "total_undrawn_amt" NUMERIC(20,4),
+    "total_fair_value_amt" NUMERIC(20,4),
+    "total_ead_amt" NUMERIC(20,4),
+    "position_count" INTEGER,
+    "product_count" INTEGER,
+    "product_types" VARCHAR(500),
+    "utilization_pct" NUMERIC(10,6),
+    "ccf_adjusted_exposure_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP,
+    PRIMARY KEY ("facility_id", "as_of_date")
+);
+
+CREATE TABLE IF NOT EXISTS "l3"."metric_change_log" (
+    "change_id" BIGINT NOT NULL,
+    "item_id" VARCHAR(64),
+    "change_type" VARCHAR(30),
+    "changed_by_id" VARCHAR(100),
+    "changed_by_name" VARCHAR(200),
+    "changed_by_role" VARCHAR(30),
+    "change_reason" TEXT,
+    "ticket_reference" VARCHAR(100),
+    "before_snapshot" VARCHAR(64),
+    "after_snapshot" VARCHAR(64),
+    "diff_summary" VARCHAR(64),
+    "governance_status" VARCHAR(30),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("change_id")
+);
+
+CREATE TABLE IF NOT EXISTS "l3"."metric_sandbox_run" (
+    "sandbox_run_id" BIGINT NOT NULL,
+    "item_id" VARCHAR(64),
+    "run_by_name" VARCHAR(200),
+    "run_by_id" VARCHAR(100),
+    "level" VARCHAR(30),
+    "as_of_date" DATE,
+    "proposed_sql" TEXT,
+    "current_sql" TEXT,
+    "proposed_row_count" INTEGER,
+    "current_row_count" INTEGER,
+    "proposed_total" NUMERIC(20,6),
+    "current_total" NUMERIC(20,6),
+    "reconciliation_pass" BOOLEAN,
+    "duration_ms" BIGINT,
+    "result_snapshot" VARCHAR(64),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("sandbox_run_id")
+);
+
+CREATE TABLE IF NOT EXISTS "l3"."position_exposure_calc" (
+    "position_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "ead_amt" NUMERIC(20,4),
+    "ead_method" VARCHAR(30),
+    "expected_loss_amt" NUMERIC(20,4),
+    "el_rate_pct" NUMERIC(10,6),
+    "rwa_amt" NUMERIC(20,4),
+    "rwa_method" VARCHAR(30),
+    "risk_weight_pct" NUMERIC(10,6),
+    "capital_consumption_amt" NUMERIC(20,4),
+    "capital_ratio_contribution_pct" NUMERIC(10,6),
+    "ccf_applied_pct" NUMERIC(10,6),
+    "ccf_source" VARCHAR(30),
+    "reporting_currency_code" VARCHAR(10),
+    "fx_rate" NUMERIC(12,6),
+    "ead_reporting_ccy_amt" NUMERIC(20,4),
+    "rwa_reporting_ccy_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP,
+    PRIMARY KEY ("position_id", "as_of_date")
+);
+
+CREATE TABLE IF NOT EXISTS "l3"."schema_change_log" (
+    "change_id" BIGINT NOT NULL,
+    "change_type" VARCHAR(30),
+    "layer" VARCHAR(5),
+    "table_name" VARCHAR(200),
+    "field_name" VARCHAR(200),
+    "changed_by_id" VARCHAR(100),
+    "changed_by_name" VARCHAR(200),
+    "change_reason" VARCHAR(2000),
+    "before_snapshot" VARCHAR(64),
+    "after_snapshot" VARCHAR(64),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("change_id")
+);
+

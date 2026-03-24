@@ -75,6 +75,7 @@ levels:
         ffs.interest_rate_sensitivity_pct AS metric_value
       FROM l2.facility_financial_snapshot ffs
       WHERE ffs.as_of_date = :as_of_date
+      -- SCD2: is_active_flag not applicable (facility-level reads directly from snapshot, no SCD2 joins)
   counterparty:
     aggregation_type: RAW
     formula_text: >

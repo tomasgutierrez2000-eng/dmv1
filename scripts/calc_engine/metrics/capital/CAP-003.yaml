@@ -62,6 +62,9 @@ levels:
         frs.facility_id AS dimension_key,
         frs.risk_weight_pct AS metric_value
       FROM l2.facility_risk_snapshot frs
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = frs.facility_id
+        AND fm.is_active_flag = 'Y'
       WHERE frs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: WEIGHTED_AVG

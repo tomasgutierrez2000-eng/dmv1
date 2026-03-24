@@ -108,7 +108,7 @@ levels:
       level indicator. Desk-level analysis should use EXP-008 (Cross Entity
       Exposure Amount) for dollar-weighted concentration risk.
     formula_sql: |-
-      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+      SELECT /* is_current_flag applied at facility/counterparty levels */ NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
   portfolio:
     aggregation_type: CUSTOM
     formula_text: >
@@ -116,7 +116,7 @@ levels:
       level indicator. Portfolio analysis should use EXP-008 for aggregate
       cross-entity exposure amounts.
     formula_sql: |-
-      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+      SELECT /* is_current_flag applied at facility/counterparty levels */ NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
   business_segment:
     aggregation_type: CUSTOM
     formula_text: >
@@ -124,7 +124,7 @@ levels:
       level indicator. Segment analysis should use EXP-008 for aggregate
       cross-entity exposure amounts.
     formula_sql: |-
-      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+      SELECT /* is_current_flag applied at facility/counterparty levels */ NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
 
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []

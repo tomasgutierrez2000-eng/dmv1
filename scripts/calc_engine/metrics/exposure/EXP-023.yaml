@@ -101,6 +101,9 @@ levels:
       INNER JOIN l2.facility_risk_snapshot frs
         ON frs.facility_id = fes.facility_id
         AND frs.as_of_date = fes.as_of_date
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fes.facility_id
+        AND fm.is_active_flag = 'Y'
       WHERE fes.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM

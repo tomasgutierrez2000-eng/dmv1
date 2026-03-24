@@ -64,6 +64,14 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date"
+    fields:
+      - name: rate
+        role: MEASURE
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -86,6 +94,7 @@ levels:
         fps.spread_bps AS metric_value
       FROM l2.facility_pricing_snapshot fps
       WHERE fps.as_of_date = :as_of_date
+      -- SCD2: is_active_flag not applicable (facility-level reads directly from snapshot, no SCD2 joins)
   counterparty:
     aggregation_type: WEIGHTED_AVG
     formula_text: >
@@ -94,8 +103,8 @@ levels:
     formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fps.spread_bps * fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
-          / NULLIF(SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0), 0)
+        SUM(fps.spread_bps * fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fes.bank_share_pct, 100.0) / 100.0), 0)
           AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -104,6 +113,10 @@ levels:
       INNER JOIN l2.facility_exposure_snapshot fes
         ON fes.facility_id = fps.facility_id
         AND fes.as_of_date = fps.as_of_date
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       WHERE fps.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
@@ -113,8 +126,8 @@ levels:
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fps.spread_bps * fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
-          / NULLIF(SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0), 0)
+        SUM(fps.spread_bps * fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fes.bank_share_pct, 100.0) / 100.0), 0)
           AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -123,6 +136,10 @@ levels:
       INNER JOIN l2.facility_exposure_snapshot fes
         ON fes.facility_id = fps.facility_id
         AND fes.as_of_date = fps.as_of_date
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
           AND ebt.is_current_flag = 'Y'
@@ -135,8 +152,8 @@ levels:
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fps.spread_bps * fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
-          / NULLIF(SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0), 0)
+        SUM(fps.spread_bps * fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fes.bank_share_pct, 100.0) / 100.0), 0)
           AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -145,6 +162,10 @@ levels:
       INNER JOIN l2.facility_exposure_snapshot fes
         ON fes.facility_id = fps.facility_id
         AND fes.as_of_date = fps.as_of_date
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
           AND ebt_l3.is_current_flag = 'Y'
@@ -160,8 +181,8 @@ levels:
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fps.spread_bps * fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
-          / NULLIF(SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0), 0)
+        SUM(fps.spread_bps * fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fes.bank_share_pct, 100.0) / 100.0), 0)
           AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -170,6 +191,10 @@ levels:
       INNER JOIN l2.facility_exposure_snapshot fes
         ON fes.facility_id = fps.facility_id
         AND fes.as_of_date = fps.as_of_date
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
           AND ebt_l3.is_current_flag = 'Y'

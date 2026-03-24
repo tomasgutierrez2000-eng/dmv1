@@ -141,6 +141,8 @@ export const L2_TABLE_META: L2TableMeta[] = [
   { name: 'stock_classification_snapshot', scd: 'Snapshot', category: 'Counterparty & Entity' },
   { name: 'stock_indicative_snapshot', scd: 'Snapshot', category: 'Exposure & Position' },
   { name: 'stock_risk_snapshot', scd: 'Snapshot', category: 'Credit Risk & Ratings' },
+  // Capital
+  { name: 'capital_position_snapshot', scd: 'Snapshot', category: 'Regulatory & Capital' },
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

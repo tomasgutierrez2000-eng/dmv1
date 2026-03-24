@@ -103,6 +103,9 @@ levels:
         fes.facility_id AS dimension_key,
         fes.limit_status_code AS metric_value
       FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fes.facility_id
+        AND fm.is_active_flag = 'Y'
       WHERE fes.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM

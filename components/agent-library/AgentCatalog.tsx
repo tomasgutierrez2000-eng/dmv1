@@ -132,6 +132,7 @@ export default function AgentCatalog() {
             <div className="text-center py-12 text-slate-500">
               <Bot className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">No agents found</p>
+              <p className="text-xs mt-1">Try adjusting your search or category filter</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

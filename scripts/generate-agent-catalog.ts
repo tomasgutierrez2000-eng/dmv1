@@ -1,15 +1,38 @@
 /**
- * Agent Parser — reads .claude/commands/*.md files and extracts AgentDefinition metadata.
- * Handles both frontmatter-based and structure-based parsing.
+ * Pre-generate agent catalog JSON from .claude/commands/*.md files.
+ * This runs at build time so the agent library works on Vercel
+ * where .claude/ is gitignored and not available at runtime.
+ *
+ * Usage: tsx scripts/generate-agent-catalog.ts
  */
 
 import fs from 'fs';
 import path from 'path';
-import type { AgentDefinition, AgentCategory, AgentStatus } from './types';
 
-const COMMANDS_DIR = path.join(process.cwd(), '.claude', 'commands');
+// Inline the parser logic here since we need to resolve from main repo root,
+// not from the Next.js process.cwd()
 
-/** Infer category from directory structure */
+type AgentCategory = 'expert' | 'builder' | 'reviewer' | 'workflow' | 'session';
+type AgentStatus = 'built' | 'planned' | 'deprecated';
+
+interface AgentDefinition {
+  name: string;
+  slug: string;
+  description: string;
+  filePath: string;
+  category: AgentCategory;
+  status: AgentStatus;
+  sessionId: string | null;
+  capabilities: string[];
+  prerequisites: string[];
+  dependencies: string[];
+  version: string | null;
+  inputFormat: string | null;
+  lastRunAt: string | null;
+  totalRuns: number;
+  successRate: number | null;
+}
+
 function inferCategory(filePath: string): AgentCategory {
   if (filePath.includes('/experts/')) return 'expert';
   if (filePath.includes('/builders/')) return 'builder';
@@ -19,13 +42,11 @@ function inferCategory(filePath: string): AgentCategory {
   return 'workflow';
 }
 
-/** Extract session ID from filename (e.g., "session-s1.md" → "S1") */
 function extractSessionId(filename: string): string | null {
   const match = filename.match(/session-s(\d+(?:-\d+)?)/i);
   return match ? `S${match[1].toUpperCase()}` : null;
 }
 
-/** Infer agent status from content */
 function inferStatus(content: string, filename: string): AgentStatus {
   const lower = content.toLowerCase();
   if (lower.includes('status: active') || lower.includes('## 1.') || lower.includes('## role')) {
@@ -35,33 +56,26 @@ function inferStatus(content: string, filename: string): AgentStatus {
     return 'planned';
   }
   if (filename.startsWith('session-')) {
-    // Sessions with substantial content are built
-    if (content.length > 500) return 'built';
-    return 'planned';
+    return content.length > 500 ? 'built' : 'planned';
   }
-  // Default: if file has meaningful content (>200 chars of instructions), it's built
   return content.length > 200 ? 'built' : 'planned';
 }
 
-/** Extract capabilities from ## headers */
 function extractCapabilities(content: string): string[] {
   const capabilities: string[] = [];
   const headerRegex = /^##\s+(?:\d+\.\s+)?(.+)$/gm;
   let match;
   while ((match = headerRegex.exec(content)) !== null) {
     const header = match[1].trim();
-    // Skip generic headers
     if (!['Role', 'Context', 'Prerequisites', 'References', 'Notes'].some(s => header.startsWith(s))) {
       capabilities.push(header);
     }
   }
-  return capabilities.slice(0, 10); // cap at 10
+  return capabilities.slice(0, 10);
 }
 
-/** Extract prerequisites from content */
 function extractPrerequisites(content: string): string[] {
   const prereqs: string[] = [];
-  // Look for "Context Loading" or "Prerequisites" sections
   const prereqSection = content.match(/(?:Prerequisites|Context Loading)[^\n]*\n([\s\S]*?)(?=\n##|\n---|\Z)/i);
   if (prereqSection) {
     const lines = prereqSection[1].split('\n');
@@ -73,10 +87,8 @@ function extractPrerequisites(content: string): string[] {
   return prereqs;
 }
 
-/** Extract agent dependencies from content */
 function extractDependencies(content: string): string[] {
   const deps: string[] = [];
-  // Look for references to other agents
   const patterns = [
     /(?:from|by|after)\s+(?:the\s+)?(\w[\w\s-]*?)\s+(?:agent|expert|builder|reviewer)/gi,
     /(?:requires|depends on|needs)\s+(?:the\s+)?(\w[\w\s-]*?)\s+(?:agent|to)/gi,
@@ -93,52 +105,14 @@ function extractDependencies(content: string): string[] {
   return deps;
 }
 
-/** Create a URL-safe slug from filename */
-function toSlug(filename: string, category: AgentCategory): string {
-  const base = path.basename(filename, '.md');
+function toSlug(filePath: string, category: AgentCategory): string {
+  const base = path.basename(filePath, '.md');
   if (category === 'expert' || category === 'builder' || category === 'reviewer') {
     return `${category}s/${base}`;
   }
   return base;
 }
 
-/** Parse a single agent markdown file into an AgentDefinition */
-export function parseAgentFile(filePath: string): AgentDefinition {
-  const content = fs.readFileSync(filePath, 'utf-8');
-  const filename = path.basename(filePath, '.md');
-  const category = inferCategory(filePath);
-
-  // Extract first line as description
-  const firstLine = content.split('\n')[0].trim();
-  const description = firstLine.length > 10 ? firstLine : filename.replace(/-/g, ' ');
-
-  // Extract name: use first line up to first " — " or the whole line
-  const dashIdx = firstLine.indexOf(' — ');
-  const name = dashIdx > 0 ? firstLine.substring(0, dashIdx).trim() : firstLine.trim();
-
-  // Check for $ARGUMENTS
-  const hasArguments = content.includes('$ARGUMENTS');
-
-  return {
-    name: name || filename.replace(/-/g, ' '),
-    slug: toSlug(filePath, category),
-    description,
-    filePath,
-    category,
-    status: inferStatus(content, filename),
-    sessionId: extractSessionId(filename),
-    capabilities: extractCapabilities(content),
-    prerequisites: extractPrerequisites(content),
-    dependencies: extractDependencies(content),
-    version: null, // Could parse from frontmatter if added
-    inputFormat: hasArguments ? '$ARGUMENTS' : null,
-    lastRunAt: null,   // Populated from audit data
-    totalRuns: 0,
-    successRate: null,
-  };
-}
-
-/** Recursively find all .md files in a directory */
 function findMarkdownFiles(dir: string): string[] {
   if (!fs.existsSync(dir)) return [];
   const files: string[] = [];
@@ -153,32 +127,57 @@ function findMarkdownFiles(dir: string): string[] {
   return files;
 }
 
-/** Static fallback path for Vercel deployments where .claude/ is gitignored */
-const STATIC_CATALOG_PATH = path.join(process.cwd(), 'data', 'agent-library', 'agents.json');
+// --- Main ---
 
-/** Parse all agent files from .claude/commands/, falling back to pre-generated JSON */
-export function parseAllAgents(): AgentDefinition[] {
-  const files = findMarkdownFiles(COMMANDS_DIR);
+const projectRoot = path.resolve(__dirname, '..');
+const commandsDir = path.join(projectRoot, '.claude', 'commands');
+const outputPath = path.join(projectRoot, 'data', 'agent-library', 'agents.json');
 
-  // If .claude/commands/ exists and has files, parse live
-  if (files.length > 0) {
-    return files.map(parseAgentFile).sort((a, b) => {
-      const order: Record<AgentCategory, number> = { expert: 0, builder: 1, reviewer: 2, workflow: 3, session: 4 };
-      const diff = order[a.category] - order[b.category];
-      if (diff !== 0) return diff;
-      return a.name.localeCompare(b.name);
-    });
-  }
+console.log(`Scanning ${commandsDir} for agent definitions...`);
 
-  // Fallback: read pre-generated static catalog (for Vercel deployments)
-  if (fs.existsSync(STATIC_CATALOG_PATH)) {
-    try {
-      const raw = fs.readFileSync(STATIC_CATALOG_PATH, 'utf-8');
-      return JSON.parse(raw) as AgentDefinition[];
-    } catch {
-      return [];
-    }
-  }
+const files = findMarkdownFiles(commandsDir);
 
-  return [];
+if (files.length === 0) {
+  console.error('No .md files found in .claude/commands/. Is the directory present?');
+  process.exit(1);
 }
+
+const agents: AgentDefinition[] = files.map(filePath => {
+  const content = fs.readFileSync(filePath, 'utf-8');
+  const filename = path.basename(filePath, '.md');
+  const category = inferCategory(filePath);
+  const firstLine = content.split('\n')[0].trim();
+  const description = firstLine.length > 10 ? firstLine : filename.replace(/-/g, ' ');
+  const dashIdx = firstLine.indexOf(' — ');
+  const name = dashIdx > 0 ? firstLine.substring(0, dashIdx).trim() : firstLine.trim();
+  const hasArguments = content.includes('$ARGUMENTS');
+
+  return {
+    name: name || filename.replace(/-/g, ' '),
+    slug: toSlug(filePath, category),
+    description,
+    filePath: path.relative(projectRoot, filePath),
+    category,
+    status: inferStatus(content, filename),
+    sessionId: extractSessionId(filename),
+    capabilities: extractCapabilities(content),
+    prerequisites: extractPrerequisites(content),
+    dependencies: extractDependencies(content),
+    version: null,
+    inputFormat: hasArguments ? '$ARGUMENTS' : null,
+    lastRunAt: null,
+    totalRuns: 0,
+    successRate: null,
+  };
+}).sort((a, b) => {
+  const order: Record<AgentCategory, number> = { expert: 0, builder: 1, reviewer: 2, workflow: 3, session: 4 };
+  const diff = order[a.category] - order[b.category];
+  if (diff !== 0) return diff;
+  return a.name.localeCompare(b.name);
+});
+
+// Ensure output directory exists
+fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+fs.writeFileSync(outputPath, JSON.stringify(agents, null, 2));
+
+console.log(`Generated ${agents.length} agent definitions → ${path.relative(projectRoot, outputPath)}`);

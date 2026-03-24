@@ -1,0 +1,931 @@
+[
+  {
+    "name": "Capital Decomposition Expert",
+    "slug": "experts/decomp-capital",
+    "description": "Capital Decomposition Expert — decomposes a capital adequacy metric into atomic ingredients, source tables, formulas, rollup architecture, and schema gaps.",
+    "filePath": ".claude/commands/experts/decomp-capital.md",
+    "category": "expert",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Intake Questions (Direct mode only)",
+      "Capital Knowledge Base",
+      "Decomposition Output Format",
+      "Confirmation Gate",
+      "Audit Logging",
+      "Duplicate Detection Algorithm",
+      "Error Handling",
+      "Example: Decomposing \"CET1 Capital Ratio\"",
+      "Integration Points"
+    ],
+    "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Compliance & Regulatory Decomposition Expert",
+    "slug": "experts/decomp-compliance",
+    "description": "Compliance & Regulatory Decomposition Expert — decomposes a compliance, regulatory reporting, or supervisory metric into atomic ingredients, source tables, formulas, rollup architecture, and schema gaps.",
+    "filePath": ".claude/commands/experts/decomp-compliance.md",
+    "category": "expert",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Intake Questions (Direct mode only)",
+      "Compliance & Regulatory Knowledge Base",
+      "Decomposition Output Format",
+      "Confirmation Gate",
+      "Audit Logging",
+      "Duplicate Detection Algorithm",
+      "Error Handling",
+      "Example: Decomposing \"DFAST Severely Adverse CET1 Minimum\"",
+      "Integration Points"
+    ],
+    "prerequisites": [],
+    "dependencies": [
+      "all-risk-stripe-schemas"
+    ],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Counterparty Credit Risk Decomposition Expert",
+    "slug": "experts/decomp-ccr",
+    "description": "Counterparty Credit Risk Decomposition Expert — decomposes a CCR metric into atomic ingredients, source tables, formulas, rollup architecture, and schema gaps.",
+    "filePath": ".claude/commands/experts/decomp-ccr.md",
+    "category": "expert",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Intake Questions (Direct mode only — skip in Orchestrator mode)",
+      "Counterparty Credit Risk Knowledge Base",
+      "Decomposition Output Format",
+      "Confirmation Gate (MANDATORY in Direct mode, AUTOMATIC in Orchestrator mode)",
+      "Decomposition Summary: [Metric Name]",
+      "Audit Logging",
+      "Duplicate Detection Algorithm",
+      "Error Handling",
+      "Example: Decomposing \"SA-CCR EAD\""
+    ],
+    "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Credit Risk Decomposition Expert",
+    "slug": "experts/decomp-credit-risk",
+    "description": "Credit Risk Decomposition Expert — decomposes a credit risk metric into atomic ingredients, source tables, formulas, rollup architecture, and schema gaps.",
+    "filePath": ".claude/commands/experts/decomp-credit-risk.md",
+    "category": "expert",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Intake Questions (Direct mode only — skip in Orchestrator mode)",
+      "Credit Risk Knowledge Base",
+      "Decomposition Output Format",
+      "Confirmation Gate (MANDATORY in Direct mode, AUTOMATIC in Orchestrator mode)",
+      "Decomposition Summary: [Metric Name]",
+      "Audit Logging",
+      "Duplicate Detection Algorithm",
+      "Error Handling",
+      "Example: Decomposing \"Expected Loss Rate\""
+    ],
+    "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Data Model Expert",
+    "slug": "experts/data-model-expert",
+    "description": "Data Model Expert — analyzes schema gaps and proposes DDL changes for new metrics/capabilities.",
+    "filePath": ".claude/commands/experts/data-model-expert.md",
+    "category": "expert",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Schema Analysis Procedure",
+      "Output Format",
+      "Session: {session_id}",
+      "Trigger: {metric_name or capability description}",
+      "Risk Stripe: {credit_risk | capital_risk | ...}",
+      "Confidence: {HIGH | MEDIUM | LOW} — {reasoning}",
+      "Confirmation Gate",
+      "Audit Logging",
+      "Error Handling"
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      ".claude/config/schema-manifest.yaml",
+      "facility-summary-mvp/output/data-dictionary/data-dictionary.json",
+      ".claude/audit/audit_logger.py"
+    ],
+    "dependencies": [
+      "decomp",
+      "this"
+    ],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "IRRBB & ALM Decomposition Expert",
+    "slug": "experts/decomp-irrbb-alm",
+    "description": "IRRBB & ALM Decomposition Expert — decomposes an interest rate risk in the banking book or asset-liability management metric into atomic ingredients, source tables, formulas, rollup architecture, and schema gaps.",
+    "filePath": ".claude/commands/experts/decomp-irrbb-alm.md",
+    "category": "expert",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Intake Questions (Direct mode only)",
+      "IRRBB & ALM Knowledge Base",
+      "Decomposition Output Format",
+      "Confirmation Gate",
+      "Audit Logging",
+      "Duplicate Detection Algorithm",
+      "Error Handling",
+      "Example: Decomposing \"NII Sensitivity to +200bp\"",
+      "Integration Points"
+    ],
+    "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Liquidity Risk Decomposition Expert",
+    "slug": "experts/decomp-liquidity",
+    "description": "Liquidity Risk Decomposition Expert — decomposes a liquidity risk metric into atomic ingredients, source tables, formulas, rollup architecture, and schema gaps.",
+    "filePath": ".claude/commands/experts/decomp-liquidity.md",
+    "category": "expert",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Intake Questions (Direct mode only)",
+      "Liquidity Risk Knowledge Base",
+      "Decomposition Output Format",
+      "Confirmation Gate",
+      "Audit Logging",
+      "Duplicate Detection Algorithm",
+      "Error Handling",
+      "Example: Decomposing \"Liquidity Coverage Ratio\"",
+      "Integration Points"
+    ],
+    "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Market Risk Decomposition Expert",
+    "slug": "experts/decomp-market-risk",
+    "description": "Market Risk Decomposition Expert — decomposes a market risk metric into atomic ingredients, source tables, formulas, rollup architecture, and schema gaps.",
+    "filePath": ".claude/commands/experts/decomp-market-risk.md",
+    "category": "expert",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Intake Questions (Direct mode only — skip in Orchestrator mode)",
+      "Market Risk Knowledge Base",
+      "Decomposition Output Format",
+      "Confirmation Gate (MANDATORY in Direct mode, AUTOMATIC in Orchestrator mode)",
+      "Decomposition Summary: [Metric Name]",
+      "Audit Logging",
+      "Duplicate Detection Algorithm",
+      "Error Handling",
+      "Example: Decomposing \"FRTB SA Capital Charge\""
+    ],
+    "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Operational Risk Decomposition Expert",
+    "slug": "experts/decomp-oprisk",
+    "description": "Operational Risk Decomposition Expert — decomposes an operational risk metric into atomic ingredients, source tables, formulas, rollup architecture, and schema gaps.",
+    "filePath": ".claude/commands/experts/decomp-oprisk.md",
+    "category": "expert",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Intake Questions (Direct mode only)",
+      "Operational Risk Knowledge Base",
+      "Decomposition Output Format",
+      "Confirmation Gate",
+      "Audit Logging",
+      "Duplicate Detection Algorithm",
+      "Error Handling",
+      "Example: Decomposing \"SMA Operational Risk Capital\"",
+      "Integration Points"
+    ],
+    "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Regulatory Mapping Expert",
+    "slug": "experts/reg-mapping-expert",
+    "description": "Regulatory Mapping Expert — maps the data model against US + BCBS regulatory reporting requirements.",
+    "filePath": ".claude/commands/experts/reg-mapping-expert.md",
+    "category": "expert",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Regulatory Framework Knowledge Base",
+      "Coverage Assessment Procedure",
+      "Output Format",
+      "Institution: {institution_name} ({institution_tier})",
+      "Assessment Date: {date}",
+      "Assessment Mode: {Full | Targeted | Delta}",
+      "Schema Manifest Version: {last_updated from schema-manifest.yaml}",
+      "Executive Summary",
+      "Detailed Coverage — FR Y-14Q Schedule H"
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      ".claude/config/schema-manifest.yaml",
+      "facility-summary-mvp/output/data-dictionary/data-dictionary.json",
+      "data/metric-library/catalogue.json",
+      ".claude/audit/audit_logger.py"
+    ],
+    "dependencies": [
+      "db-schema"
+    ],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Data Factory Builder",
+    "slug": "builders/data-factory-builder",
+    "description": "Data Factory Builder — generates GSIB-quality synthetic L2 data for new or modified schema objects using the V2 state-machine engine.",
+    "filePath": ".claude/commands/builders/data-factory-builder.md",
+    "category": "builder",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Regeneration Scope Decision",
+      "Data Generation Scope",
+      "Dependency Analysis",
+      "Data Profile Generation",
+      "Generator Implementation",
+      "Execution Pipeline",
+      "Validation",
+      "Audit Logging",
+      "Integration Points"
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      ".claude/config/schema-manifest.yaml",
+      "facility-summary-mvp/output/data-dictionary/data-dictionary.json",
+      "scenarios/factory/schema-validator.ts",
+      "scenarios/factory/v2/types.ts",
+      "scenarios/factory/scenario-config.ts",
+      "scenarios/factory/sql-emitter.ts",
+      "Scan"
+    ],
+    "dependencies": [
+      "db-schema",
+      "schema"
+    ],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "DB Schema Builder",
+    "slug": "builders/db-schema-builder",
+    "description": "DB Schema Builder — validates, generates, and applies DDL changes to the GSIB credit risk PostgreSQL database.",
+    "filePath": ".claude/commands/builders/db-schema-builder.md",
+    "category": "builder",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Input Validation (Gate 0 — reject garbage early)",
+      "DDL Test Battery (6 Tests — ALL must pass)",
+      "PRE_EXECUTION Reviewer Gate (MANDATORY — NON-BYPASSABLE)",
+      "Migration File Generation",
+      "DDL Execution (Transactional)",
+      "Post-Execution Actions (automatic)",
+      "Audit Logging",
+      "Error Handling",
+      "Integration Points"
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      ".claude/config/schema-manifest.yaml",
+      "facility-summary-mvp/output/data-dictionary/data-dictionary.json",
+      ".claude/audit/audit_logger.py",
+      "Scan"
+    ],
+    "dependencies": [
+      "data-model"
+    ],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Migration Manager",
+    "slug": "builders/migration-manager",
+    "description": "Migration Manager — tracks, orders, validates, and manages DDL migration lifecycle.",
+    "filePath": ".claude/commands/builders/migration-manager.md",
+    "category": "builder",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Migration Registry",
+      "Status Report",
+      "Ordering Validation",
+      "Apply Pending Migrations",
+      "Rollback",
+      "Rollback Generation",
+      "Dependency Graph",
+      "Audit Logging",
+      "Integration Points"
+    ],
+    "prerequisites": [
+      "sql/migrations/*.sql",
+      ".claude/config/bank-profile.yaml",
+      "facility-summary-mvp/output/data-dictionary/data-dictionary.json"
+    ],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "YAML Metric Config Writer",
+    "slug": "builders/metric-config-writer",
+    "description": "YAML Metric Config Writer — converts Decomposition Expert output into executable YAML metric configs using the add-metric workflow.",
+    "filePath": ".claude/commands/builders/metric-config-writer.md",
+    "category": "builder",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Pre-Flight Validation",
+      "Decomposition-to-YAML Translation",
+      "Invoke Add-Metric Workflow",
+      "Output Format",
+      "Audit Logging",
+      "Integration Points",
+      "Error Handling",
+      "Safety Rules"
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      "scripts/calc_engine/metrics/_template.yaml",
+      "CLAUDE.md",
+      ".claude/commands/add-metric.md",
+      "Grep",
+      "Grep",
+      ".claude/audit/audit_logger.py"
+    ],
+    "dependencies": [
+      "decomposition",
+      "decomp"
+    ],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Audit Report Generator",
+    "slug": "reviewers/audit-reporter",
+    "description": "Audit Report Generator — produces comprehensive audit reports from the agent audit trail.",
+    "filePath": ".claude/commands/reviewers/audit-reporter.md",
+    "category": "reviewer",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Data Source Strategy",
+      "Report Sections",
+      "Time Range Filtering",
+      "Trend Analysis",
+      "Audit Logging",
+      "Integration Points",
+      "Safety Rules"
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      ".claude/audit/schema/audit_ddl.sql",
+      ".claude/audit/audit_logger.py",
+      "Scan",
+      "Scan"
+    ],
+    "dependencies": [
+      "the",
+      "all"
+    ],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Dual-mode risk expert reviewer",
+    "slug": "reviewers/risk-expert-reviewer",
+    "description": "Dual-mode risk expert reviewer — PRE_EXECUTION gate and POST_EXECUTION QA for schema changes, metric decompositions, and data factory outputs.",
+    "filePath": ".claude/commands/reviewers/risk-expert-reviewer.md",
+    "category": "reviewer",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Ten-Dimension Assessment Framework",
+      "Finding Format",
+      "Regulatory Coverage Score",
+      "Gate Decision (PRE_EXECUTION mode)",
+      "Implementation Delta Report (POST_EXECUTION mode)",
+      "Audit Logging",
+      "Review Summary Output",
+      "Risk Expert Review: [Target Description]",
+      "Integration Points"
+    ],
+    "prerequisites": [],
+    "dependencies": [
+      "db-schema",
+      "decomp",
+      "execution--"
+    ],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Schema Drift Monitor",
+    "slug": "reviewers/drift-monitor",
+    "description": "Schema Drift Monitor — detects schema divergence between the golden-source data dictionary / manifest and live PostgreSQL.",
+    "filePath": ".claude/commands/reviewers/drift-monitor.md",
+    "category": "reviewer",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Invocation Modes",
+      "Drift Detection Pipeline",
+      "Drift Classification",
+      "Metric Impact Analysis",
+      "Drift Report Output",
+      "CRITICAL Findings",
+      "HIGH Findings",
+      "MEDIUM Findings",
+      "LOW Findings",
+      "Post-Migration Verification (Mode C)"
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      ".claude/config/schema-manifest.yaml",
+      "facility-summary-mvp/output/data-dictionary/data-dictionary.json",
+      "lib/db-status.ts",
+      ".claude/audit/audit_logger.py"
+    ],
+    "dependencies": [
+      "a-db-schema",
+      "db-schema"
+    ],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "SR 11-7 / OCC 2011-12 documentation completeness checker",
+    "slug": "reviewers/sr-11-7-checker",
+    "description": "SR 11-7 / OCC 2011-12 documentation completeness checker — validates that required model risk management artifacts EXIST and are populated for each metric or model.",
+    "filePath": ".claude/commands/reviewers/sr-11-7-checker.md",
+    "category": "reviewer",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Purpose",
+      "Invocation Modes",
+      "SR 11-7 Documentation Checklist (12 Items)",
+      "Tier-Adjusted Requirements",
+      "Output Format",
+      "SR 11-7 Documentation Check: [Metric ID] — [Name]",
+      "SR 11-7 Domain Summary: [Domain Name]",
+      "SR 11-7 Portfolio Summary",
+      "Audit Logging",
+      "Integration Points"
+    ],
+    "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "---",
+    "slug": "orchestrate",
+    "description": "orchestrate",
+    "filePath": ".claude/commands/orchestrate.md",
+    "category": "workflow",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Session Initialization",
+      "Intent Parsing",
+      "Pipeline Planning",
+      "Orchestrator Pipeline Plan",
+      "Pipeline Execution",
+      "Phase-Specific Logic",
+      "Decomposition: {metric_name}",
+      "DRY RUN: What Would Happen",
+      "End-of-Session Summary",
+      "Orchestrator Session Summary"
+    ],
+    "prerequisites": [],
+    "dependencies": [
+      "data-model",
+      "risk",
+      "decomposition"
+    ],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Add a new metric to the metric library from a spec definition.",
+    "slug": "add-metric",
+    "description": "Add a new metric to the metric library from a spec definition.",
+    "filePath": ".claude/commands/add-metric.md",
+    "category": "workflow",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Input Format",
+      "Steps"
+    ],
+    "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Debug and fix a metric calculation issue.",
+    "slug": "fix-metric",
+    "description": "Debug and fix a metric calculation issue.",
+    "filePath": ".claude/commands/fix-metric.md",
+    "category": "workflow",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Steps"
+    ],
+    "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Review changes on current branch before merging.",
+    "slug": "review-pr",
+    "description": "Review changes on current branch before merging.",
+    "filePath": ".claude/commands/review-pr.md",
+    "category": "workflow",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      "Steps"
+    ],
+    "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": null,
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Build the Credit Risk Decomposition Expert agent",
+    "slug": "session-s1",
+    "description": "Build the Credit Risk Decomposition Expert agent — Session S1 of the GSIB Agent Suite.",
+    "filePath": ".claude/commands/session-s1.md",
+    "category": "session",
+    "status": "built",
+    "sessionId": "S1",
+    "capabilities": [
+      "Design Doc (read for context)",
+      "Your First Actions",
+      "Clarifying Questions (ask ALL before building)",
+      "After Answers, Build"
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      ".claude/config/schema-manifest.yaml",
+      ".claude/audit/audit_logger.py"
+    ],
+    "dependencies": [
+      "s0-foundation"
+    ],
+    "version": null,
+    "inputFormat": null,
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Build the Dashboard Generator agent",
+    "slug": "session-s6",
+    "description": "Build the Dashboard Generator agent — Session S6 of the GSIB Agent Suite.",
+    "filePath": ".claude/commands/session-s6.md",
+    "category": "session",
+    "status": "built",
+    "sessionId": "S6",
+    "capabilities": [
+      "Your First Actions",
+      "Clarifying Questions",
+      "After Answers, Build ONE File"
+    ],
+    "prerequisites": [
+      ".claude/commands/experts/decomp-credit-risk.md",
+      ".claude/commands/builders/db-schema-builder.md",
+      ".claude/config/bank-profile.yaml",
+      ".claude/audit/audit_logger.py"
+    ],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": null,
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Build the Data Factory Builder and YAML Metric Config Writer agents",
+    "slug": "session-s5",
+    "description": "Build the Data Factory Builder and YAML Metric Config Writer agents — Session S5 of the GSIB Agent Suite.",
+    "filePath": ".claude/commands/session-s5.md",
+    "category": "session",
+    "status": "built",
+    "sessionId": "S5",
+    "capabilities": [
+      "Your First Actions",
+      "Clarifying Questions",
+      "After Answers, Build TWO Files"
+    ],
+    "prerequisites": [
+      ".claude/commands/builders/db-schema-builder.md",
+      ".claude/commands/experts/decomp-credit-risk.md",
+      ".claude/commands/add-metric.md",
+      ".claude/config/bank-profile.yaml",
+      ".claude/audit/audit_logger.py"
+    ],
+    "dependencies": [
+      "decomp"
+    ],
+    "version": null,
+    "inputFormat": null,
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Build the Data Model Expert and Regulatory Mapping Expert agents",
+    "slug": "session-s2",
+    "description": "Build the Data Model Expert and Regulatory Mapping Expert agents — Session S2 of the GSIB Agent Suite.",
+    "filePath": ".claude/commands/session-s2.md",
+    "category": "session",
+    "status": "built",
+    "sessionId": "S2",
+    "capabilities": [
+      "Design Doc",
+      "Your First Actions",
+      "Clarifying Questions (ask ALL before building)",
+      "After Answers, Build TWO Files"
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      ".claude/config/schema-manifest.yaml",
+      ".claude/audit/audit_logger.py",
+      ".claude/audit/schema/audit_ddl.sql"
+    ],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": null,
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Build the DB Schema Builder and Migration Manager agents",
+    "slug": "session-s3",
+    "description": "Build the DB Schema Builder and Migration Manager agents — Session S3 of the GSIB Agent Suite.",
+    "filePath": ".claude/commands/session-s3.md",
+    "category": "session",
+    "status": "planned",
+    "sessionId": "S3",
+    "capabilities": [
+      "Your First Actions",
+      "Clarifying Questions",
+      "After Answers, Build TWO Files"
+    ],
+    "prerequisites": [
+      ".claude/commands/experts/data-model-expert.md",
+      ".claude/commands/experts/decomp-credit-risk.md",
+      ".claude/config/bank-profile.yaml",
+      ".claude/config/schema-manifest.yaml",
+      ".claude/audit/audit_logger.py",
+      ".claude/audit/schema/audit_ddl.sql"
+    ],
+    "dependencies": [
+      "this"
+    ],
+    "version": null,
+    "inputFormat": null,
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Build the Master Orchestrator",
+    "slug": "session-s8",
+    "description": "Build the Master Orchestrator — Session S8 of the GSIB Agent Suite.",
+    "filePath": ".claude/commands/session-s8.md",
+    "category": "session",
+    "status": "built",
+    "sessionId": "S8",
+    "capabilities": [
+      "Your First Actions",
+      "Clarifying Questions",
+      "After Answers, Build ONE File"
+    ],
+    "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": null,
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Build the remaining 7 Decomposition Expert agents",
+    "slug": "session-s2-5",
+    "description": "Build the remaining 7 Decomposition Expert agents — Session S2.5 of the GSIB Agent Suite.",
+    "filePath": ".claude/commands/session-s2-5.md",
+    "category": "session",
+    "status": "built",
+    "sessionId": "S2-5",
+    "capabilities": [
+      "Your First Actions",
+      "Clarifying Questions",
+      "After Answers, Build 7 Files (confirm each before next)"
+    ],
+    "prerequisites": [
+      ".claude/commands/experts/decomp-credit-risk.md",
+      ".claude/config/bank-profile.yaml",
+      ".claude/config/schema-manifest.yaml",
+      ".claude/audit/audit_logger.py"
+    ],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": null,
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Build the Risk Expert Reviewer and SR 11-7 Documentation Checker agents",
+    "slug": "session-s4",
+    "description": "Build the Risk Expert Reviewer and SR 11-7 Documentation Checker agents — Session S4 of the GSIB Agent Suite.",
+    "filePath": ".claude/commands/session-s4.md",
+    "category": "session",
+    "status": "built",
+    "sessionId": "S4",
+    "capabilities": [
+      "Your First Actions",
+      "Clarifying Questions",
+      "After Answers, Build TWO Files"
+    ],
+    "prerequisites": [
+      ".claude/commands/experts/decomp-credit-risk.md",
+      ".claude/config/bank-profile.yaml",
+      ".claude/config/schema-manifest.yaml",
+      ".claude/audit/audit_logger.py",
+      ".claude/audit/schema/audit_ddl.sql"
+    ],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": null,
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Build the Schema Drift Monitor and Audit Report Generator agents",
+    "slug": "session-s7",
+    "description": "Build the Schema Drift Monitor and Audit Report Generator agents — Session S7 of the GSIB Agent Suite.",
+    "filePath": ".claude/commands/session-s7.md",
+    "category": "session",
+    "status": "built",
+    "sessionId": "S7",
+    "capabilities": [
+      "Your First Actions",
+      "Clarifying Questions",
+      "After Answers, Build TWO Files"
+    ],
+    "prerequisites": [
+      ".claude/commands/builders/db-schema-builder.md",
+      ".claude/config/schema-manifest.yaml",
+      ".claude/audit/schema/audit_ddl.sql",
+      ".claude/audit/audit_logger.py"
+    ],
+    "dependencies": [
+      "the"
+    ],
+    "version": null,
+    "inputFormat": null,
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "Integration Test and Final CLAUDE.md Update",
+    "slug": "session-s9",
+    "description": "Integration Test and Final CLAUDE.md Update — Session S9 of the GSIB Agent Suite.",
+    "filePath": ".claude/commands/session-s9.md",
+    "category": "session",
+    "status": "built",
+    "sessionId": "S9",
+    "capabilities": [
+      "What To Do"
+    ],
+    "prerequisites": [],
+    "dependencies": [
+      "the"
+    ],
+    "version": null,
+    "inputFormat": null,
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  }
+]

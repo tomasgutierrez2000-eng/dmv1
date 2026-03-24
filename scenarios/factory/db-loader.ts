@@ -50,10 +50,10 @@ async function checkCurrentState(client: pg.Client) {
 
   // Count rows in key tables
   const tables = [
-    { schema: 'l1', table: 'counterparty' },
-    { schema: 'l1', table: 'credit_agreement_master' },
-    { schema: 'l1', table: 'facility_master' },
-    { schema: 'l1', table: 'facility_lender_allocation' },
+    { schema: 'l2', table: 'counterparty' },
+    { schema: 'l2', table: 'credit_agreement_master' },
+    { schema: 'l2', table: 'facility_master' },
+    { schema: 'l2', table: 'facility_lender_allocation' },
     { schema: 'l1', table: 'metric_threshold' },
     { schema: 'l2', table: 'facility_exposure_snapshot' },
     { schema: 'l2', table: 'facility_pricing_snapshot' },
@@ -75,7 +75,6 @@ async function checkCurrentState(client: pg.Client) {
     { schema: 'l2', table: 'facility_credit_approval' },
     { schema: 'l2', table: 'financial_metric_observation' },
     { schema: 'l2', table: 'netting_set_exposure_snapshot' },
-    { schema: 'l2', table: 'metric_threshold' },
     { schema: 'l2', table: 'stress_test_result' },
     { schema: 'l2', table: 'facility_delinquency_snapshot' },
     { schema: 'l2', table: 'deal_pipeline_fact' },
@@ -93,11 +92,11 @@ async function checkCurrentState(client: pg.Client) {
   // Check max IDs to see what's already loaded
   console.log('\n── Max IDs (detect factory data) ──');
   try {
-    const cpMax = await client.query('SELECT MAX(counterparty_id) as max_id FROM l1.counterparty');
+    const cpMax = await client.query('SELECT MAX(counterparty_id) as max_id FROM l2.counterparty');
     console.log(`  counterparty max_id: ${cpMax.rows[0].max_id}`);
-    const facMax = await client.query('SELECT MAX(facility_id) as max_id FROM l1.facility_master');
+    const facMax = await client.query('SELECT MAX(facility_id) as max_id FROM l2.facility_master');
     console.log(`  facility max_id: ${facMax.rows[0].max_id}`);
-    const agrMax = await client.query('SELECT MAX(credit_agreement_id) as max_id FROM l1.credit_agreement_master');
+    const agrMax = await client.query('SELECT MAX(credit_agreement_id) as max_id FROM l2.credit_agreement_master');
     console.log(`  credit_agreement max_id: ${agrMax.rows[0].max_id}`);
   } catch (e: any) {
     console.log(`  Error checking max IDs: ${e.message.split('\n')[0]}`);
@@ -105,7 +104,7 @@ async function checkCurrentState(client: pg.Client) {
 
   // Check if factory data already exists (counterparty_id > 1729 = factory range)
   try {
-    const factoryCount = await client.query('SELECT COUNT(*) as cnt FROM l1.counterparty WHERE counterparty_id >= 1730');
+    const factoryCount = await client.query('SELECT COUNT(*) as cnt FROM l2.counterparty WHERE counterparty_id >= 1730');
     console.log(`\n  Factory counterparties (id >= 1730): ${factoryCount.rows[0].cnt}`);
   } catch (e: any) {
     console.log(`  Error: ${e.message.split('\n')[0]}`);
@@ -167,7 +166,7 @@ async function loadFactorySQL(client: pg.Client) {
       "DELETE FROM l2.exception_event WHERE counterparty_id >= 1730",
       "DELETE FROM l2.financial_metric_observation WHERE counterparty_id >= 1730",
       "DELETE FROM l2.netting_set_exposure_snapshot WHERE netting_set_exposure_id >= 500000",
-      "DELETE FROM l2.metric_threshold WHERE threshold_id >= 1500000",
+      "DELETE FROM l1.metric_threshold WHERE threshold_id >= 1500000",
       // L2 event tables (children of L1) — original
       "DELETE FROM l2.stress_test_breach WHERE stress_test_result_id IN (SELECT result_id FROM l2.stress_test_result WHERE result_id >= 5001)",
       "DELETE FROM l2.stress_test_result WHERE result_id >= 5001",
@@ -185,17 +184,17 @@ async function loadFactorySQL(client: pg.Client) {
       "DELETE FROM l2.exposure_counterparty_attribution WHERE facility_id >= 5744",
       "DELETE FROM l2.data_quality_score_snapshot WHERE counterparty_id >= 1730",
       "DELETE FROM l2.facility_exposure_snapshot WHERE facility_id >= 5744",
-      // L1 children
-      "DELETE FROM l1.facility_lender_allocation WHERE facility_id >= 5744",
-      "DELETE FROM l1.collateral_link WHERE facility_id >= 5744",
-      "DELETE FROM l1.collateral_asset_master WHERE collateral_asset_id >= 50201",
+      // L2 children / L1 limits
+      "DELETE FROM l2.facility_lender_allocation WHERE facility_id >= 5744",
+      "DELETE FROM l2.collateral_link WHERE facility_id >= 5744",
+      "DELETE FROM l2.collateral_asset_master WHERE collateral_asset_id >= 50201",
       "DELETE FROM l1.limit_threshold WHERE limit_rule_id >= 5100",
       "DELETE FROM l1.limit_rule WHERE limit_rule_id >= 5100",
-      "DELETE FROM l1.counterparty_hierarchy WHERE counterparty_id >= 1730",
-      // L1 parents (last)
-      "DELETE FROM l1.facility_master WHERE facility_id >= 5744",
-      "DELETE FROM l1.credit_agreement_master WHERE credit_agreement_id >= 1190",
-      "DELETE FROM l1.counterparty WHERE counterparty_id >= 1730",
+      "DELETE FROM l2.counterparty_hierarchy WHERE counterparty_id >= 1730",
+      // L2 parents (last)
+      "DELETE FROM l2.facility_master WHERE facility_id >= 5744",
+      "DELETE FROM l2.credit_agreement_master WHERE credit_agreement_id >= 1190",
+      "DELETE FROM l2.counterparty WHERE counterparty_id >= 1730",
     ];
 
     for (const q of cleanupQueries) {
@@ -267,9 +266,9 @@ async function verifyData(client: pg.Client) {
   // 1. Count factory rows
   console.log('── Row Counts ──');
   const counts = [
-    { label: 'Factory counterparties', query: 'SELECT COUNT(*) as cnt FROM l1.counterparty WHERE counterparty_id >= 1730' },
-    { label: 'Factory agreements', query: 'SELECT COUNT(*) as cnt FROM l1.credit_agreement_master WHERE credit_agreement_id >= 1190' },
-    { label: 'Factory facilities', query: 'SELECT COUNT(*) as cnt FROM l1.facility_master WHERE facility_id >= 5744' },
+    { label: 'Factory counterparties', query: 'SELECT COUNT(*) as cnt FROM l2.counterparty WHERE counterparty_id >= 1730' },
+    { label: 'Factory agreements', query: 'SELECT COUNT(*) as cnt FROM l2.credit_agreement_master WHERE credit_agreement_id >= 1190' },
+    { label: 'Factory facilities', query: 'SELECT COUNT(*) as cnt FROM l2.facility_master WHERE facility_id >= 5744' },
     { label: 'Factory exposures', query: 'SELECT COUNT(*) as cnt FROM l2.facility_exposure_snapshot WHERE facility_id >= 5744' },
     { label: 'Factory risk flags', query: 'SELECT COUNT(*) as cnt FROM l2.risk_flag WHERE risk_flag_id >= 5218' },
     { label: 'Factory credit events', query: 'SELECT COUNT(*) as cnt FROM l2.credit_event WHERE counterparty_id >= 1730' },
@@ -301,9 +300,9 @@ async function verifyData(client: pg.Client) {
         fm.credit_agreement_id,
         ca.credit_agreement_id AS agr_exists,
         c.counterparty_id AS cp_exists
-      FROM l1.facility_master fm
-      LEFT JOIN l1.credit_agreement_master ca ON fm.credit_agreement_id = ca.credit_agreement_id
-      LEFT JOIN l1.counterparty c ON fm.counterparty_id = c.counterparty_id
+      FROM l2.facility_master fm
+      LEFT JOIN l2.credit_agreement_master ca ON fm.credit_agreement_id = ca.credit_agreement_id
+      LEFT JOIN l2.counterparty c ON fm.counterparty_id = c.counterparty_id
       WHERE fm.facility_id >= 5744
         AND (ca.credit_agreement_id IS NULL OR c.counterparty_id IS NULL)
     `);
@@ -325,7 +324,7 @@ async function verifyData(client: pg.Client) {
     const expCheck = await client.query(`
       SELECT COUNT(*) as cnt
       FROM l2.facility_exposure_snapshot fes
-      LEFT JOIN l1.facility_master fm ON fes.facility_id = fm.facility_id
+      LEFT JOIN l2.facility_master fm ON fes.facility_id = fm.facility_id
       WHERE fes.facility_id >= 5744 AND fm.facility_id IS NULL
     `);
     const orphans = parseInt(expCheck.rows[0].cnt);
@@ -360,9 +359,9 @@ async function verifyData(client: pg.Client) {
   try {
     const total = await client.query(`
       SELECT
-        (SELECT COUNT(*) FROM l1.counterparty) as total_cp,
-        (SELECT COUNT(*) FROM l1.credit_agreement_master) as total_agr,
-        (SELECT COUNT(*) FROM l1.facility_master) as total_fac,
+        (SELECT COUNT(*) FROM l2.counterparty) as total_cp,
+        (SELECT COUNT(*) FROM l2.credit_agreement_master) as total_agr,
+        (SELECT COUNT(*) FROM l2.facility_master) as total_fac,
         (SELECT COUNT(*) FROM l2.facility_exposure_snapshot) as total_exp
     `);
     const r = total.rows[0];

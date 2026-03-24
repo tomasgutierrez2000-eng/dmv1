@@ -16,8 +16,8 @@ In QA mode, flag any code that doesn't match DESIGN.md.
 Banking data model visualization platform with metrics calculation engine. Next.js 14 App Router, TypeScript, Tailwind CSS, Zustand, Recharts. PostgreSQL + sql.js for calculations.
 
 ## Architecture: Three-Layer Data Model
-- **L1 — Reference Data (75 tables):** Dimensions, masters, lookups, hierarchies, configuration. Rarely changes. Examples: `counterparty`, `facility_master`, `currency_dim`, `metric_threshold`
-- **L2 — Atomic Data (102 tables):** Raw source-system snapshots and events. Point-in-time observations, not computed. Examples: `facility_exposure_snapshot`, `credit_event`, `position`
+- **L1 — Reference Data (75 tables):** Dimensions, lookups, hierarchies, configuration. Rarely changes. Examples: `currency_dim`, `metric_threshold`, `enterprise_business_taxonomy`, `rating_scale_dim`
+- **L2 — Atomic Data (101 tables):** Raw source-system snapshots, events, and master tables. Point-in-time observations, not computed. Examples: `counterparty`, `facility_master`, `credit_agreement_master`, `facility_exposure_snapshot`, `credit_event`, `position`
 - **L3 — Derived Data (83 tables):** Anything calculated, aggregated, or computed from L1+L2. Examples: `exposure_metric_cube`, `facility_financial_calc`, `stress_test_result`
 
 Rollup hierarchy: **Facility → Counterparty → Desk (L3) → Portfolio (L2) → Business Segment (L1)**
@@ -472,8 +472,8 @@ L1 reference data is the foundation of all metric calculations and rollups. Erro
 - Verify alignment after bulk data loads:
   ```sql
   SELECT fm.facility_id, fm.counterparty_id, ca.borrower_counterparty_id
-  FROM l1.facility_master fm
-  JOIN l1.credit_agreement_master ca ON fm.credit_agreement_id = ca.credit_agreement_id
+  FROM l2.facility_master fm
+  JOIN l2.credit_agreement_master ca ON fm.credit_agreement_id = ca.credit_agreement_id
   WHERE fm.counterparty_id != ca.borrower_counterparty_id
   ```
   Non-zero results (outside syndicated deals) indicate broken FK chains that will cause incorrect counterparty-level rollups
@@ -713,7 +713,7 @@ FK integrity was the single biggest category of issues: 96 FK violations in firs
     - `credit_status_code = 'CURRENT'` fails if the dim table uses integer codes `1`-`10`
     - Always verify FK string values against the actual parent PK values, not human-readable labels
 
-15. **FK value ranges must be coordinated:** When generating scenario data, you must know which IDs exist in parent tables. If scenario creates `counterparty_id` 1001-1010, any child table referencing those IDs ONLY works if you also INSERT counterparty 1001-1010 into `l1.counterparty`.
+15. **FK value ranges must be coordinated:** When generating scenario data, you must know which IDs exist in parent tables. If scenario creates `counterparty_id` 1001-1010, any child table referencing those IDs ONLY works if you also INSERT counterparty 1001-1010 into `l2.counterparty`.
 
 ### Primary Key Rules
 
@@ -787,13 +787,13 @@ scenario_base_fac = 5000 + (scenario_number * BLOCK_SIZE)
 - Why (trigger): what event/trend drives the scenario
 - Risk flags: what the CRO dashboard should highlight
 
-**Step 2: Create L1 Reference Data** — INSERT in this order:
-1. `l1.counterparty` — the borrowers/counterparties
-2. `l1.credit_agreement_master` — the legal agreements
-3. `l1.facility_master` — the facilities under each agreement
-4. `l1.counterparty_hierarchy` — parent/subsidiary relationships
+**Step 2: Create L2 Master Data** — INSERT in this order:
+1. `l2.counterparty` — the borrowers/counterparties
+2. `l2.credit_agreement_master` — the legal agreements
+3. `l2.facility_master` — the facilities under each agreement
+4. `l2.counterparty_hierarchy` — parent/subsidiary relationships
 
-Every FK must be satisfied before moving to L2.
+Every FK must be satisfied before moving to L2 snapshots/events.
 
 **Step 3: Create L2 Atomic Data** — INSERT:
 1. `l2.facility_exposure_snapshot` — exposure amounts per facility per date
@@ -810,9 +810,9 @@ Every FK must be satisfied before moving to L2.
 SELECT fm.facility_id, fm.counterparty_id, fm.credit_agreement_id,
        ca.borrower_counterparty_id, c.legal_name,
        fes.drawn_amount, fes.as_of_date
-FROM l1.facility_master fm
-JOIN l1.credit_agreement_master ca ON fm.credit_agreement_id = ca.credit_agreement_id
-JOIN l1.counterparty c ON fm.counterparty_id = c.counterparty_id
+FROM l2.facility_master fm
+JOIN l2.credit_agreement_master ca ON fm.credit_agreement_id = ca.credit_agreement_id
+JOIN l2.counterparty c ON fm.counterparty_id = c.counterparty_id
 LEFT JOIN l2.facility_exposure_snapshot fes ON fm.facility_id = fes.facility_id
 WHERE fm.facility_id BETWEEN {scenario_fac_start} AND {scenario_fac_end};
 ```
@@ -1021,7 +1021,7 @@ source /Users/tomas/120/.env && /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql
 | Rating tier enum mismatch | `INVESTMENT_GRADE` vs `IG_HIGH` | Always check actual enum values in V2 types, not human-readable labels |
 | Size profile enum mismatch | `MEDIUM` vs `MID` | Same — check `SizeProfile` type definition for valid values |
 | `_flag` suffix convention | `is_active` column doesn't exist | ALL boolean columns in PG use `_flag` suffix — `is_active_flag`, `is_developed_market_flag`, etc. |
-| search_path for cross-schema queries | `l1.collateral_asset_master` not found | Set `search_path TO l1, l2, public` before querying, OR remove schema prefixes |
+| search_path for cross-schema queries | `l2.collateral_asset_master` not found | Set `search_path TO l1, l2, public` before querying, OR remove schema prefixes |
 | ON CONFLICT for idempotent loads | Weekly data overlaps existing monthly dates | Use `ON CONFLICT DO NOTHING` so re-runs don't fail on existing data |
 
 ## Agent Suite Architecture

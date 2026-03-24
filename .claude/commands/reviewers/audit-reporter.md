@@ -192,7 +192,7 @@ Output format:
   ├─────┼──────────────┼─────────────────────────┼──────────┼────────────┤
   │  1  │ ADD_COLUMN   │ l2.facility_risk_snap…  │ Applied  │ 2026-03-22 │
   │  2  │ CREATE_TABLE │ l3.new_calc_table       │ Pending  │ 2026-03-23 │
-  │  3  │ DROP_COLUMN  │ l1.facility_master      │ Rollback │ 2026-03-21 │
+  │  3  │ DROP_COLUMN  │ l2.facility_master      │ Rollback │ 2026-03-21 │
   └─────┴──────────────┴─────────────────────────┴──────────┴────────────┘
 
   Change Velocity: {n} changes/week (trend: ↑/↓/→)

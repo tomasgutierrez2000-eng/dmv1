@@ -62,7 +62,7 @@ npm run db:load-gsib
 The following tables were added to `02-l2-ddl.sql` so the scenario seed loads without errors:
 
 - `l2.data_quality_score_snapshot` — S11 Data Quality Crisis
-- `l2.metric_threshold` — S14 Regulatory Compliance Near-Miss
+- `l1.metric_threshold` — S14 Regulatory Compliance Near-Miss
 
 **After adding these tables, reload the database from scratch** so the new DDL is applied and scenario seed inserts succeed.
 

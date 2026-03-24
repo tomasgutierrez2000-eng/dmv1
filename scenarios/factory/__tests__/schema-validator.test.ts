@@ -173,18 +173,18 @@ describe('validateAgainstSchema', () => {
 describe('validateLoadOrder', () => {
   it('passes when all tables exist', () => {
     const registry = buildRegistry({
-      'l1.counterparty': ['counterparty_id'],
+      'l2.counterparty': ['counterparty_id'],
       'l2.facility_master': ['facility_id'],
     });
-    const result = validateLoadOrder(['l1.counterparty', 'l2.facility_master'], registry);
+    const result = validateLoadOrder(['l2.counterparty', 'l2.facility_master'], registry);
     expect(result.valid).toBe(true);
   });
 
   it('fails when table does not exist', () => {
     const registry = buildRegistry({
-      'l1.counterparty': ['counterparty_id'],
+      'l2.counterparty': ['counterparty_id'],
     });
-    const result = validateLoadOrder(['l1.counterparty', 'l2.nonexistent'], registry);
+    const result = validateLoadOrder(['l2.counterparty', 'l2.nonexistent'], registry);
     expect(result.valid).toBe(false);
     expect(result.errors[0]).toContain('l2.nonexistent');
   });

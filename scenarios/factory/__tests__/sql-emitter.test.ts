@@ -72,12 +72,12 @@ describe('formatSqlValue', () => {
 
 describe('buildInsert', () => {
   test('builds correct INSERT for simple row', () => {
-    const sql = buildInsert('l1.counterparty', {
+    const sql = buildInsert('l2.counterparty', {
       counterparty_id: 1,
       legal_name: 'Test Corp',
       country_code: 'US',
     });
-    expect(sql).toContain('INSERT INTO l1.counterparty');
+    expect(sql).toContain('INSERT INTO l2.counterparty');
     expect(sql).toContain('counterparty_id');
     expect(sql).toContain('legal_name');
     expect(sql).toContain('country_code');
@@ -111,15 +111,15 @@ describe('LOAD_ORDER', () => {
     const lastL1 = LOAD_ORDER.map((t, i) => t.startsWith('l1.') ? i : -1)
       .filter(i => i >= 0)
       .pop()!;
-    // Some L1 tables may be interleaved with L2 (e.g., l1.credit_agreement_counterparty_participation)
+    // Some L2 entity tables may be interleaved (e.g., l2.credit_agreement_counterparty_participation)
     // but core L1 dims should come first
     const firstL1Dim = LOAD_ORDER.indexOf('l1.country_dim');
     expect(firstL1Dim).toBeLessThan(firstL2);
   });
 
   test('contains all key tables', () => {
-    expect(LOAD_ORDER).toContain('l1.counterparty');
-    expect(LOAD_ORDER).toContain('l1.facility_master');
+    expect(LOAD_ORDER).toContain('l2.counterparty');
+    expect(LOAD_ORDER).toContain('l2.facility_master');
     expect(LOAD_ORDER).toContain('l2.facility_exposure_snapshot');
     expect(LOAD_ORDER).toContain('l2.credit_event');
     expect(LOAD_ORDER).toContain('l2.position');
@@ -153,13 +153,13 @@ describe('emitScenarioSql', () => {
   test('emits tables in load order', () => {
     const sql = emitScenarioSql([
       { table: 'l2.facility_exposure_snapshot', rows: [{ facility_id: 1, drawn_amount: 100 }] },
-      { table: 'l1.counterparty', rows: [{ counterparty_id: 1, legal_name: 'Test' }] },
+      { table: 'l2.counterparty', rows: [{ counterparty_id: 1, legal_name: 'Test' }] },
     ], {
       scenarioId: 'S1',
       scenarioName: 'Test',
       narrative: 'Test',
     });
-    const cpIdx = sql.indexOf('l1.counterparty');
+    const cpIdx = sql.indexOf('l2.counterparty');
     const expIdx = sql.indexOf('l2.facility_exposure_snapshot');
     // counterparty should come before exposure (load order)
     expect(cpIdx).toBeLessThan(expIdx);
@@ -179,12 +179,12 @@ describe('emitScenarioSql', () => {
 
   test('skips empty tables', () => {
     const sql = emitScenarioSql([
-      { table: 'l1.counterparty', rows: [] },
+      { table: 'l2.counterparty', rows: [] },
     ], {
       scenarioId: 'S1',
       scenarioName: 'Test',
       narrative: 'Test',
     });
-    expect(sql).not.toContain('l1.counterparty (0 rows)');
+    expect(sql).not.toContain('l2.counterparty (0 rows)');
   });
 });

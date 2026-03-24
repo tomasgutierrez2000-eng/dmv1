@@ -42,7 +42,7 @@ export function buildDimensionsAndHierarchies(): {
       id: 'counterparty',
       name: 'Counterparty',
       description: 'Legal entity or borrower that facilities are extended to',
-      source_table: 'l1.counterparty',
+      source_table: 'l2.counterparty',
       source_field: 'counterparty_id',
       label_field: 'legal_name',
       hierarchy_id: 'org_hierarchy',

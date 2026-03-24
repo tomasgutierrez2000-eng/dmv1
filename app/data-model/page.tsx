@@ -898,7 +898,7 @@ export default function DataModelPage() {
                       type="text"
                       value={addFieldForm.fk_target}
                       onChange={(e) => setAddFieldForm((f) => ({ ...f, fk_target: e.target.value }))}
-                      placeholder="FK target (e.g. l1.counterparty.counterparty_id)"
+                      placeholder="FK target (e.g. l2.counterparty.counterparty_id)"
                       className="border border-gray-300 rounded px-2 py-1.5 text-sm"
                     />
                     <input

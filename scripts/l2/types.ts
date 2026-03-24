@@ -7,7 +7,7 @@ export interface L2ColumnDef {
   nullable?: boolean;
   default?: string;
   pk?: boolean;
-  fk?: string; // "l1.facility_master(facility_id)" or "l2.amendment_event(amendment_id)"
+  fk?: string; // "l2.facility_master(facility_id)" or "l2.amendment_event(amendment_id)"
 }
 
 export type L2SCDType = 'Snapshot' | 'Event' | 'SCD-1';

@@ -136,8 +136,8 @@ async function queryDemoFacilities(
             PARTITION BY fm.counterparty_id
             ORDER BY COALESCE(fes.committed_amount, 0) DESC
           ) AS rn
-      FROM l1.facility_master fm
-      JOIN l1.counterparty cp ON cp.counterparty_id = fm.counterparty_id
+      FROM l2.facility_master fm
+      JOIN l2.counterparty cp ON cp.counterparty_id = fm.counterparty_id
       LEFT JOIN l2.facility_exposure_snapshot fes
         ON fes.facility_id = fm.facility_id
         AND fes.as_of_date = (
@@ -239,8 +239,8 @@ async function simpleFallback(client: PgClient): Promise<DemoFacility[]> {
       fm.facility_name,
       fm.counterparty_id,
       cp.legal_name AS counterparty_name
-    FROM l1.facility_master fm
-    JOIN l1.counterparty cp ON cp.counterparty_id = fm.counterparty_id
+    FROM l2.facility_master fm
+    JOIN l2.counterparty cp ON cp.counterparty_id = fm.counterparty_id
     ORDER BY fm.facility_id
     LIMIT $1
   `;

@@ -8,8 +8,8 @@ vi.mock('../formula-resolver', () => ({
     return {
       formula: 'test',
       formulaSQL: `SELECT * FROM l2.facility_exposure_snapshot fes
-        LEFT JOIN l1.facility_master fm ON fm.facility_id = fes.facility_id
-        LEFT JOIN l1.counterparty c ON c.counterparty_id = fm.counterparty_id`,
+        LEFT JOIN l2.facility_master fm ON fm.facility_id = fes.facility_id
+        LEFT JOIN l2.counterparty c ON c.counterparty_id = fm.counterparty_id`,
       source: 'metric-base',
     };
   }),
@@ -45,8 +45,8 @@ describe('getTableKeysForMetric', () => {
   it('extracts tables from formula SQL via regex', () => {
     const m = makeMetric();
     const keys = getTableKeysForMetric(m, 'facility');
-    expect(keys).toContain('L1.facility_master');
-    expect(keys).toContain('L1.counterparty');
+    expect(keys).toContain('L2.facility_master');
+    expect(keys).toContain('L2.counterparty');
   });
 
   it('deduplicates table keys', () => {

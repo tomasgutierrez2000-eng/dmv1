@@ -46,7 +46,7 @@ Compare specific schema(s) or table(s):
 ```
 /drift-monitor l2
 /drift-monitor l2.facility_risk_snapshot
-/drift-monitor l1.facility_master l2.facility_exposure_snapshot
+/drift-monitor l2.facility_master l2.facility_exposure_snapshot
 ```
 
 ### Mode C: Post-Change Verification

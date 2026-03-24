@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeCaughtError } from '../api-response';
+import { normalizeCaughtError, jsonSuccess, jsonError, withErrorHandling } from '../api-response';
 
 describe('normalizeCaughtError', () => {
   it('normalizes read-only FS error', () => {
@@ -119,5 +119,109 @@ describe('normalizeCaughtError', () => {
   it('handles non-Error values (null)', () => {
     const result = normalizeCaughtError(null);
     expect(result.status).toBe(500);
+  });
+});
+
+/* ────────────────── jsonSuccess ────────────────── */
+
+describe('jsonSuccess', () => {
+  it('returns data directly by default', async () => {
+    const res = jsonSuccess({ foo: 'bar' });
+    const body = await res.json();
+    expect(body.foo).toBe('bar');
+    expect(res.status).toBe(200);
+  });
+
+  it('wraps in standard shape when requested', async () => {
+    const res = jsonSuccess({ count: 5 }, 200, true);
+    const body = await res.json();
+    expect(body.ok).toBe(true);
+    expect(body.data.count).toBe(5);
+  });
+
+  it('respects custom status code', async () => {
+    const res = jsonSuccess('created', 201);
+    expect(res.status).toBe(201);
+  });
+});
+
+/* ────────────────── jsonError ────────────────── */
+
+describe('jsonError', () => {
+  it('returns standard error shape', async () => {
+    const res = jsonError('Something failed', { status: 400, code: 'BAD_REQ' });
+    const body = await res.json();
+    expect(body.ok).toBe(false);
+    expect(body.error).toBe('Something failed');
+    expect(body.code).toBe('BAD_REQ');
+    expect(res.status).toBe(400);
+  });
+
+  it('defaults to 500 status', async () => {
+    const res = jsonError('Internal error');
+    expect(res.status).toBe(500);
+  });
+
+  it('includes details when provided', async () => {
+    const res = jsonError('Fail', { details: 'stack trace here' });
+    const body = await res.json();
+    expect(body.details).toBe('stack trace here');
+  });
+
+  it('omits details and code when not provided', async () => {
+    const res = jsonError('Fail');
+    const body = await res.json();
+    expect(body.details).toBeUndefined();
+    expect(body.code).toBeUndefined();
+  });
+});
+
+/* ────────────────── withErrorHandling ────────────────── */
+
+describe('withErrorHandling', () => {
+  it('returns handler result on success', async () => {
+    const res = await withErrorHandling(async () => jsonSuccess({ ok: true }));
+    const body = await res.json();
+    expect(body.ok).toBe(true);
+  });
+
+  it('catches errors and returns normalized error response', async () => {
+    const res = await withErrorHandling(async () => {
+      throw new Error('ENOENT: no such file');
+    });
+    const body = await res.json();
+    expect(body.ok).toBe(false);
+    expect(body.code).toBe('NOT_FOUND');
+    expect(res.status).toBe(404);
+  });
+
+  it('catches read-only FS errors', async () => {
+    const res = await withErrorHandling(async () => {
+      const err = new Error('EROFS');
+      (err as NodeJS.ErrnoException).code = 'EROFS';
+      throw err;
+    });
+    const body = await res.json();
+    expect(body.ok).toBe(false);
+    expect(body.code).toBe('READ_ONLY_FS');
+    expect(res.status).toBe(503);
+  });
+
+  it('uses fallbackStatus for unknown errors when normalization returns 500', async () => {
+    const res = await withErrorHandling(async () => {
+      throw new Error('mystery error');
+    });
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error).toBe('An unexpected error occurred');
+  });
+
+  it('catches non-Error thrown values', async () => {
+    const res = await withErrorHandling(async () => {
+      throw 'raw string error'; // eslint-disable-line no-throw-literal
+    });
+    const body = await res.json();
+    expect(body.ok).toBe(false);
+    expect(res.status).toBe(500);
   });
 });

@@ -18,6 +18,7 @@ import path from 'path';
 import { IDRegistry } from './id-registry';
 import { generateV2Data, type V2GeneratorConfig } from './v2/generators';
 import type { L1Chain, CollateralAssetRow, LimitRuleRow } from './chain-builder';
+import { formatSqlValue, quoteColumn } from '../../lib/sql-value-formatter';
 import type { EnrichedCounterparty, EnrichedAgreement, EnrichedFacility } from './gsib-enrichment';
 import type { TableData as V2TableData, TimeFrequency } from './v2/types';
 import type { StoryArc, RatingTier, SizeProfile } from '../../scripts/shared/mvp-config';
@@ -241,44 +242,12 @@ function assignStoryArcs(chain: L1Chain): {
 
 /* ────────────────── SQL Emitter ────────────────── */
 
-const RESERVED_WORDS = new Set([
-  'value', 'all', 'and', 'array', 'as', 'between', 'case', 'check',
-  'column', 'constraint', 'create', 'cross', 'default', 'distinct',
-  'do', 'else', 'end', 'except', 'false', 'fetch', 'for', 'foreign',
-  'from', 'full', 'grant', 'group', 'having', 'in', 'inner', 'into',
-  'is', 'join', 'leading', 'left', 'like', 'limit', 'not', 'null',
-  'offset', 'on', 'only', 'or', 'order', 'outer', 'primary',
-  'references', 'right', 'select', 'table', 'then', 'to', 'true',
-  'union', 'unique', 'user', 'using', 'when', 'where', 'window', 'with',
-]);
-
-function quoteCol(col: string): string {
-  return RESERVED_WORDS.has(col.toLowerCase()) ? `"${col}"` : col;
-}
-
-function formatSqlValue(value: unknown): string {
-  if (value === null || value === undefined) return 'NULL';
-  if (typeof value === 'boolean') return value ? 'TRUE' : 'FALSE';
-  if (typeof value === 'number') return isNaN(value) ? 'NULL' : String(value);
-  // Handle Date objects → 'YYYY-MM-DD' format
-  if (value instanceof Date) {
-    const y = value.getFullYear();
-    const m = String(value.getMonth() + 1).padStart(2, '0');
-    const d = String(value.getDate()).padStart(2, '0');
-    return `'${y}-${m}-${d}'`;
-  }
-  const s = String(value);
-  if (s === 'true' || s === 'TRUE' || s === 'Y') return 'TRUE';
-  if (s === 'false' || s === 'FALSE' || s === 'N') return 'FALSE';
-  return `'${s.replace(/'/g, "''")}'`;
-}
-
 function emitTableSql(td: V2TableData): string[] {
   if (td.rows.length === 0) return [];
 
   const lines: string[] = [];
   const columns = Object.keys(td.rows[0]);
-  const colList = columns.map(quoteCol).join(', ');
+  const colList = columns.map(quoteColumn).join(', ');
 
   lines.push(`-- ${td.schema}.${td.table} (${td.rows.length} rows)`);
 
@@ -289,7 +258,7 @@ function emitTableSql(td: V2TableData): string[] {
     lines.push(`INSERT INTO ${td.schema}.${td.table} (${colList}) VALUES`);
 
     const valueSets = batch.map((row, i) => {
-      const vals = columns.map(col => formatSqlValue(row[col]));
+      const vals = columns.map(col => formatSqlValue(col, row[col]));
       const comma = i < batch.length - 1 ? ',' : '';
       return `(${vals.join(', ')})${comma}`;
     });

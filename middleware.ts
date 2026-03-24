@@ -9,16 +9,23 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // ─── Security Headers ───────────────────────────────────────────────────
 
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
 const SECURITY_HEADERS: Record<string, string> = {
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  // HSTS: enforce HTTPS for 1 year, include subdomains (production only)
+  ...(IS_PRODUCTION ? { 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains' } : {}),
   // CSP: allow self + inline styles (Tailwind/Next.js needs them) + data URIs for images
+  // In production, drop unsafe-eval (only needed for Next.js dev hot-reload)
   'Content-Security-Policy': [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline'",  // Next.js dev requires unsafe-eval
+    IS_PRODUCTION
+      ? "script-src 'self' 'unsafe-inline'"              // Prod: no unsafe-eval
+      : "script-src 'self' 'unsafe-eval' 'unsafe-inline'", // Dev: Next.js HMR needs eval
     "style-src 'self' 'unsafe-inline'",                  // Tailwind inline styles
     "img-src 'self' data: blob:",
     "font-src 'self'",
@@ -97,12 +104,42 @@ function logRequest(req: NextRequest, status: number, durationMs: number): void 
   console.info('[api-request]', JSON.stringify(payload));
 }
 
+// ─── CORS ────────────────────────────────────────────────────────────────
+
+// In production, restrict to same-origin only. In dev, allow localhost variants.
+const ALLOWED_ORIGINS = IS_PRODUCTION
+  ? new Set<string>()  // Empty = same-origin only (no cross-origin allowed)
+  : new Set(['http://localhost:3000', 'http://127.0.0.1:3000']);
+
+function applyCorsHeaders(response: NextResponse, origin: string | null): void {
+  if (!origin) return;
+  if (!IS_PRODUCTION && ALLOWED_ORIGINS.has(origin)) {
+    response.headers.set('Access-Control-Allow-Origin', origin);
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    response.headers.set('Access-Control-Max-Age', '86400');
+    response.headers.set('Vary', 'Origin');
+  }
+  // In production: no ACAO header = browser blocks cross-origin requests (same-origin policy)
+}
+
 // ─── Middleware ──────────────────────────────────────────────────────────
 
 export function middleware(request: NextRequest): NextResponse {
   const startedAt = Date.now();
   const isApiRoute = request.nextUrl.pathname.startsWith('/api/');
   const isAgentRoute = request.nextUrl.pathname.startsWith('/api/agent');
+  const origin = request.headers.get('origin');
+
+  // Handle CORS preflight (OPTIONS) for API routes
+  if (isApiRoute && request.method === 'OPTIONS') {
+    const response = new NextResponse(null, { status: 204 });
+    applyCorsHeaders(response, origin);
+    for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+      response.headers.set(key, value);
+    }
+    return response;
+  }
 
   // Rate limiting for API routes
   if (isApiRoute) {
@@ -114,6 +151,9 @@ export function middleware(request: NextRequest): NextResponse {
         { ok: false, error: 'Rate limit exceeded', code: 'RATE_LIMIT' },
         { status: 429 }
       );
+      for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+        response.headers.set(key, value);
+      }
       response.headers.set('Retry-After', '60');
       response.headers.set('X-RateLimit-Remaining', '0');
       logRequest(request, 429, Date.now() - startedAt);
@@ -123,10 +163,11 @@ export function middleware(request: NextRequest): NextResponse {
     // Continue with rate limit headers
     const response = NextResponse.next();
 
-    // Add security headers
+    // Add security + CORS headers
     for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
       response.headers.set(key, value);
     }
+    applyCorsHeaders(response, origin);
     response.headers.set('X-RateLimit-Remaining', String(remaining));
 
     logRequest(request, 200, Date.now() - startedAt);

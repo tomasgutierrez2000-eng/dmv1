@@ -66,11 +66,42 @@ Show dependency graph for a specific migration or all migrations (Section 9).
 
 ## 3. Migration Registry
 
-The migration registry is built dynamically by scanning `sql/migrations/*.sql`. No separate
-tracking table is needed — the filesystem IS the registry, and PostgreSQL's schema state IS
-the applied state.
+The migration registry uses a dual-source approach:
 
-### Detection logic
+1. **Primary:** `audit.schema_migrations` table in PostgreSQL — authoritative record of what was applied
+2. **Fallback:** Filesystem scan + `information_schema` introspection — for when the tracking table doesn't exist yet or for bootstrapping
+
+### Schema Migrations Table
+
+If the `audit.schema_migrations` table doesn't exist, create it on first run:
+
+```sql
+CREATE TABLE IF NOT EXISTS audit.schema_migrations (
+    version         INTEGER         NOT NULL,
+    filename        VARCHAR(200)    NOT NULL,
+    checksum        VARCHAR(64),    -- SHA-256 of migration file contents
+    applied_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    applied_by      VARCHAR(100)    DEFAULT 'db-schema-builder',
+    execution_ms    INTEGER,
+    rolled_back_at  TIMESTAMPTZ,
+    CONSTRAINT pk_schema_migrations PRIMARY KEY (version, filename)
+);
+
+COMMENT ON TABLE audit.schema_migrations IS
+    'Authoritative migration tracking. Records every applied migration with checksum for drift detection.';
+```
+
+After applying any migration, INSERT a record. After rolling back, UPDATE `rolled_back_at`.
+
+### Bootstrapping (one-time)
+
+On first run, if `audit.schema_migrations` is empty but `sql/migrations/` has files:
+1. Scan all migration files (filesystem detection below)
+2. For each file, check applied state via `information_schema` introspection
+3. For all APPLIED migrations, INSERT a record into `audit.schema_migrations` with `applied_by = 'bootstrap'`
+4. Report: "Bootstrapped {N} existing migrations into tracking table."
+
+### Filesystem Detection (fallback + supplement)
 
 For each `.sql` file in `sql/migrations/`:
 
@@ -83,14 +114,18 @@ For each `.sql` file in `sql/migrations/`:
 
 4. **Detect dependencies:** Parse the `-- Dependencies:` header comment if present
 
-5. **Detect applied state:** Query PostgreSQL to check if the objects created/modified by the migration exist:
-   - `CREATE TABLE` → check `information_schema.tables`
-   - `ADD COLUMN` → check `information_schema.columns`
-   - `CREATE INDEX` → check `pg_indexes`
-   - `ADD CONSTRAINT` → check `information_schema.table_constraints`
+5. **Detect applied state (dual-source):**
+   - **If tracking table exists:** Check `audit.schema_migrations` for a matching `(version, filename)` row with NULL `rolled_back_at`
+   - **Fallback (no tracking table):** Query PostgreSQL to check if the objects created/modified by the migration exist:
+     - `CREATE TABLE` → check `information_schema.tables`
+     - `ADD COLUMN` → check `information_schema.columns`
+     - `CREATE INDEX` → check `pg_indexes`
+     - `ADD CONSTRAINT` → check `information_schema.table_constraints`
    - If ALL objects exist → `APPLIED`
    - If SOME objects exist → `PARTIAL` (requires investigation)
    - If NO objects exist → `PENDING`
+
+6. **Checksum drift detection:** If migration is in tracking table, compare stored checksum against current file SHA-256. If different: warn "Migration {filename} has been modified since it was applied. This is a policy violation (Safety Rule #4)."
 
 ---
 
@@ -186,7 +221,8 @@ For each pending migration, in sequence order:
 3. **Confirm** — wait for user approval (same PRE_EXECUTION gate as DB Schema Builder)
 4. **Execute** against PostgreSQL:
    ```bash
-   source /Users/tomas/120/.env && /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql "$DATABASE_URL" \
+   # Read psql_path and env_file from .claude/config/bank-profile.yaml
+   source {env_file} && {psql_path} "$DATABASE_URL" \
      -v ON_ERROR_STOP=1 \
      -f sql/migrations/{filename}
    ```

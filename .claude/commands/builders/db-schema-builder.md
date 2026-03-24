@@ -148,10 +148,14 @@ Every column name MUST follow the CLAUDE.md naming convention:
 - Table names: `snake_case`, no uppercase, no hyphens
 - Column names: `snake_case`, no uppercase, no hyphens
 - Constraint names: `snake_case`, descriptive prefix (`pk_`, `fk_`, `uq_`, `chk_`, `idx_`)
-- Table names match layer convention:
+- **Table suffix enforcement (CREATE TABLE only — strict):**
   - L1: dim tables end with `_dim`, master tables end with `_master` or describe reference entities
   - L2: snapshot tables end with `_snapshot`, event tables end with `_event`
   - L3: calc tables end with `_calc`, result tables end with `_result`, cube tables end with `_cube`
+- **Table suffix enforcement (ALTER TABLE — warn only):**
+  - Existing tables like `facility_master`, `counterparty`, `fx_rate`, `position` predate the suffix convention
+  - When altering these tables, emit a WARNING but do NOT reject the DDL
+  - Log: "WARN: Table {name} does not follow L2 suffix convention (_snapshot/_event). Pre-existing table — allowed."
 
 ### Test 6: Constraint Name Length
 
@@ -270,13 +274,18 @@ Write both files to `sql/migrations/`.
 
 ## 7. DDL Execution (Transactional)
 
-Execute against PostgreSQL using the `DATABASE_URL` from `.env`:
+Execute against PostgreSQL using the connection details from `bank-profile.yaml`:
 
 ```bash
-source /Users/tomas/120/.env && /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql "$DATABASE_URL" \
+# Read psql_path and env_file from .claude/config/bank-profile.yaml
+source {env_file} && {psql_path} "$DATABASE_URL" \
   -v ON_ERROR_STOP=1 \
   -f sql/migrations/{NNN}-{description}.sql
 ```
+
+Default paths (from bank-profile.yaml `migration_tooling` section):
+- `psql_path`: `/opt/homebrew/Cellar/postgresql@18/18.3/bin/psql`
+- `env_file`: `/Users/tomas/120/.env`
 
 **Transaction safety:**
 - The migration file is already wrapped in `BEGIN; ... COMMIT;`

@@ -348,8 +348,14 @@ async function main() {
         }
       }
     } catch (err) {
-      console.log(`⚠ Could not load L1 registry: ${err instanceof Error ? err.message : String(err)}`);
-      console.log('  Quality controls will be skipped. Use --skip-quality-controls to suppress this warning.');
+      // FAIL FAST — quality controls are NOT optional. Without the L1 registry,
+      // entity_type_code, industry_id, and DPD bucket validation are all skipped,
+      // which is exactly how the audit found 468 broken industry FKs and 15 leaked
+      // entity_type codes. Use --skip-quality-controls only for development.
+      console.error(`✗ Could not load L1 registry: ${err instanceof Error ? err.message : String(err)}`);
+      console.error('  Quality controls cannot run without L1 reference data.');
+      console.error('  Fix the registry or use --skip-quality-controls to bypass (NOT recommended for production).');
+      process.exit(1);
     }
   } else {
     console.log('Quality controls: SKIPPED (--skip-quality-controls)');

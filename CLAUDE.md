@@ -325,6 +325,13 @@ against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
 | FK value range mismatch | `counterparty.industry_id = 1-10` but `industry_dim` uses NAICS codes 11+ | Verify FK values actually exist in parent dim PK range — values may be syntactically valid BIGINT but semantically wrong (no matching PK row) |
 | NULL weight column | `gross_exposure_usd` NULL for 347/2753 FES rows | Weighted avg returns NULL for entire segments when weight column has NULL gaps — verify weight columns have 100% coverage, not just formula correctness |
 | ROW_NUMBER for string rollup | `SUM(industry_name)` invalid at segment level | Use `ROW_NUMBER() OVER (PARTITION BY segment ORDER BY SUM(exposure) DESC)` to find dominant string value by exposure weight |
+| PK duplicates in FES | 14,580 duplicate (facility_id, as_of_date) rows inflating SUM metrics 2-7x | Factory dedup or `ON CONFLICT DO NOTHING`; validator.ts now checks PK uniqueness pre-emit |
+| Entity type code leak | `entity_type_code = '53'` (NAICS code) instead of 'RE' on 15 CPs | gsib-enrichment.ts now maps internal IDs → valid entity_type_dim codes; validator errors on invalid codes |
+| Internal industry_id emission | `industry_id = 1-10` (factory internal) not in `industry_dim` (NAICS 11+) | gsib-enrichment.ts now emits `naicsCode` (11-92), never internal factory IDs; validator checks NAICS range |
+| NULL drawn_amount in FES | 87% NULL because factory wrote `outstanding_balance_amt` but metrics use `drawn_amount` | Exposure generator now populates BOTH `drawn_amount` AND `outstanding_balance_amt`; validator errors on NULL |
+| DPD bucket code mismatch | Generator hardcoded `'0-30', '31-60', '61-90'` but dim uses FFIEC `'CURRENT', '30-59', '60-89'` | Delinquency generator updated to FFIEC codes; validator checks generated codes against valid set |
+| FX rate date coverage gap | Only 3 of 34 snapshot dates had fx_rate rows — JOINs returned NULL for 26 weeks | New fx-rate generator creates rates for ALL snapshot dates; validator checks FX date coverage |
+| QC silent skip on registry fail | `ReferenceDataRegistry.fromSeedSQL()` failure silently skipped all 11 QC groups | scenario-runner now fails fast on registry load failure — QC is not optional |
 
 ### PostgreSQL Seed Data Quality Checklist (Phase 5C Extended)
 
@@ -1023,6 +1030,12 @@ source /Users/tomas/120/.env && /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql
 | `_flag` suffix convention | `is_active` column doesn't exist | ALL boolean columns in PG use `_flag` suffix — `is_active_flag`, `is_developed_market_flag`, etc. |
 | search_path for cross-schema queries | `l1.collateral_asset_master` not found | Set `search_path TO l1, l2, public` before querying, OR remove schema prefixes |
 | ON CONFLICT for idempotent loads | Weekly data overlaps existing monthly dates | Use `ON CONFLICT DO NOTHING` so re-runs don't fail on existing data |
+| drawn_amount vs outstanding_balance_amt | Factory wrote `outstanding_balance_amt` but metrics use `drawn_amount` — 87% NULL | Exposure generator must populate BOTH column aliases. PG has both columns in FES. |
+| Internal industry_id emitted to PG | `industry_id: profile.industry_id` emits factory ID 1-10, not NAICS 11+ | gsib-enrichment now maps via `industryMap.naicsCode`. Never emit `profile.industry_id` raw. |
+| entity_type_code = NAICS prefix | RE counterparties got `entity_type_code = '53'` instead of `'RE'` | enrichCounterparty now throws on unknown industry_id. QC group 1 upgraded to error severity. |
+| No FX rate rows generated | Factory has BASE_FX_RATES in market-environment but never writes l2.fx_rate | New fx-rate.ts generator creates rate rows for all (currency, date) combinations. |
+| DPD buckets hardcoded wrong | Generator used `'0-30', '31-60', '61-90'` — not in l1.dpd_bucket_dim | Updated to FFIEC standard: `'CURRENT', '1-29', '30-59', '60-89', '90+'`. |
+| QC registry fail = silent skip | `ReferenceDataRegistry.fromSeedSQL()` catch block just warned and continued | Now calls `process.exit(1)` — QC is mandatory for production data. |
 
 ## Agent Suite Architecture
 

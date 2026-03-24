@@ -41,6 +41,7 @@ import { generateCounterpartyFinancialRows } from './cp-financial';
 import { generateProvisionRows } from './provision';
 import { generateStressTestRows } from './stress-test';
 import { generateProductTableRows } from './product-tables';
+import { generateFxRateRows } from './fx-rate';
 
 // ─── Generator Dependency Declarations ────────────────────────────────
 //
@@ -59,6 +60,7 @@ export interface GeneratorDef {
  * Order here matches intended execution order in generateV2Data().
  */
 export const GENERATOR_REGISTRY: GeneratorDef[] = [
+  { name: 'fx-rate',               dependsOn: [] },
   { name: 'exposure',              dependsOn: [] },
   { name: 'pricing',               dependsOn: [] },
   { name: 'risk',                  dependsOn: [] },
@@ -208,6 +210,13 @@ export function generateV2Data(
   // ── Step 5: Run all generators ──
   const tables: TableData[] = [];
   const tableBreakdown: Record<string, number> = {};
+
+  // 0. FX Rates — must run before exposure so metric JOINs on fx.as_of_date have matching rows
+  const currencies = new Set(chain.facilities.map(f => f.currency_code));
+  currencies.add('USD'); // always include USD
+  const fxRateRows = generateFxRateRows(currencies, dates, registry);
+  tables.push({ schema: 'l2', table: 'fx_rate', rows: fxRateRows });
+  tableBreakdown['fx_rate'] = fxRateRows.length;
 
   // 1. Exposure
   const exposureRows = generateExposureRows(stateMap, facilityIds, dates, registry);

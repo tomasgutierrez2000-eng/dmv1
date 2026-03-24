@@ -24,6 +24,12 @@ export function generateExposureRows(
       const utilization = state.committed_amount > 0
         ? state.drawn_amount / state.committed_amount : 0;
 
+      // drawn_amount & undrawn_amount are the canonical columns used by metric formulas.
+      // outstanding_balance_amt & undrawn_commitment_amt are legacy aliases — populate both
+      // to prevent NULL gaps that silently break utilization, EAD, and exposure metrics.
+      const drawnAmt = round(state.drawn_amount, 2);
+      const undrawnAmt = round(state.undrawn_amount, 2);
+
       rows.push({
         facility_exposure_id: exposureId,
         facility_id: state.facility_id,
@@ -31,10 +37,12 @@ export function generateExposureRows(
         counterparty_id: state.counterparty_id,
         currency_code: state.currency_code,
         committed_amount: round(state.committed_amount, 2),
-        outstanding_balance_amt: round(state.drawn_amount, 2),
-        undrawn_commitment_amt: round(state.undrawn_amount, 2),
+        drawn_amount: drawnAmt,
+        undrawn_amount: undrawnAmt,
+        outstanding_balance_amt: drawnAmt,
+        undrawn_commitment_amt: undrawnAmt,
         gross_exposure_usd: round(state.ead, 2),
-        exposure_amount_local: round(state.drawn_amount, 2),
+        exposure_amount_local: drawnAmt,
         bank_share_pct: 1.000000,
         source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',

@@ -17,8 +17,8 @@ const SECURITY_HEADERS: Record<string, string> = {
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-  // HSTS: enforce HTTPS for 1 year, include subdomains
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  // HSTS: enforce HTTPS for 1 year, include subdomains (production only)
+  ...(IS_PRODUCTION ? { 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains' } : {}),
   // CSP: allow self + inline styles (Tailwind/Next.js needs them) + data URIs for images
   // In production, drop unsafe-eval (only needed for Next.js dev hot-reload)
   'Content-Security-Policy': [
@@ -151,6 +151,9 @@ export function middleware(request: NextRequest): NextResponse {
         { ok: false, error: 'Rate limit exceeded', code: 'RATE_LIMIT' },
         { status: 429 }
       );
+      for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+        response.headers.set(key, value);
+      }
       response.headers.set('Retry-After', '60');
       response.headers.set('X-RateLimit-Remaining', '0');
       logRequest(request, 429, Date.now() - startedAt);

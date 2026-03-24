@@ -29,6 +29,7 @@ export const L1_TABLE_META: L1TableMeta[] = [
   { name: 'credit_event_type_dim', scd: 'SCD-0', category: 'Credit Risk & Ratings' },
   { name: 'credit_status_dim', scd: 'SCD-0', category: 'Credit Risk & Ratings' },
   { name: 'exposure_type_dim', scd: 'SCD-0', category: 'Exposure & Position' },
+  { name: 'facility_type_dim', scd: 'SCD-0', category: 'Exposure & Position' },
   { name: 'amendment_status_dim', scd: 'SCD-0', category: 'Amendments & Forbearance' },
   { name: 'amendment_type_dim', scd: 'SCD-0', category: 'Amendments & Forbearance' },
   { name: 'default_definition_dim', scd: 'SCD-0', category: 'Credit Risk & Ratings' },

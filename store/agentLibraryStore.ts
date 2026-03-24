@@ -101,7 +101,7 @@ export const useAgentLibraryStore = create<AgentLibraryState>((set, get) => ({
 
   filteredAgents: () => {
     const { agents, selectedCategory, searchQuery } = get();
-    let filtered = agents;
+    let filtered = agents.filter(a => a.category !== 'session');
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(a => a.category === selectedCategory);
     }

@@ -22,11 +22,13 @@
 **What:** Delete ~140 lines of modulo arithmetic FK remapping. Fix L2 seed data to reference valid L1 IDs natively.
 **Why:** Exact anti-pattern CLAUDE.md warns against ("The Modular Arithmetic Trap — NEVER DO THIS"). Silently destroys narrative coherence.
 **Depends on:** May need L1 dim table expansion if L2 seed references IDs outside L1 range.
+**Completed:** Verified 2026-03-23 — `load-gsib-export.ts` is clean; no modulo FK remapping exists. L2 seed data references valid L1 IDs natively with ON CONFLICT DO NOTHING for composite PKs.
 
 ### 5. Document L3 FK-less design as ADR
 **What:** Write Architecture Decision Record explaining why L3 uses formula-driven joins (not DDL FKs).
 **Why:** 5 existing L3 FKs suggest partial intent that was never completed — confusing without documentation.
 **Depends on:** Nothing.
+**Completed:** `docs/adr/001-l3-formula-driven-joins.md` — documents formula-driven join rationale, L3 FK counts (5 vs L1's 76 and L2's 170), and compensating controls.
 
 ### 6. GitHub Actions CI workflow
 **What:** Create .github/workflows/ci.yml running typecheck, lint, test:metrics, test:calc-engine, validate on push/PR.
@@ -37,36 +39,43 @@
 **What:** Consolidate 3 formatSqlValue() implementations (sql-emitter.ts, db-writer.ts, ddl-generator.ts) and 3 PG_RESERVED_WORDS copies into one module.
 **Why:** DRY violation that can cause silent data corruption. db-writer missing exception IDs and count rounding.
 **Depends on:** Nothing. Other items (4, 8, 9) benefit from this being done first.
+**Completed:** `lib/sql-value-formatter.ts` (162 LOC) — shared module with `formatSqlValue()`, `VARCHAR_EXCEPTION_IDS`, `PG_RESERVED_WORDS`, `quoteColumn()`. Consumed by `sql-emitter.ts` and `v2/db-writer.ts`.
 
 ### 8. Convert factory hard-coded SQL to structured data
 **What:** Replace FACTORY_COUNTRY_SETUP and FACTORY_CURRENCY_SETUP raw SQL strings in sql-emitter.ts with structured objects validated by SchemaValidator.
 **Why:** Hard-coded SQL bypasses schema validation. Schema changes would silently break these inserts.
 **Depends on:** Issue 7 (shared formatter) for consistent type formatting.
+**Completed:** `scenarios/factory/factory-prerequisites.ts` (95 LOC) — structured `PrerequisiteTable[]` objects for countries, currencies, thresholds. Uses `formatSqlValue()` and `ON CONFLICT DO NOTHING`.
 
 ### 9. Fix LOAD_ORDER schema labels
 **What:** Change 'l2.counterparty' → 'l1.counterparty' (and credit_agreement_master, facility_master) in sql-emitter.ts LOAD_ORDER.
 **Why:** Documentation bug — these are L1 tables labeled as L2. Would break schema-qualified lookups.
 **Depends on:** Nothing. 3-line fix.
+**Completed:** Verified 2026-03-23 — all 136 LOAD_ORDER entries in `sql-emitter.ts` have correct `l1./l2.` prefixes. No mislabeled tables found.
 
 ### 10. Add error logging to readDataDictionary
 **What:** Log parse errors in lib/data-dictionary.ts before returning null. Distinguish ENOENT from corruption.
 **Why:** Silent error swallowing masks DD file corruption. Downstream consumers operate on stale data with no diagnosis path.
 **Depends on:** Nothing. 3-line fix.
+**Completed:** 2026-03-23 — Added `console.warn` for ENOENT case; `console.error` for parse errors already existed.
 
 ### 11. Full Vitest framework migration
 **What:** Add Vitest, convert existing test scripts to test suites, add new tests for untested flows.
 **Why:** No test framework exists. Custom assert() scripts lack parallel execution, watch mode, coverage, test isolation.
 **Depends on:** Nothing (can start immediately).
+**Completed:** Vitest 4.1.0 integrated — 25 test files across `lib/__tests__/`, `lib/metrics-calculation/__tests__/`, `scenarios/factory/__tests__/`, `scripts/shared/__tests__/`. `npm test` runs full suite.
 
 ### 12. Comprehensive formatSqlValue test suite
 **What:** Write 30+ test cases covering all suffix rules, edge cases, exception IDs, NaN/null handling, boolean coercion.
 **Why:** formatSqlValue() is called for every INSERT row in the entire database pipeline. Zero tests today.
 **Depends on:** Issues 7 (shared module) and 11 (Vitest).
+**Completed:** `lib/__tests__/sql-value-formatter.test.ts` (359 LOC) — 77 test cases covering all suffix rules, exception IDs, NaN/Infinity, quote escaping, boolean coercion, reserved words.
 
 ### 13. Incremental introspection
 **What:** Parse DDL commands to identify affected tables, only re-introspect those instead of all 211.
 **Why:** db:introspect takes 10-30 seconds over GCP Cloud SQL network. PostToolUse hook blocks dev on every DDL change.
 **Depends on:** Nothing.
+**Completed:** `scripts/introspect-db.ts` supports `--tables=table1,table2` flag. PostToolUse hook (`.claude/hooks/post-db-change.sh`) auto-extracts affected table names from DDL commands and passes them for incremental introspection.
 
 ---
 

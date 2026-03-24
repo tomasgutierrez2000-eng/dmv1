@@ -67,6 +67,7 @@ export function getDataDictionaryDir(): string {
 export function readDataDictionary(): DataDictionary | null {
   const p = getDataDictionaryPath();
   if (!fs.existsSync(p)) {
+    console.warn(`[data-dictionary] File not found: ${p}`);
     return null;
   }
   try {

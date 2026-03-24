@@ -47,8 +47,8 @@ migration_tooling:
   current: raw_sql_with_prefixes  # sql/migrations/NNN-*.sql
   target: formal  # to be selected — Flyway, golang-migrate, or sqitch
   migration_dir: sql/migrations/
-  psql_path: /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql
-  env_file: /Users/tomas/120/.env
+  psql_path: "${PSQL_PATH:-/opt/homebrew/Cellar/postgresql@18/18.3/bin/psql}"
+  env_file: "${ENV_FILE:-/Users/tomas/120/.env}"
 
 data_factory:
   primary_tooling: typescript

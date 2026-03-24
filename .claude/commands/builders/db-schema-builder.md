@@ -77,7 +77,7 @@ For EVERY proposed change, verify before any testing:
 | `change_type` | Not in: `CREATE_TABLE`, `ALTER_TABLE`, `ADD_COLUMN`, `MODIFY_COLUMN`, `DROP_COLUMN`, `CREATE_INDEX`, `ADD_FK`, `ADD_CONSTRAINT`, `DROP_CONSTRAINT`, `DROP_TABLE`, `RENAME_COLUMN`, `RENAME_TABLE` |
 | `object_schema` | Not in: `l1`, `l2`, `l3` |
 | `ddl_statement` | Contains `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`, `GRANT`, `REVOKE` (DML/DCL not allowed through this agent) |
-| `ddl_statement` | Contains semicolons within the statement body (multi-statement injection risk) |
+| `ddl_statement` | Contains 2+ semicolons, or non-whitespace follows the first semicolon (multi-statement injection risk) |
 | `rollback_ddl` | Missing for any destructive change (`DROP_COLUMN`, `MODIFY_COLUMN`, `DROP_TABLE`, `DROP_CONSTRAINT`) |
 
 On rejection: halt with specific error, log to audit, return to caller.
@@ -232,8 +232,11 @@ Example: if highest is `036-facility-type-dim-fixes.sql`, next is `037-add-ttc-p
 
 BEGIN;
 
--- Set search_path for cross-schema references
-SET search_path TO l1, l2, l3, public;
+-- Set search_path based on target schema:
+--   L1-only: SET search_path TO l1, public;
+--   L2: SET search_path TO l1, l2, public;
+--   L3: SET search_path TO l1, l2, l3, public;
+SET search_path TO {appropriate_search_path};
 
 -- Change 1: {description}
 {ddl_statement_1}

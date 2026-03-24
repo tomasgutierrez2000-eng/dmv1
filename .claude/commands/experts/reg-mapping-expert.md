@@ -244,15 +244,17 @@ This helps the Data Model Expert prioritize schema additions that close the most
 
 | Framework | Schedule | Total Fields | Covered | Partial | Gap | Coverage % | Rating |
 |-----------|----------|-------------|---------|---------|-----|-----------|--------|
-| FR Y-14Q | Schedule H | 120 | 95 | 12 | 13 | 84.2% | AMBER |
-| FR Y-14Q | Schedule Q | 25 | 18 | 3 | 4 | 78.0% | AMBER |
-| FR Y-9C | HC-R | 85 | 72 | 8 | 5 | 89.4% | AMBER |
-| FFIEC 101 | Wholesale IRB | 60 | 48 | 5 | 7 | 84.2% | AMBER |
-| FR 2052a | Wholesale | 45 | 30 | 8 | 7 | 75.6% | AMBER |
-| FR 2590 | Credit Risk | 30 | 25 | 3 | 2 | 88.3% | AMBER |
-| Basel III | SA + IRB | 40 | 32 | 4 | 4 | 85.0% | AMBER |
+| FR Y-14Q | Schedule H | {total} | {covered} | {partial} | {gap} | {computed}% | {rating} |
+| FR Y-14Q | Schedule Q | {total} | {covered} | {partial} | {gap} | {computed}% | {rating} |
+| FR Y-9C | HC-R | {total} | {covered} | {partial} | {gap} | {computed}% | {rating} |
+| FFIEC 101 | Wholesale IRB | {total} | {covered} | {partial} | {gap} | {computed}% | {rating} |
+| FR 2052a | Wholesale | {total} | {covered} | {partial} | {gap} | {computed}% | {rating} |
+| FR 2590 | Credit Risk | {total} | {covered} | {partial} | {gap} | {computed}% | {rating} |
+| Basel III | SA + IRB | {total} | {covered} | {partial} | {gap} | {computed}% | {rating} |
 | BCBS 239 | 14 Principles | 14 | — | — | — | See below | — |
-| **TOTAL** | | **419** | **320** | **43** | **42** | **83.4%** | **AMBER** |
+| **TOTAL** | | **{sum}** | **{sum}** | **{sum}** | **{sum}** | **{computed}%** | **{rating}** |
+
+**IMPORTANT:** NEVER use example numbers as defaults. Compute ALL scores from the actual field inventory in schema-manifest.yaml and data-dictionary.json. Each field must be individually verified against the data model.
 
 ## Detailed Coverage — FR Y-14Q Schedule H
 

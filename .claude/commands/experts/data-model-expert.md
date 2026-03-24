@@ -184,7 +184,7 @@ If a proposed field conflicts with an existing field (same name, different type 
         updated_ts                 TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
     );
 
-**Migration DDL:**
+**Migration DDL (PROPOSAL ONLY — DO NOT EXECUTE WITHOUT REVIEWER GATE APPROVAL):**
 
     ALTER TABLE l2.facility_risk_snapshot
         ADD COLUMN pd_ttc_pct NUMERIC(10,6);
@@ -202,7 +202,7 @@ If a proposed field conflicts with an existing field (same name, different type 
 
     CREATE TABLE l3.{table_name} (
         {table_name}_id        BIGSERIAL    PRIMARY KEY,
-        facility_id            BIGINT       NOT NULL REFERENCES l2.facility_master(facility_id),
+        facility_id            BIGINT       NOT NULL REFERENCES l1.facility_master(facility_id),
         as_of_date             DATE         NOT NULL,
         -- metric columns --
         {metric_field}_amt     NUMERIC(20,4),
@@ -255,6 +255,8 @@ To proceed:
 - Type **CANCEL** to discard
 
 The DB Schema Builder will validate all DDL, run through the reviewer gate, and apply changes to PostgreSQL.
+
+**SAFETY:** If DB Schema Builder agent is not available, output the migration DDL for manual execution. NEVER execute DDL directly from this agent.
 ```
 
 ## Audit Logging

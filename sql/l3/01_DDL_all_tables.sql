@@ -82,116 +82,11 @@ CREATE TABLE IF NOT EXISTS "l3"."risk_metric_cube" (
     PRIMARY KEY ("risk_metric_cube_sk")
 );
 
--- counterparty_exposure_summary (Exposure & Risk Metrics)
-CREATE TABLE IF NOT EXISTS "l3"."counterparty_exposure_summary" (
-    "counterparty_exposure_summary_sk" BIGSERIAL NOT NULL,
-    "run_version_id" BIGINT,
-    "as_of_date" DATE,
-    "scenario_id" BIGINT,
-    "legal_entity_id" BIGINT,
-    "counterparty_id" BIGINT,
-    "sccl_group_id" BIGINT,
-    "country_code" VARCHAR(30),
-    "base_currency_code" VARCHAR(30),
-    "total_gross_exposure_amt" NUMERIC(20,4),
-    "total_net_exposure_amt" NUMERIC(20,4),
-    "total_ead_amt" NUMERIC(20,4),
-    "secured_amt" NUMERIC(20,4),
-    "unsecured_residual_amt" NUMERIC(20,4),
+-- T03 counterparty_exposure_summary: REMOVED (subsumed by counterparty_derived)
 
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
+-- T04 facility_exposure_summary: REMOVED (subsumed by facility_derived)
 
-    "created_ts" TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "lob_node_id" BIGINT,
-    "hierarchy_id" BIGINT,
-    "has_cross_entity_flag" BOOLEAN,
-    "cross_entity_exposure_amt" NUMERIC(20,4),
-    "cross_entity_entity_count" INTEGER,
-    "is_parent_flag" BOOLEAN,
-    "total_committed_amt" NUMERIC(20,4),
-    "total_outstanding_amt" NUMERIC(20,4),
-    "prior_period_gross_exposure_amt" NUMERIC(20,4),
-    "exposure_change_pct" NUMERIC(10,6),
-    "avg_pd_pct" NUMERIC(10,6),
-    "avg_lgd_pct" NUMERIC(10,6),
-    "expected_loss_amt" NUMERIC(20,4),
-    "credit_limit_amt" NUMERIC(20,4),
-    "utilization_pct" NUMERIC(10,6),
-    "headroom_amt" NUMERIC(20,4),
-    "risk_rating_tier_code" VARCHAR(30),
-    "limit_status_code" VARCHAR(30),
-    "region_code" VARCHAR(30),
-    "industry_code" VARCHAR(30),
-    "rwa_amt" NUMERIC(20,4),
-    "rwa_density_pct" NUMERIC(10,6),
-    "total_cross_entity_exposure_usd" NUMERIC(18,2),
-    PRIMARY KEY ("counterparty_exposure_summary_sk")
-);
-
--- facility_exposure_summary (Exposure & Risk Metrics)
-CREATE TABLE IF NOT EXISTS "l3"."facility_exposure_summary" (
-    "facility_exposure_summary_sk" BIGSERIAL NOT NULL,
-    "run_version_id" BIGINT,
-    "as_of_date" DATE,
-    "scenario_id" BIGINT,
-    "legal_entity_id" BIGINT,
-    "facility_id" BIGINT,
-    "counterparty_id" BIGINT,
-    "portfolio_id" BIGINT,
-    "base_currency_code" VARCHAR(30),
-    "outstanding_amt" NUMERIC(20,4),
-    "undrawn_commitment_amt" NUMERIC(20,4),
-    "ead_amt" NUMERIC(20,4),
-    "secured_amt" NUMERIC(20,4),
-    "unsecured_residual_amt" NUMERIC(20,4),
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "lob_node_id" BIGINT,
-    "attribution_pct" NUMERIC(10,6),
-    "is_syndicated_flag" BOOLEAN,
-    "has_amendment_flag" BOOLEAN,
-    "amendment_type_code" VARCHAR(30),
-    "amendment_status_code" VARCHAR(30),
-    PRIMARY KEY ("facility_exposure_summary_sk")
-);
-
--- portfolio_summary (Exposure & Risk Metrics)
-CREATE TABLE IF NOT EXISTS "l3"."portfolio_summary" (
-    "portfolio_summary_sk" BIGSERIAL NOT NULL,
-    "run_version_id" BIGINT,
-    "as_of_date" DATE,
-    "scenario_id" BIGINT,
-    "legal_entity_id" BIGINT,
-    "portfolio_id" BIGINT,
-    "base_currency_code" VARCHAR(30),
-    "total_gross_exposure_amt" NUMERIC(20,4),
-    "total_ead_amt" NUMERIC(20,4),
-    "total_expected_loss_amt" NUMERIC(20,4),
-    "avg_pd_pct" NUMERIC(10,6),
-    "avg_lgd_pct" NUMERIC(10,6),
-    "total_rwa_amt" NUMERIC(20,4),
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "lob_node_id" BIGINT,
-    "rwa_density_pct" NUMERIC(10,6),
-    PRIMARY KEY ("portfolio_summary_sk")
-);
+-- T05 portfolio_summary: REMOVED (subsumed by portfolio_derived)
 
 -- crm_allocation_summary (Credit Risk Mitigation (CRM))
 CREATE TABLE IF NOT EXISTS "l3"."crm_allocation_summary" (
@@ -931,55 +826,7 @@ CREATE TABLE IF NOT EXISTS "l3"."executive_highlight_summary" (
     PRIMARY KEY ("executive_highlight_summary_sk")
 );
 
--- counterparty_detail_snapshot (Counterparty Analytics)
-CREATE TABLE IF NOT EXISTS "l3"."counterparty_detail_snapshot" (
-    "counterparty_detail_snapshot_sk" BIGSERIAL NOT NULL,
-    "run_version_id" BIGINT,
-    "as_of_date" DATE,
-    "counterparty_id" BIGINT,
-    "counterparty_name" VARCHAR(500),
-    "is_parent_flag" BOOLEAN,
-    "parent_counterparty_id" BIGINT,
-    "parent_counterparty_name" VARCHAR(500),
-    "legal_entity_id" BIGINT,
-    "country_code" VARCHAR(30),
-    "region_code" VARCHAR(30),
-    "industry_code" VARCHAR(30),
-    "industry_name" VARCHAR(500),
-    "internal_risk_rating" VARCHAR(255),
-    "external_risk_rating" VARCHAR(255),
-    "counterparty_type" VARCHAR(255),
-    "total_gross_exposure_amt" NUMERIC(20,4),
-    "total_net_exposure_amt" NUMERIC(20,4),
-    "total_committed_amt" NUMERIC(20,4),
-    "total_outstanding_amt" NUMERIC(20,4),
-    "pd_pct" NUMERIC(10,6),
-    "lgd_pct" NUMERIC(10,6),
-    "expected_loss_amt" NUMERIC(20,4),
-    "credit_limit_amt" NUMERIC(20,4),
-    "utilized_amt" NUMERIC(20,4),
-    "utilization_pct" NUMERIC(10,6),
-    "headroom_amt" NUMERIC(20,4),
-    "risk_tier_code" VARCHAR(30),
-    "limit_status_code" VARCHAR(30),
-    "facility_count" INTEGER,
-    "crm_type" VARCHAR(255),
-    "prior_period_gross_exposure_amt" NUMERIC(20,4),
-    "exposure_change_pct" NUMERIC(10,6),
-    "base_currency_code" VARCHAR(30),
-    "lob_node_id" BIGINT,
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "rwa_amt" NUMERIC(20,4),
-    "rwa_density_pct" NUMERIC(10,6),
-    PRIMARY KEY ("counterparty_detail_snapshot_sk")
-);
+-- T06 counterparty_detail_snapshot: REMOVED (subsumed by *_derived tables)
 
 -- limit_tier_status_matrix (Limits & Appetite)
 CREATE TABLE IF NOT EXISTS "l3"."limit_tier_status_matrix" (
@@ -1057,37 +904,7 @@ CREATE TABLE IF NOT EXISTS "l3"."data_quality_score_summary" (
     PRIMARY KEY ("data_quality_score_summary_sk")
 );
 
--- legal_entity_risk_profile (Legal Entity Analytics)
-CREATE TABLE IF NOT EXISTS "l3"."legal_entity_risk_profile" (
-    "legal_entity_risk_profile_sk" BIGSERIAL NOT NULL,
-    "run_version_id" BIGINT,
-    "as_of_date" DATE,
-    "legal_entity_id" BIGINT,
-    "legal_entity_name" VARCHAR(500),
-    "le_classification" VARCHAR(255),
-    "gross_exposure_amt" NUMERIC(20,4),
-    "net_exposure_amt" NUMERIC(20,4),
-    "has_cross_entity_flag" BOOLEAN,
-    "cross_entity_exposure_amt" NUMERIC(20,4),
-    "facility_count" INTEGER,
-    "liquidity_ratio_pct" NUMERIC(10,6),
-    "utilization_pct" NUMERIC(10,6),
-    "avg_pd_pct" NUMERIC(10,6),
-    "avg_lgd_pct" NUMERIC(10,6),
-    "expected_loss_amt" NUMERIC(20,4),
-    "base_currency_code" VARCHAR(30),
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "rwa_amt" NUMERIC(20,4),
-    "rwa_density_pct" NUMERIC(10,6),
-    PRIMARY KEY ("legal_entity_risk_profile_sk")
-);
+-- T07 legal_entity_risk_profile: REMOVED (subsumed by *_derived tables)
 
 -- data_quality_attribute_score (Data Quality)
 CREATE TABLE IF NOT EXISTS "l3"."data_quality_attribute_score" (
@@ -1212,27 +1029,7 @@ CREATE TABLE IF NOT EXISTS "l3"."regulatory_compliance_state" (
     PRIMARY KEY ("regulatory_compliance_state_sk")
 );
 
--- facility_timeline_summary (Facility Analytics)
-CREATE TABLE IF NOT EXISTS "l3"."facility_timeline_summary" (
-    "facility_timeline_summary_sk" BIGSERIAL NOT NULL,
-    "run_version_id" BIGINT,
-    "as_of_date" DATE,
-    "timeline_month" VARCHAR(255),
-    "timeline_type" VARCHAR(255),
-    "facility_count" INTEGER,
-    "total_exposure_amt" NUMERIC(20,4),
-    "cumulative_exposure_change_amt" NUMERIC(20,4),
-    "base_currency_code" VARCHAR(30),
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ("facility_timeline_summary_sk")
-);
+-- T08 facility_timeline_summary: REMOVED (subsumed by *_derived tables)
 
 -- amendment_summary (Amendment Analytics)
 CREATE TABLE IF NOT EXISTS "l3"."amendment_summary" (
@@ -1282,64 +1079,7 @@ CREATE TABLE IF NOT EXISTS "l3"."amendment_detail" (
     PRIMARY KEY ("amendment_detail_sk")
 );
 
--- facility_detail_snapshot (Facility Analytics)
-CREATE TABLE IF NOT EXISTS "l3"."facility_detail_snapshot" (
-    "facility_detail_snapshot_sk" BIGSERIAL NOT NULL,
-    "run_version_id" BIGINT,
-    "as_of_date" DATE,
-    "facility_id" BIGINT,
-    "facility_type" VARCHAR(255),
-    "facility_purpose_desc" TEXT,
-    "lob_l1_name" VARCHAR(500),
-    "lob_l2_name" VARCHAR(500),
-    "portfolio_name" VARCHAR(500),
-    "product_name" VARCHAR(500),
-    "region_name" VARCHAR(500),
-    "counterparty_id" BIGINT,
-    "counterparty_name" VARCHAR(500),
-    "committed_amt" NUMERIC(20,4),
-    "utilized_amt" NUMERIC(20,4),
-    "utilization_pct" NUMERIC(10,6),
-    "coverage_ratio_pct" NUMERIC(10,6),
-    "effective_date" DATE,
-    "maturity_date" DATE,
-    "days_remaining" INTEGER,
-    "facility_duration_days" INTEGER,
-    "status_code" VARCHAR(30),
-    "is_syndicated_flag" BOOLEAN,
-    "interest_rate_pct" NUMERIC(10,6),
-    "rate_type" VARCHAR(255),
-    "all_in_rate_pct" NUMERIC(10,6),
-    "interest_rate_spread_bps" NUMERIC(10,4),
-    "interest_rate_index" VARCHAR(255),
-    "rate_cap_pct" NUMERIC(10,6),
-    "payment_frequency" VARCHAR(255),
-    "prepayment_penalty_desc" TEXT,
-    "has_amendment_flag" BOOLEAN,
-    "amendment_count" INTEGER,
-    "is_facility_active_flag" BOOLEAN,
-    "maturity_date_bucket" VARCHAR(20),
-    "origination_date_bucket" VARCHAR(20),
-    "effective_date_bucket" VARCHAR(20),
-    "bank_share_pct" NUMERIC(10,4),
-    "base_currency_code" VARCHAR(30),
-
-    -- Governance
-    "model_version" VARCHAR(50),
-    "run_id" VARCHAR(64),
-    "created_by" VARCHAR(100),
-
-    "created_ts" TIMESTAMP,
-    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "is_deteriorated" BOOLEAN,
-    "risk_rating_tier_code" VARCHAR(20),
-    "utilization_status_code" VARCHAR(20),
-    "pricing_tier_code" VARCHAR(20),
-    "dpd_bucket_code" VARCHAR(20),
-    "origination_bucket_code" VARCHAR(20),
-    "maturity_bucket_id" BIGINT,
-    PRIMARY KEY ("facility_detail_snapshot_sk")
-);
+-- T09 facility_detail_snapshot: REMOVED (subsumed by *_derived tables)
 
 -- lob_risk_ratio_summary (Business Segment Summary)
 CREATE TABLE IF NOT EXISTS "l3"."lob_risk_ratio_summary" (

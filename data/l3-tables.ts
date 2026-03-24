@@ -1,9 +1,15 @@
 /**
- * L3 Table manifest — 79 tables.
+ * L3 Table manifest — 76 tables.
  * Matches sql/l3/01_DDL_all_tables.sql and execution order in 06_ORCHESTRATOR.sql.
  * T51-T52: Calculated overlay tables (derived fields split from L2 snapshots).
  * T53-T54: Promoted from L2 (entirely computed tables).
  * T55-T56: Additional calculated overlay tables (derived fields split from L2 snapshots).
+ *
+ * Removed tables (subsumed by *_derived Tier 4 tables + YAML calc engine):
+ *   T03 counterparty_exposure_summary, T04 facility_exposure_summary,
+ *   T05 portfolio_summary, T32 counterparty_detail_snapshot,
+ *   T36 legal_entity_risk_profile, T42 facility_timeline_summary,
+ *   T45 facility_detail_snapshot
  *
  * Categories (11 unified across L1/L2/L3):
  *   Counterparty & Entity, Exposure & Position, Credit Risk & Ratings,
@@ -26,9 +32,9 @@ export interface L3TableDef {
 export const L3_TABLES: L3TableDef[] = [
   { id: 'T01', name: 'exposure_metric_cube',              category: 'Exposure & Position',            tier: 1 },
   { id: 'T02', name: 'risk_metric_cube',                   category: 'Exposure & Position',            tier: 1 },
-  { id: 'T03', name: 'counterparty_exposure_summary',     category: 'Exposure & Position',            tier: 2 },
-  { id: 'T04', name: 'facility_exposure_summary',         category: 'Exposure & Position',            tier: 1 },
-  { id: 'T05', name: 'portfolio_summary',                 category: 'Exposure & Position',            tier: 1 },
+  // T03 removed: subsumed by counterparty_derived (T79)
+  // T04 removed: subsumed by facility_derived (T78)
+  // T05 removed: subsumed by portfolio_derived (T81)
   { id: 'T06', name: 'crm_allocation_summary',            category: 'Collateral & Risk Mitigation',   tier: 1 },
   { id: 'T07', name: 'collateral_portfolio_valuation',   category: 'Collateral & Risk Mitigation',   tier: 1 },
   { id: 'T08', name: 'limit_current_state',               category: 'Limits & Risk Appetite',         tier: 1 },
@@ -55,20 +61,20 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T29', name: 'kpi_period_summary',                category: 'Business Segment & Dashboard',   tier: 4 },
   { id: 'T30', name: 'risk_appetite_metric_state',        category: 'Limits & Risk Appetite',         tier: 3 },
   { id: 'T31', name: 'executive_highlight_summary',       category: 'Business Segment & Dashboard',   tier: 4 },
-  { id: 'T32', name: 'counterparty_detail_snapshot',      category: 'Counterparty & Entity',          tier: 3 },
+  // T32 removed: subsumed by counterparty_derived (T79)
   { id: 'T33', name: 'limit_tier_status_matrix',          category: 'Limits & Risk Appetite',         tier: 2 },
   { id: 'T34', name: 'limit_counterparty_movement',       category: 'Limits & Risk Appetite',         tier: 2 },
   { id: 'T35', name: 'data_quality_score_summary',        category: 'Data Quality & Infrastructure',  tier: 3 },
-  { id: 'T36', name: 'legal_entity_risk_profile',         category: 'Counterparty & Entity',          tier: 3 },
+  // T36 removed: subsumed by derived tables via legal_entity_id dimension
   { id: 'T37', name: 'data_quality_attribute_score',      category: 'Data Quality & Infrastructure',  tier: 3 },
   { id: 'T38', name: 'data_quality_trend',                 category: 'Data Quality & Infrastructure',  tier: 3 },
   { id: 'T39', name: 'stress_test_result_summary',        category: 'Stress Testing',                 tier: 1 },
   { id: 'T40', name: 'stress_test_breach_detail',         category: 'Stress Testing',                 tier: 1 },
   { id: 'T41', name: 'regulatory_compliance_state',       category: 'Regulatory & Capital',           tier: 3 },
-  { id: 'T42', name: 'facility_timeline_summary',         category: 'Financial Performance',          tier: 3 },
+  // T42 removed: subsumed by facility_derived (T78) via as_of_date
   { id: 'T43', name: 'amendment_summary',                  category: 'Amendments & Forbearance',      tier: 3 },
   { id: 'T44', name: 'amendment_detail',                  category: 'Amendments & Forbearance',      tier: 3 },
-  { id: 'T45', name: 'facility_detail_snapshot',          category: 'Financial Performance',          tier: 3 },
+  // T45 removed: subsumed by facility_derived (T78)
   { id: 'T46', name: 'lob_risk_ratio_summary',            category: 'Business Segment & Dashboard',   tier: 3 },
   { id: 'T47', name: 'lob_deterioration_summary',         category: 'Business Segment & Dashboard',   tier: 3 },
   { id: 'T48', name: 'lob_rating_distribution',           category: 'Business Segment & Dashboard',   tier: 3 },

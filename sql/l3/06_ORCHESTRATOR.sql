@@ -32,15 +32,15 @@ BEGIN
 
     -- TIER 2: Reads Tier 1 L3
     RAISE NOTICE 'TIER 2...';
-    CALL l3.populate_counterparty_exposure_summary(p_run_version_id, p_as_of_date, p_prior_as_of_date);
+    -- T03 counterparty_exposure_summary: REMOVED (subsumed by *_derived tables)
     CALL l3.populate_limit_tier_status_matrix(p_run_version_id, p_as_of_date, p_prior_as_of_date);
     -- (remaining Tier 2 procedures...)
 
     -- TIER 3: Reads Tier 1-2 L3
     RAISE NOTICE 'TIER 3...';
     CALL l3.populate_lob_exposure_summary(p_run_version_id, p_as_of_date, p_prior_as_of_date);
-    CALL l3.populate_counterparty_detail_snapshot(p_run_version_id, p_as_of_date);
-    CALL l3.populate_facility_detail_snapshot(p_run_version_id, p_as_of_date);
+    -- T32 counterparty_detail_snapshot: REMOVED (subsumed by *_derived tables)
+    -- T45 facility_detail_snapshot: REMOVED (subsumed by *_derived tables)
     CALL l3.populate_risk_appetite_metric_state(p_run_version_id, p_as_of_date);
     -- (remaining Tier 3 procedures...)
 

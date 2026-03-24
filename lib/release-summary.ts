@@ -494,7 +494,7 @@ function detectRollupPropagation(
   claimedIdx: Set<number>,
 ): SummaryBullet[] {
   const summaryTables = ['desk_summary', 'lob_l1_summary', 'lob_l2_summary', 'lob_exposure_summary',
-    'counterparty_exposure_summary', 'portfolio_summary', 'facility_summary'];
+    'facility_derived', 'counterparty_derived', 'desk_derived', 'portfolio_derived', 'segment_derived'];
 
   // Find fields added to multiple summary tables
   const fieldToTables = new Map<string, FieldEntry[]>();

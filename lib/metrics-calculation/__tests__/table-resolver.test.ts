@@ -4,7 +4,7 @@ import type { L3Metric } from '@/data/l3-metrics';
 
 // Mock formula-resolver to return controlled SQL
 vi.mock('../formula-resolver', () => ({
-  resolveFormulaForDimension: vi.fn((_metric, _dim, _opts) => {
+  resolveFormulaForDimension: vi.fn((_metric, _dim) => {
     return {
       formula: 'test',
       formulaSQL: `SELECT * FROM l2.facility_exposure_snapshot fes
@@ -13,11 +13,6 @@ vi.mock('../formula-resolver', () => ({
       source: 'metric-base',
     };
   }),
-}));
-
-// Mock legacy fallback
-vi.mock('@/data/metrics_dimensions_filled', () => ({
-  getFormulaForDimension: vi.fn(() => null),
 }));
 
 function makeMetric(overrides: Partial<L3Metric> = {}): L3Metric {

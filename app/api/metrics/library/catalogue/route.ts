@@ -22,8 +22,13 @@ export async function POST(req: NextRequest) {
       return jsonError('item_id, item_name, and kind are required', { status: 400 });
     }
 
+    // Catalogue is YAML-generated — direct writes are allowed but discouraged
+    console.warn('[catalogue] Direct POST to catalogue.json — prefer editing YAML and running calc:sync', { item_id: body.item_id });
+
     await upsertCatalogueItem(body);
-    return jsonSuccess(body, 201);
+    const res = jsonSuccess(body, 201);
+    res.headers.set('X-Catalogue-Warning', 'Direct write — catalogue.json is generated from YAML. Run calc:sync to regenerate.');
+    return res;
   } catch (err) {
     const normalized = normalizeCaughtError(err);
     return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });

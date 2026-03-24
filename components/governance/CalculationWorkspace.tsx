@@ -323,20 +323,27 @@ export default function CalculationWorkspace({
     <div className="h-full flex flex-col overflow-hidden">
       {/* Level tabs */}
       <div className="flex items-center gap-1 px-4 py-2 border-b border-pwc-gray-light shrink-0 overflow-x-auto">
-        {LEVEL_TABS.map(tab => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => { setActiveLevel(tab.key); setRows([]); setClassifiedError(null); setDrillDownMap(new Map()); setExpandedPaths(new Set()); setFilterText(''); }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors
-              ${activeLevel === tab.key
-                ? 'bg-pwc-orange/20 text-pwc-orange border border-pwc-orange/40'
-                : 'text-gray-400 hover:text-gray-300 hover:bg-pwc-gray-light/30'
-              }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {LEVEL_TABS.map(tab => {
+          const hasFormula = !!levelFormulas[tab.key];
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => { setActiveLevel(tab.key); setRows([]); setClassifiedError(null); setDrillDownMap(new Map()); setExpandedPaths(new Set()); setFilterText(''); }}
+              disabled={!hasFormula}
+              title={!hasFormula ? `No formula defined for ${tab.label} level` : tab.label}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors
+                ${!hasFormula
+                  ? 'text-gray-600 cursor-not-allowed opacity-40'
+                  : activeLevel === tab.key
+                    ? 'bg-pwc-orange/20 text-pwc-orange border border-pwc-orange/40'
+                    : 'text-gray-400 hover:text-gray-300 hover:bg-pwc-gray-light/30'
+                }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
 
         {/* Run / Cancel button */}
         {loading ? (

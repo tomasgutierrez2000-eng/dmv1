@@ -1,16 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { resolveFormulaForDimension } from '../formula-resolver';
 import type { L3Metric } from '@/data/l3-metrics';
-
-// Mock the legacy fallback module
-vi.mock('@/data/metrics_dimensions_filled', () => ({
-  getFormulaForDimension: vi.fn((metricId: string, dimension: string) => {
-    if (metricId === 'C001' && dimension === 'counterparty') {
-      return { formula: 'legacy formula', formulaSQL: 'SELECT legacy' };
-    }
-    return null;
-  }),
-}));
 
 function makeMetric(overrides: Partial<L3Metric> = {}): L3Metric {
   return {
@@ -55,22 +45,7 @@ describe('resolveFormulaForDimension', () => {
     expect(result!.formulaSQL).toBe('SELECT dim_sql');
   });
 
-  it('priority 2: falls back to legacy when allowLegacyFallback=true', () => {
-    const m = makeMetric();
-    const result = resolveFormulaForDimension(m, 'counterparty', { allowLegacyFallback: true });
-    expect(result).not.toBeNull();
-    expect(result!.source).toBe('legacy-fallback');
-    expect(result!.formulaSQL).toBe('SELECT legacy');
-  });
-
-  it('priority 2: skips legacy when allowLegacyFallback is false/missing', () => {
-    const m = makeMetric();
-    const result = resolveFormulaForDimension(m, 'counterparty');
-    // Should fall through to metric-base, not legacy
-    expect(result!.source).toBe('metric-base');
-  });
-
-  it('priority 3: falls back to metric base formula', () => {
+  it('priority 2: falls back to metric base formula', () => {
     const m = makeMetric();
     const result = resolveFormulaForDimension(m, 'facility');
     expect(result).not.toBeNull();
@@ -85,13 +60,13 @@ describe('resolveFormulaForDimension', () => {
     expect(result).toBeNull();
   });
 
-  it('prefers dimension override over legacy even when legacy exists', () => {
+  it('prefers dimension override over base formula', () => {
     const m = makeMetric({
       formulasByDimension: {
         counterparty: { formula: 'dim override', formulaSQL: 'SELECT override' },
       },
     });
-    const result = resolveFormulaForDimension(m, 'counterparty', { allowLegacyFallback: true });
+    const result = resolveFormulaForDimension(m, 'counterparty');
     expect(result!.source).toBe('metric-dimension');
     expect(result!.formulaSQL).toBe('SELECT override');
   });
@@ -104,5 +79,17 @@ describe('resolveFormulaForDimension', () => {
     });
     const result = resolveFormulaForDimension(m, 'facility');
     expect(result!.source).toBe('metric-base');
+  });
+
+  it('returns base formula for dimension without override', () => {
+    const m = makeMetric({
+      formulasByDimension: {
+        facility: { formula: 'fac formula', formulaSQL: 'SELECT fac' },
+      },
+    });
+    // Ask for 'counterparty' which has no override
+    const result = resolveFormulaForDimension(m, 'counterparty');
+    expect(result!.source).toBe('metric-base');
+    expect(result!.formulaSQL).toBe('SELECT base');
   });
 });

@@ -19,8 +19,22 @@ const VALID_AGG_TYPES = new Set([
   'RAW', 'SUM', 'WEIGHTED_AVG', 'COUNT', 'COUNT_DISTINCT', 'MIN', 'MAX', 'MEDIAN', 'CUSTOM',
 ]);
 
+/** Expected aggregation types for each rollup strategy at aggregate levels.
+ *  CUSTOM is allowed alongside the primary type since many metrics have
+ *  custom SQL (e.g., FX conversion) that implements the same aggregation pattern. */
+const STRATEGY_TO_AGG: Record<string, string[]> = {
+  'direct-sum': ['SUM', 'CUSTOM'],
+  'sum-ratio': ['SUM', 'WEIGHTED_AVG', 'CUSTOM'],
+  'count-ratio': ['COUNT', 'COUNT_DISTINCT', 'CUSTOM'],
+  'weighted-avg': ['WEIGHTED_AVG', 'CUSTOM'],
+  'none': ['RAW', 'MIN', 'MAX', 'CUSTOM'],
+  'custom': ['CUSTOM', 'SUM', 'WEIGHTED_AVG', 'COUNT', 'COUNT_DISTINCT', 'MIN', 'MAX', 'MEDIAN', 'RAW'],
+  'worst-case': ['MIN', 'MAX', 'CUSTOM'],
+};
+
 let passed = 0;
 let failed = 0;
+let rollupWarnings = 0;
 
 function assert(condition: boolean, message: string): void {
   if (!condition) {
@@ -136,6 +150,28 @@ async function main() {
       Array.isArray(metric.validations),
       `${metric.metric_id} has validations array`
     );
+
+    // Rollup strategy consistency: declared strategy should match aggregate-level aggregation_type
+    const strategy = metric.catalogue?.rollup_strategy;
+    if (strategy) {
+      const AGGREGATE_LEVELS: AggregationLevel[] = ['counterparty', 'desk', 'portfolio', 'business_segment'];
+      const expectedAggTypes = STRATEGY_TO_AGG[strategy];
+      if (expectedAggTypes) {
+        for (const level of AGGREGATE_LEVELS) {
+          const levelDef = metric.levels[level];
+          if (!levelDef?.aggregation_type) continue;
+          const aggType = levelDef.aggregation_type;
+          if (expectedAggTypes.includes(aggType)) {
+            assert(true,
+              `${metric.metric_id}:${level} aggregation_type (${aggType}) matches rollup_strategy "${strategy}"`);
+          } else {
+            // Warn but don't fail — many metrics have legitimate custom aggregation
+            console.warn(`  WARN: ${metric.metric_id}:${level} aggregation_type (${aggType}) may not match rollup_strategy "${strategy}" (expected: ${expectedAggTypes.join('|')})`);
+            rollupWarnings++;
+          }
+        }
+      }
+    }
   }
 
   // Optional: run DB integration for ACTIVE metrics
@@ -143,7 +179,7 @@ async function main() {
 
   // Summary
   console.log(`\n${'='.repeat(60)}`);
-  console.log(`  Passed: ${passed}, Failed: ${failed}`);
+  console.log(`  Passed: ${passed}, Failed: ${failed}${rollupWarnings > 0 ? `, Rollup Warnings: ${rollupWarnings}` : ''}`);
   console.log(`${'='.repeat(60)}`);
 
   if (failed > 0) {

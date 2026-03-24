@@ -799,7 +799,7 @@ async function validateCalculationEngine(mergedMetrics: L3Metric[]): Promise<Che
     for (const m of mergedMetrics) {
       const allowed = m.allowedDimensions ?? CALCULATION_DIMENSIONS;
       for (const dim of allowed) {
-        const resolved = resolveFormulaForDimension(m, dim, { allowLegacyFallback: true });
+        const resolved = resolveFormulaForDimension(m, dim);
         if (!resolved?.formulaSQL?.trim()) {
           issues.push(`${m.id}:${dim} formula did not resolve to formulaSQL`);
         }

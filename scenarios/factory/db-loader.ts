@@ -53,7 +53,7 @@ async function checkCurrentState(client: pg.Client) {
     { schema: 'l2', table: 'counterparty' },
     { schema: 'l2', table: 'credit_agreement_master' },
     { schema: 'l2', table: 'facility_master' },
-    { schema: 'l1', table: 'facility_lender_allocation' },
+    { schema: 'l2', table: 'facility_lender_allocation' },
     { schema: 'l1', table: 'metric_threshold' },
     { schema: 'l2', table: 'facility_exposure_snapshot' },
     { schema: 'l2', table: 'facility_pricing_snapshot' },

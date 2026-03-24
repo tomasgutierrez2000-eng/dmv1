@@ -125,15 +125,18 @@ export class StoryWeaver {
         continue;
       }
 
-      // Random assignment based on portfolio distribution
-      const r = this.rng() * 100;
+      // Random assignment based on portfolio distribution (normalized to 100%)
+      const entries = Object.entries(STORY_TEMPLATES);
+      const rawWeights = entries.map(([, t]) => (t.portfolioSharePct.min + t.portfolioSharePct.max) / 2);
+      const totalWeight = rawWeights.reduce((s, w) => s + w, 0);
+      const r = this.rng() * totalWeight;
       let cumulative = 0;
       let selectedType: StoryType = 'STABLE';
 
-      for (const [type, template] of Object.entries(STORY_TEMPLATES)) {
-        cumulative += (template.portfolioSharePct.min + template.portfolioSharePct.max) / 2;
+      for (let i = 0; i < entries.length; i++) {
+        cumulative += rawWeights[i];
         if (r <= cumulative) {
-          selectedType = type as StoryType;
+          selectedType = entries[i][0] as StoryType;
           break;
         }
       }
@@ -237,10 +240,14 @@ export class StoryWeaver {
     }
     // Clamp PD to valid range
     newPD = Math.max(0.01, Math.min(100, newPD));
-    // Enforce temporal constraint
+    // Enforce temporal constraint — EVENT_DRIVEN stories bypass the cap
+    // to allow sudden spikes (fraud, regulatory action, etc.)
+    const maxFactor = prevStory.storyType === 'EVENT_DRIVEN'
+      ? TEMPORAL_LIMITS.pd_max_monthly_factor * 3  // allow up to 9x for events
+      : TEMPORAL_LIMITS.pd_max_monthly_factor;
     const pdRatio = newPD / prevStory.pdAnnual;
-    if (pdRatio > TEMPORAL_LIMITS.pd_max_monthly_factor) {
-      newPD = prevStory.pdAnnual * TEMPORAL_LIMITS.pd_max_monthly_factor;
+    if (pdRatio > maxFactor) {
+      newPD = prevStory.pdAnnual * maxFactor;
     }
     if (pdRatio < 1 / TEMPORAL_LIMITS.pd_max_monthly_factor) {
       newPD = prevStory.pdAnnual / TEMPORAL_LIMITS.pd_max_monthly_factor;

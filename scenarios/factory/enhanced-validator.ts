@@ -189,15 +189,19 @@ export class EnhancedValidator {
         if (!col.fkTarget) continue;
 
         let violations = 0;
-        const sampleRow = td.rows[0];
-        const value = sampleRow[col.name];
-        if (!this.pkRegistry.checkFK(col.fkTarget.parentTable, col.fkTarget.parentColumn, value)) {
-          violations++;
+        let firstBadValue: unknown = null;
+        // Check all rows, not just the first — sampling misses dangling FKs
+        for (const row of td.rows) {
+          const value = row[col.name];
+          if (!this.pkRegistry.checkFK(col.fkTarget.parentTable, col.fkTarget.parentColumn, value)) {
+            violations++;
+            if (!firstBadValue) firstBadValue = value;
+          }
         }
 
         if (violations > 0) {
           this.addCheck('FK_INTEGRITY', `${qn}.${col.name} → ${col.fkTarget.parentTable}`, 'HIGH',
-            false, `FK value not found in parent table (sample: ${value})`, 'fk_violation');
+            false, `${violations} FK violations — sample bad value: ${firstBadValue}`, 'fk_violation');
         }
       }
     }
@@ -259,7 +263,7 @@ export class EnhancedValidator {
       for (const col of Object.keys(td.rows[0])) {
         if (reserved.has(col.toLowerCase())) {
           this.addCheck('RESERVED_WORD', `${td.schema}.${td.table}.${col}`, 'MEDIUM',
-            true, `Column '${col}' is a PG reserved word — ensure it's quoted in SQL`, 'reserved_word_quoting');
+            false, `Column '${col}' is a PG reserved word — must be quoted in SQL`, 'reserved_word_quoting');
         }
       }
     }

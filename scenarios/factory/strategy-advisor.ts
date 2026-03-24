@@ -47,11 +47,12 @@ export class StrategyAdvisor {
       };
     }
 
+    let client: any = null;
     try {
       // Dynamic import pg to avoid hard dependency
       const pg = await import('pg');
       const Client = (pg as any).default?.Client ?? (pg as any).Client;
-      const client = new Client({ connectionString: dbUrl });
+      client = new Client({ connectionString: dbUrl });
       await client.connect();
 
       const targetTables = tables ?? this.analyzer.getTablesByLayer('L2');
@@ -123,6 +124,10 @@ export class StrategyAdvisor {
         overallMaxDate: null,
         totalRows: 0,
       };
+    } finally {
+      if (client) {
+        try { await client.end(); } catch { /* already closed */ }
+      }
     }
   }
 
@@ -287,7 +292,7 @@ export class StrategyAdvisor {
         if (state.totalRows > 0) {
           requiresConfirmation = true;
           confirmationReason = `FRESH_START will regenerate all data. Current DB has ${state.totalRows.toLocaleString()} rows.`;
-          cleanupSQL = tablesToGenerate
+          cleanupSQL = [...tablesToGenerate]
             .reverse()
             .map(t => `TRUNCATE ${t} CASCADE;`)
             .join('\n');
@@ -347,19 +352,19 @@ export class StrategyAdvisor {
 
   private getNextMonthEnd(currentMaxDate: string | null): string {
     if (!currentMaxDate) {
-      // Default to end of current month
+      // Default to end of current month (UTC-safe)
       const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth(); // 0-based
-      const lastDay = new Date(year, month + 1, 0);
+      const year = now.getUTCFullYear();
+      const month = now.getUTCMonth(); // 0-based
+      const lastDay = new Date(Date.UTC(year, month + 1, 0));
       return lastDay.toISOString().split('T')[0];
     }
 
-    // Parse current max and add one month
+    // Parse current max and add one month (UTC-safe)
     const [y, m] = currentMaxDate.split('-').map(Number);
     const nextMonth = m === 12 ? 1 : m + 1;
     const nextYear = m === 12 ? y + 1 : y;
-    const lastDay = new Date(nextYear, nextMonth, 0);
+    const lastDay = new Date(Date.UTC(nextYear, nextMonth, 0));
     return lastDay.toISOString().split('T')[0];
   }
 }

@@ -60,7 +60,14 @@ Verify each agent file exists. Build an availability map:
 | Reviewer | drift-monitor | `.claude/commands/reviewers/drift-monitor.md` | AVAILABLE / MISSING |
 | Reviewer | audit-reporter | `.claude/commands/reviewers/audit-reporter.md` | AVAILABLE / MISSING |
 
-Report summary: "Found X/19 agents. Missing: [list]. Pipeline steps requiring missing agents will be SKIPPED."
+| Factory | schema-analyzer | `.claude/commands/factory/schema-analyzer.md` | AVAILABLE / MISSING |
+| Factory | strategy-advisor | `.claude/commands/factory/strategy-advisor.md` | AVAILABLE / MISSING |
+| Factory | generator-builder | `.claude/commands/factory/generator-builder.md` | AVAILABLE / MISSING |
+| Factory | story-weaver | `.claude/commands/factory/story-weaver.md` | AVAILABLE / MISSING |
+| Factory | validator | `.claude/commands/factory/validator.md` | AVAILABLE / MISSING |
+| Factory | scenario-observer | `.claude/commands/factory/scenario-observer.md` | AVAILABLE / MISSING |
+
+Report summary: "Found X/25 agents. Missing: [list]. Pipeline steps requiring missing agents will be SKIPPED."
 
 ### 1D. Check for Resumable Session
 
@@ -92,6 +99,10 @@ Examples:
 - `"review all capital metrics"` → REVIEW mode
 - `"check for drift"` → MONITOR mode
 - `"dry run CET1 ratio"` → DRY_RUN mode
+- `"generate data for 2026-03-31"` → DATA_FACTORY mode
+- `"populate all tables"` → DATA_FACTORY mode
+- `"backfill data from 2025-06 to 2026-03"` → DATA_FACTORY mode
+- `"add scenario S57"` → DATA_FACTORY mode
 
 ### 2B. Structured Input
 
@@ -112,6 +123,7 @@ Examples:
 | "review", "audit", "check compliance", "SR 11-7" | REVIEW |
 | "drift", "monitor", "health check" | MONITOR |
 | "dry run", "plan only", "what would happen" | DRY_RUN |
+| "generate data", "populate", "backfill", "factory", "seed data", "add scenario" | DATA_FACTORY |
 | No clear signal | Ask user to choose mode |
 
 ### 2D. Risk Stripe Detection

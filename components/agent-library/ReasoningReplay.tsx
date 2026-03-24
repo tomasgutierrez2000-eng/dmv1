@@ -22,7 +22,7 @@ function ReasoningStepRow({ step, isOpen, onToggle }: { step: ReasoningStep; isO
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <span className="text-[10px] text-slate-500 font-mono">Step {step.step}</span>
-            <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${CONFIDENCE_COLORS[step.confidence]}`}>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${CONFIDENCE_COLORS[step.confidence]}`}>
               {step.confidence}
             </span>
           </div>
@@ -234,7 +234,7 @@ export default function ReasoningReplay({ agentSlug, runId }: { agentSlug: strin
                     <div className="flex items-center gap-2 text-xs">
                       <span className="text-slate-300 font-mono">{d.metric_id}</span>
                       <span className="text-slate-400">{d.metric_name}</span>
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded ${CONFIDENCE_COLORS[d.confidence_level]}`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded ${CONFIDENCE_COLORS[d.confidence_level]}`}>
                         {d.confidence_level}
                       </span>
                     </div>

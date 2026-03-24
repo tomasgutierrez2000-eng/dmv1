@@ -163,7 +163,7 @@ function DecompositionRow({ decomp }: { decomp: MetricDecomposition }) {
         <div className="flex items-center gap-3">
           <span className="text-xs font-mono text-violet-400">{decomp.metric_id}</span>
           <span className="text-xs text-slate-300">{decomp.metric_name}</span>
-          <span className={`text-[9px] px-1.5 py-0.5 rounded bg-slate-700 ${confColor}`}>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded bg-slate-700 ${confColor}`}>
             {decomp.confidence_level}
           </span>
         </div>
@@ -175,12 +175,12 @@ function DecompositionRow({ decomp }: { decomp: MetricDecomposition }) {
       {decomp.ingredients && decomp.ingredients.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-1">
           {decomp.ingredients.slice(0, 6).map((ing, i) => (
-            <span key={i} className="text-[9px] bg-slate-700/50 text-slate-400 px-1.5 py-0.5 rounded font-mono">
+            <span key={i} className="text-[10px] bg-slate-700/50 text-slate-400 px-1.5 py-0.5 rounded font-mono">
               {ing.source_table}.{ing.source_field}
             </span>
           ))}
           {decomp.ingredients.length > 6 && (
-            <span className="text-[9px] text-slate-500">+{decomp.ingredients.length - 6}</span>
+            <span className="text-[10px] text-slate-500">+{decomp.ingredients.length - 6}</span>
           )}
         </div>
       )}
@@ -234,7 +234,7 @@ function LineageRow({ entry }: { entry: DataLineageEntry }) {
           <span className="text-xs font-mono text-blue-400">{entry.metric_id}</span>
           <span className="text-xs text-slate-300">{entry.ingredient_name}</span>
         </div>
-        <span className={`text-[9px] px-1.5 py-0.5 rounded bg-slate-700 ${
+        <span className={`text-[10px] px-1.5 py-0.5 rounded bg-slate-700 ${
           entry.data_quality_tier === 'T1' ? 'text-green-400' :
           entry.data_quality_tier === 'T2' ? 'text-amber-400' : 'text-red-400'
         }`}>
@@ -251,7 +251,7 @@ function LineageRow({ entry }: { entry: DataLineageEntry }) {
         )}
       </div>
       {entry.bcbs239_principle_ref && (
-        <span className="inline-block mt-1 text-[9px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded">
+        <span className="inline-block mt-1 text-[10px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded">
           {entry.bcbs239_principle_ref}
         </span>
       )}

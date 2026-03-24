@@ -78,12 +78,12 @@ export default function AgentCard({ agent }: { agent: AgentDefinition }) {
       {agent.capabilities.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1">
           {agent.capabilities.slice(0, 3).map(cap => (
-            <span key={cap} className="text-[9px] bg-slate-700/50 text-slate-400 px-1.5 py-0.5 rounded">
+            <span key={cap} className="text-[10px] bg-slate-700/50 text-slate-400 px-1.5 py-0.5 rounded">
               {cap.length > 25 ? cap.slice(0, 25) + '...' : cap}
             </span>
           ))}
           {agent.capabilities.length > 3 && (
-            <span className="text-[9px] text-slate-500">+{agent.capabilities.length - 3}</span>
+            <span className="text-[10px] text-slate-500">+{agent.capabilities.length - 3}</span>
           )}
         </div>
       )}

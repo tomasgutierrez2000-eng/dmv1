@@ -74,7 +74,7 @@ export default function ArtifactExplorer() {
                   <TIcon className="w-3.5 h-3.5 text-slate-500" />
                   <span className="text-[10px] text-slate-500">{t.label}</span>
                 </div>
-                <span className="text-lg font-bold text-slate-100 font-mono">{count}</span>
+                <span className="text-2xl font-bold text-slate-100 font-mono">{count}</span>
               </button>
             );
           })}
@@ -82,7 +82,7 @@ export default function ArtifactExplorer() {
             <div className="flex items-center gap-1.5 mb-1">
               <span className="text-[10px] text-slate-500">Total</span>
             </div>
-            <span className="text-lg font-bold text-slate-100 font-mono">{summary.total}</span>
+            <span className="text-2xl font-bold text-slate-100 font-mono">{summary.total}</span>
           </div>
         </div>
       )}

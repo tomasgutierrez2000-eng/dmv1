@@ -255,7 +255,7 @@ function GlobalStatCard({ label, value, icon: Icon, color }: {
         <Icon className="w-4 h-4 text-slate-500" />
         <span className="text-[10px] text-slate-500 uppercase tracking-wide">{label}</span>
       </div>
-      <span className={`text-xl font-bold font-mono ${color || 'text-slate-100'}`}>{value}</span>
+      <span className={`text-2xl font-bold font-mono ${color || 'text-slate-100'}`}>{value}</span>
     </div>
   );
 }

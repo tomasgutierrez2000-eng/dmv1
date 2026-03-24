@@ -208,7 +208,7 @@ function StatCard({ label, value, icon: Icon }: { label: string; value: string |
         <Icon className="w-3.5 h-3.5 text-slate-500" />
         <span className="text-[10px] text-slate-500 uppercase tracking-wide">{label}</span>
       </div>
-      <span className="text-lg font-bold text-slate-100 font-mono">{value}</span>
+      <span className="text-2xl font-bold text-slate-100 font-mono">{value}</span>
     </div>
   );
 }

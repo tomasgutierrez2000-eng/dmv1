@@ -13,7 +13,6 @@ const CATEGORY_TABS: { key: AgentCategory | 'all'; label: string }[] = [
   { key: 'builder', label: 'Builders' },
   { key: 'reviewer', label: 'Reviewers' },
   { key: 'workflow', label: 'Workflows' },
-  { key: 'session', label: 'Sessions' },
 ];
 
 export default function AgentCatalog() {
@@ -49,7 +48,7 @@ export default function AgentCatalog() {
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-1">
           <Bot className="w-6 h-6 text-emerald-400" />
-          <h1 className="text-2xl font-bold text-slate-50 font-mono">Agent Library</h1>
+          <h1 className="text-2xl font-semibold text-white tracking-tight">Agent Library</h1>
         </div>
         <p className="text-sm text-slate-400">
           Artifact-centric observatory for GSIB agent governance

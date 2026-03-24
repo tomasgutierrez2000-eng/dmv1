@@ -79,8 +79,11 @@ export class PKRegistry {
 
     for (const { qualifiedName, pkColumns } of tables) {
       const [schema, tableName] = qualifiedName.split('.');
+      // Sanitize identifiers — PG doesn't support parameterized table/column names
+      if (!/^[a-z][a-z0-9_]*$/.test(schema) || !/^[a-z][a-z0-9_]*$/.test(tableName)) continue;
       try {
         for (const col of pkColumns) {
+          if (!/^[a-z][a-z0-9_]*$/.test(col)) continue;
           const result = await client.query(
             `SELECT DISTINCT ${col}::text FROM ${schema}.${tableName} WHERE ${col} IS NOT NULL LIMIT 100000`,
           );

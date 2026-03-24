@@ -62,6 +62,8 @@ export class StrategyAdvisor {
 
       for (const qualifiedName of targetTables) {
         const [schema, tableName] = qualifiedName.split('.');
+        // Sanitize identifiers — PG doesn't support parameterized table names
+        if (!/^[a-z][a-z0-9_]*$/.test(schema) || !/^[a-z][a-z0-9_]*$/.test(tableName)) continue;
         try {
           // Check if table has as_of_date column
           const hasDateCol = await client.query(

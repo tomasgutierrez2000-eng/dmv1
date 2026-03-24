@@ -64,10 +64,63 @@ export const LOAD_ORDER: string[] = [
   'l2.netting_set_exposure_snapshot',
   'l2.metric_threshold',
 
-  // L2 position tables (position before position_detail)
+  // L2 position tables (position before position_detail, then product tables)
   'l2.position',
   'l2.position_detail',
   // 'l2.cash_flow',  // Table does not exist in PG — re-enable after DDL migration
+
+  // L2 product-specific snapshot tables (40 tables, 10 products × 4 categories)
+  // All keyed on (position_id, as_of_date) with FK to l2.position
+  // Loans
+  'l2.loans_indicative_snapshot',
+  'l2.loans_accounting_snapshot',
+  'l2.loans_classification_snapshot',
+  'l2.loans_risk_snapshot',
+  // Derivatives
+  'l2.derivatives_indicative_snapshot',
+  'l2.derivatives_accounting_snapshot',
+  'l2.derivatives_classification_snapshot',
+  'l2.derivatives_risk_snapshot',
+  // Off-BS Commitments
+  'l2.offbs_commitments_indicative_snapshot',
+  'l2.offbs_commitments_accounting_snapshot',
+  'l2.offbs_commitments_classification_snapshot',
+  'l2.offbs_commitments_risk_snapshot',
+  // SFT
+  'l2.sft_indicative_snapshot',
+  'l2.sft_accounting_snapshot',
+  'l2.sft_classification_snapshot',
+  'l2.sft_risk_snapshot',
+  // Securities
+  'l2.securities_indicative_snapshot',
+  'l2.securities_accounting_snapshot',
+  'l2.securities_classification_snapshot',
+  'l2.securities_risk_snapshot',
+  // Deposits
+  'l2.deposits_indicative_snapshot',
+  'l2.deposits_accounting_snapshot',
+  'l2.deposits_classification_snapshot',
+  'l2.deposits_risk_snapshot',
+  // Borrowings
+  'l2.borrowings_indicative_snapshot',
+  'l2.borrowings_accounting_snapshot',
+  'l2.borrowings_classification_snapshot',
+  'l2.borrowings_risk_snapshot',
+  // Debt
+  'l2.debt_indicative_snapshot',
+  'l2.debt_accounting_snapshot',
+  'l2.debt_classification_snapshot',
+  'l2.debt_risk_snapshot',
+  // Equities
+  'l2.equities_indicative_snapshot',
+  'l2.equities_accounting_snapshot',
+  'l2.equities_classification_snapshot',
+  'l2.equities_risk_snapshot',
+  // Stock
+  'l2.stock_indicative_snapshot',
+  'l2.stock_accounting_snapshot',
+  'l2.stock_classification_snapshot',
+  'l2.stock_risk_snapshot',
 
   // L2 events
   'l2.credit_event',

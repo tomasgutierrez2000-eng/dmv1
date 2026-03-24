@@ -39,6 +39,7 @@ import { generatePipelineRows } from './pipeline';
 import { generateCounterpartyFinancialRows } from './cp-financial';
 import { generateProvisionRows } from './provision';
 import { generateStressTestRows } from './stress-test';
+import { generateProductTableRows } from './product-tables';
 
 // ─── Configuration ─────────────────────────────────────────────────────
 
@@ -160,11 +161,20 @@ export function generateV2Data(
   tableBreakdown['facility_financial_snapshot'] = financialRows.length;
 
   // 5. Position + Position Detail
-  const { positions, positionDetails } = generatePositionRows(stateMap, facilityIds, dates, registry);
+  const { positions, positionDetails, positionIdMap } = generatePositionRows(stateMap, facilityIds, dates, registry);
   tables.push({ schema: 'l2', table: 'position', rows: positions });
   tables.push({ schema: 'l2', table: 'position_detail', rows: positionDetails });
   tableBreakdown['position'] = positions.length;
   tableBreakdown['position_detail'] = positionDetails.length;
+
+  // 5b. Product-specific snapshot tables (40 tables, 10 products × 4 categories)
+  const productOutput = generateProductTableRows(stateMap, facilityIds, dates, positionIdMap);
+  for (const [tblName, rows] of productOutput.tables) {
+    if (rows.length > 0) {
+      tables.push({ schema: 'l2', table: tblName, rows });
+      tableBreakdown[tblName] = rows.length;
+    }
+  }
 
   // 6. Cash Flow — SKIPPED: l2.cash_flow table does not exist in PostgreSQL schema.
   //    Re-enable when table is created via DDL migration.

@@ -343,17 +343,17 @@ Log at every major step using the AuditLogger patterns:
 
 ### Session start
 ```python
-log_agent_run(agent="db-schema-builder", trigger="{user|orchestrator}", input=change_set)
+logger = AuditLogger(agent_name="db-schema-builder", trigger_source="{user|orchestrator}")
 ```
 
 ### Each DDL test
 ```python
-log_reasoning_step(step=N, thought="Test {N}: {test_name}", decision="PASS|FAIL: {detail}", confidence="HIGH")
+logger.write_reasoning_step(step_num=N, thought="Test {N}: {test_name}", decision="PASS|FAIL: {detail}", confidence="HIGH")
 ```
 
 ### Schema change record (per DDL statement)
 ```python
-log_schema_change(
+logger.write_schema_change(
     change_type="{CREATE_TABLE|ADD_COLUMN|...}",
     object_schema="{l1|l2|l3}",
     object_name="{table_name}",
@@ -365,7 +365,7 @@ log_schema_change(
 
 ### Session finalize
 ```python
-log_session_complete(status="{completed|failed|blocked_by_reviewer}", output={
+logger.finalize_session(status="{completed|failed|blocked_by_reviewer}", output_payload={
     "migration_file": "sql/migrations/{NNN}-{desc}.sql",
     "changes_applied": N,
     "tests_passed": 6,

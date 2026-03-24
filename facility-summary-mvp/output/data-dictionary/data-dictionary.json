@@ -2053,13 +2053,6 @@
           "data_type": "VARCHAR(2000)"
         },
         {
-          "name": "parent",
-          "description": "FK to parent managed_segment_id in same table",
-          "category": "Counterparty & Entity",
-          "why_required": "Enables recursive parent-child hierarchy traversal",
-          "data_type": "VARCHAR(100)"
-        },
-        {
           "name": "parent_leaf",
           "description": "Flag: PARENT or LEAF",
           "category": "Counterparty & Entity",
@@ -2224,7 +2217,7 @@
           "description": "Maps product node to FR 2590 reporting category",
           "category": "Counterparty & Entity",
           "why_required": "Regulatory product grouping for FR 2590",
-          "data_type": "VARCHAR(20)",
+          "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -2241,13 +2234,6 @@
           "category": "Counterparty & Entity",
           "why_required": "Detailed context for reporting and regulatory mapping",
           "data_type": "VARCHAR(2000)"
-        },
-        {
-          "name": "parent",
-          "description": "FK to parent product_node_id in same table",
-          "category": "Counterparty & Entity",
-          "why_required": "Enables recursive parent-child hierarchy traversal",
-          "data_type": "VARCHAR(100)"
         },
         {
           "name": "parent_leaf",
@@ -9563,7 +9549,7 @@
           "description": "Currency code of position balances",
           "category": "Exposure & Position",
           "why_required": "FX conversion and reporting",
-          "data_type": "VARCHAR(100)",
+          "data_type": "VARCHAR(20)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -10322,7 +10308,7 @@
           "description": "FR 2590 category code",
           "category": "Exposure & Position",
           "why_required": "FR2590 toggle grouping (Page 2)",
-          "data_type": "VARCHAR(20)",
+          "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -10403,7 +10389,7 @@
           "name": "internal_risk_rating_bucket_code",
           "description": "",
           "category": "Exposure & Position",
-          "data_type": "VARCHAR(20)",
+          "data_type": "VARCHAR(50)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -19889,7 +19875,7 @@
         {
           "name": "currency_code",
           "description": "",
-          "data_type": "VARCHAR(30)",
+          "data_type": "VARCHAR(20)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -29916,7 +29902,7 @@
         {
           "name": "utilization_status_code",
           "description": "",
-          "data_type": "VARCHAR(30)",
+          "data_type": "VARCHAR(20)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -31148,7 +31134,7 @@
         {
           "name": "risk_rating_tier_code",
           "description": "",
-          "data_type": "VARCHAR(30)",
+          "data_type": "VARCHAR(20)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -37805,7 +37791,7 @@
           "name": "bank_share_pct",
           "description": "",
           "why_required": "",
-          "data_type": "NUMERIC(10,4)",
+          "data_type": "NUMERIC(10,6)",
           "category": "Financial Performance"
         },
         {

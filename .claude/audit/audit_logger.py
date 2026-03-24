@@ -350,3 +350,25 @@ class AuditLogger:
         data["reasoning_chain"] = self.reasoning_chain
         data["actions_taken"] = self.actions_taken
         self._write_local(data)
+
+    # ========================================================================
+    # Convenience aliases — some agent .md files reference these names.
+    # Canonical methods above are the primary API.
+    # ========================================================================
+
+    def log_agent_run(self, **kwargs: Any) -> None:
+        """Alias: agent run is initialized in __init__(). This is a no-op
+        provided for call-site compatibility in agent pseudocode."""
+        pass  # Initialization already happened in __init__
+
+    def log_action(self, action_type: str, detail: str) -> None:
+        """Alias for write_action()."""
+        self.write_action(action_type, detail)
+
+    def log_schema_change(self, **kwargs: Any) -> None:
+        """Alias for write_schema_change()."""
+        self.write_schema_change(**kwargs)
+
+    def log_session_complete(self, status: str = "completed", output_payload: Optional[dict] = None) -> None:
+        """Alias for finalize_session()."""
+        self.finalize_session(status, output_payload)

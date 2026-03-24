@@ -197,3 +197,11 @@
 **Cons:** Adds checkpoint logic and state persistence. May not be worth it if pipeline completes in <5 minutes.
 **Context:** Current mitigation: `--scenario S35` flag runs a single scenario. But doesn't help with partial SQL file from a crash. Approach: write per-scenario SQL files, then concatenate at the end. Crash = re-run only the missing scenario.
 **Depends on:** Nothing.
+
+### 31. Extend YAML metric schema for SR 11-7 documentation fields
+**What:** Add `metadata.assumptions`, `metadata.limitations`, `metadata.owner` fields to the YAML metric config schema template.
+**Why:** The SR 11-7 documentation checker (`reviewers/sr-11-7-checker.md`) references these fields in its 12-item compliance checklist (items 4-5, 10-11). Without them, every SR 11-7 review reports these items as MISSING — creating noise in validation output.
+**Pros:** SR 11-7 checks produce actionable results instead of false-positive MISSING flags. Metrics gain structured documentation for model risk management compliance.
+**Cons:** All existing YAML metrics need the new fields added (can be automated via script). Slightly increases YAML file size.
+**Context:** Identified during S9 integration testing (cross-reference audit). The checker itself documents this as an expected gap (line 118). Fix: update `scripts/calc_engine/types/metric-definition.ts` and the YAML template, then backfill existing YAMLs.
+**Depends on:** Nothing.

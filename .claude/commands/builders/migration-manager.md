@@ -326,25 +326,25 @@ Log all operations to audit trail:
 
 ### Status check
 ```python
-log_agent_run(agent="migration-manager", trigger="user")
-log_action("STATUS_CHECK", "Scanned {N} migrations: {applied} applied, {pending} pending")
-log_session_complete("completed", {"migrations_scanned": N})
+logger = AuditLogger(agent_name="migration-manager", trigger_source="user")
+logger.write_action("STATUS_CHECK", "Scanned {N} migrations: {applied} applied, {pending} pending")
+logger.finalize_session("completed", {"migrations_scanned": N})
 ```
 
 ### Apply
 ```python
-log_agent_run(agent="migration-manager", trigger="user")
-log_reasoning_step(1, "Pre-apply validation", "All dependencies satisfied", "HIGH")
-log_schema_change(change_type="MIGRATION_APPLY", object_schema="*", object_name="{filename}")
-log_session_complete("completed", {"migration_applied": "{filename}"})
+logger = AuditLogger(agent_name="migration-manager", trigger_source="user")
+logger.write_reasoning_step(1, "Pre-apply validation", "All dependencies satisfied", "HIGH")
+logger.write_schema_change(change_type="MIGRATION_APPLY", object_schema="*", object_name="{filename}")
+logger.finalize_session("completed", {"migration_applied": "{filename}"})
 ```
 
 ### Rollback
 ```python
-log_agent_run(agent="migration-manager", trigger="user")
-log_action("ROLLBACK", "Rolling back {filename}")
-log_schema_change(change_type="MIGRATION_ROLLBACK", object_schema="*", object_name="{filename}")
-log_session_complete("completed", {"migration_rolled_back": "{filename}"})
+logger = AuditLogger(agent_name="migration-manager", trigger_source="user")
+logger.write_action("ROLLBACK", "Rolling back {filename}")
+logger.write_schema_change(change_type="MIGRATION_ROLLBACK", object_schema="*", object_name="{filename}")
+logger.finalize_session("completed", {"migration_rolled_back": "{filename}"})
 ```
 
 ---

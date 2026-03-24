@@ -89,6 +89,58 @@ export const L2_TABLE_META: L2TableMeta[] = [
   { name: 'ecl_staging_snapshot', scd: 'Snapshot', category: 'Credit Risk & Ratings' },
   { name: 'watchlist_entry', scd: 'Event', category: 'Credit Risk & Ratings' },
   { name: 'forbearance_event', scd: 'Event', category: 'Amendments & Forbearance' },
+
+  // ── Product-Specific Snapshot Tables (40 tables, 10 products × 4 categories) ──
+  // Loans
+  { name: 'loans_accounting_snapshot', scd: 'Snapshot', category: 'Financial Performance' },
+  { name: 'loans_classification_snapshot', scd: 'Snapshot', category: 'Counterparty & Entity' },
+  { name: 'loans_indicative_snapshot', scd: 'Snapshot', category: 'Exposure & Position' },
+  { name: 'loans_risk_snapshot', scd: 'Snapshot', category: 'Credit Risk & Ratings' },
+  // Derivatives
+  { name: 'derivatives_accounting_snapshot', scd: 'Snapshot', category: 'Financial Performance' },
+  { name: 'derivatives_classification_snapshot', scd: 'Snapshot', category: 'Counterparty & Entity' },
+  { name: 'derivatives_indicative_snapshot', scd: 'Snapshot', category: 'Exposure & Position' },
+  { name: 'derivatives_risk_snapshot', scd: 'Snapshot', category: 'Credit Risk & Ratings' },
+  // Off-BS Commitments
+  { name: 'offbs_commitments_accounting_snapshot', scd: 'Snapshot', category: 'Financial Performance' },
+  { name: 'offbs_commitments_classification_snapshot', scd: 'Snapshot', category: 'Counterparty & Entity' },
+  { name: 'offbs_commitments_indicative_snapshot', scd: 'Snapshot', category: 'Exposure & Position' },
+  { name: 'offbs_commitments_risk_snapshot', scd: 'Snapshot', category: 'Credit Risk & Ratings' },
+  // SFT (Secured Financing Transactions)
+  { name: 'sft_accounting_snapshot', scd: 'Snapshot', category: 'Financial Performance' },
+  { name: 'sft_classification_snapshot', scd: 'Snapshot', category: 'Counterparty & Entity' },
+  { name: 'sft_indicative_snapshot', scd: 'Snapshot', category: 'Exposure & Position' },
+  { name: 'sft_risk_snapshot', scd: 'Snapshot', category: 'Credit Risk & Ratings' },
+  // Securities
+  { name: 'securities_accounting_snapshot', scd: 'Snapshot', category: 'Financial Performance' },
+  { name: 'securities_classification_snapshot', scd: 'Snapshot', category: 'Counterparty & Entity' },
+  { name: 'securities_indicative_snapshot', scd: 'Snapshot', category: 'Exposure & Position' },
+  { name: 'securities_risk_snapshot', scd: 'Snapshot', category: 'Credit Risk & Ratings' },
+  // Deposits
+  { name: 'deposits_accounting_snapshot', scd: 'Snapshot', category: 'Financial Performance' },
+  { name: 'deposits_classification_snapshot', scd: 'Snapshot', category: 'Counterparty & Entity' },
+  { name: 'deposits_indicative_snapshot', scd: 'Snapshot', category: 'Exposure & Position' },
+  { name: 'deposits_risk_snapshot', scd: 'Snapshot', category: 'Credit Risk & Ratings' },
+  // Borrowings
+  { name: 'borrowings_accounting_snapshot', scd: 'Snapshot', category: 'Financial Performance' },
+  { name: 'borrowings_classification_snapshot', scd: 'Snapshot', category: 'Counterparty & Entity' },
+  { name: 'borrowings_indicative_snapshot', scd: 'Snapshot', category: 'Exposure & Position' },
+  { name: 'borrowings_risk_snapshot', scd: 'Snapshot', category: 'Credit Risk & Ratings' },
+  // Debt
+  { name: 'debt_accounting_snapshot', scd: 'Snapshot', category: 'Financial Performance' },
+  { name: 'debt_classification_snapshot', scd: 'Snapshot', category: 'Counterparty & Entity' },
+  { name: 'debt_indicative_snapshot', scd: 'Snapshot', category: 'Exposure & Position' },
+  { name: 'debt_risk_snapshot', scd: 'Snapshot', category: 'Credit Risk & Ratings' },
+  // Equities
+  { name: 'equities_accounting_snapshot', scd: 'Snapshot', category: 'Financial Performance' },
+  { name: 'equities_classification_snapshot', scd: 'Snapshot', category: 'Counterparty & Entity' },
+  { name: 'equities_indicative_snapshot', scd: 'Snapshot', category: 'Exposure & Position' },
+  { name: 'equities_risk_snapshot', scd: 'Snapshot', category: 'Credit Risk & Ratings' },
+  // Stock
+  { name: 'stock_accounting_snapshot', scd: 'Snapshot', category: 'Financial Performance' },
+  { name: 'stock_classification_snapshot', scd: 'Snapshot', category: 'Counterparty & Entity' },
+  { name: 'stock_indicative_snapshot', scd: 'Snapshot', category: 'Exposure & Position' },
+  { name: 'stock_risk_snapshot', scd: 'Snapshot', category: 'Credit Risk & Ratings' },
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

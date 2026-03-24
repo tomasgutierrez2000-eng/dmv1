@@ -567,9 +567,12 @@ If any required ingredient does NOT exist in the data dictionary, it appears her
 
 ---
 
-## 6. Confirmation Gate (MANDATORY)
+## 6. Confirmation Gate (MANDATORY in Direct mode, AUTOMATIC in Orchestrator mode)
 
-After producing the decomposition, present a summary to the user:
+**Mode A (Direct):** Present summary to user, wait for explicit YES/NO/PARTIAL.
+**Mode B (Orchestrator):** The orchestrator reviews the confidence level (5I). If confidence is HIGH, the gate passes automatically. If MEDIUM or LOW, the orchestrator escalates to a human reviewer. The gate is never skipped — it is fulfilled by the orchestrator's programmatic review.
+
+After producing the decomposition, present a summary to the user (or return to orchestrator):
 
 ```
 ## Decomposition Summary: [Metric Name]

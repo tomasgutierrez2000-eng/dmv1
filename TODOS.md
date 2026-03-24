@@ -171,3 +171,8 @@
 3. Refactor `scenarios/factory/validator.ts` from O(n²) FK checks to O(n) using Set/Map lookups
 **Why:** 3.2MB JSON causes slow git + merge conflicts. Stale cache serves wrong data. O(n²) validator slow on 16K+ rows.
 **Depends on:** TODO #21 (YAML consolidation) is complementary.
+
+### 23. Deduplicate LineageExplorer.tsx vs LineageFlowView.tsx
+**What:** Investigate whether `components/lineage/LineageExplorer.tsx` (35KB) is dead code or used elsewhere. If dead, delete it. If used, either merge with LineageFlowView or extract shared layout engine.
+**Why:** Two lineage renderers with separate `computeLayout` functions will diverge after the Unified Lineage-Trace feature enhances LineageFlowView. Risk of stale/inconsistent rendering.
+**Depends on:** Best done after or alongside the Unified Lineage-Trace implementation.

@@ -11,6 +11,7 @@
 **What:** Write migration to remove VARCHAR 'parent' column and its FK from enterprise_business_taxonomy and enterprise_product_taxonomy.
 **Why:** VARCHAR↔BIGINT FK type mismatch is a crash risk on the rollup backbone. All code uses parent_segment_id (BIGINT).
 **Depends on:** Nothing.
+**Completed:** 2026-03-23 — Migration 026 applied. `parent` column dropped from both tables. Data dictionary updated via `db:introspect`.
 
 ### 3. Full migration framework
 **What:** Adopt a migration runner with schema_migrations version tracking table. Catalogue all 59 existing migrations.

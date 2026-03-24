@@ -107,3 +107,85 @@ body.dashboard-active .text-gray-600 {
     display: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════
+   Light theme overrides
+   Remaps common dark-mode utility classes so existing
+   components automatically adapt without individual changes.
+   ═══════════════════════════════════════════════════════ */
+
+html.light body {
+  background-color: #f8fafc !important; /* slate-50 */
+  color: #0f172a !important;            /* slate-900 */
+}
+
+/* ── Surface backgrounds ── */
+html.light .bg-pwc-black    { background-color: #f8fafc !important; }
+html.light .bg-matte-black  { background-color: #f8fafc !important; }
+html.light .bg-slate-950    { background-color: #ffffff !important; }
+html.light .bg-slate-900    { background-color: #f1f5f9 !important; }
+html.light .bg-slate-800    { background-color: #e2e8f0 !important; }
+html.light .bg-slate-700    { background-color: #cbd5e1 !important; }
+html.light .bg-gray-900     { background-color: #f1f5f9 !important; }
+html.light .bg-gray-800     { background-color: #e2e8f0 !important; }
+
+/* Alpha-modified dark backgrounds */
+html.light .bg-slate-900\/50  { background-color: rgb(241 245 249 / 0.5) !important; }
+html.light .bg-slate-900\/80  { background-color: rgb(241 245 249 / 0.85) !important; }
+html.light .bg-slate-900\/95  { background-color: rgb(241 245 249 / 0.95) !important; }
+html.light .bg-slate-800\/60  { background-color: rgb(226 232 240 / 0.6) !important; }
+html.light .bg-slate-800\/50  { background-color: rgb(226 232 240 / 0.5) !important; }
+
+/* ── Text ── */
+html.light .text-pwc-white  { color: #0f172a !important; }
+html.light .text-white       { color: #0f172a !important; }
+html.light .text-slate-50    { color: #0f172a !important; }
+html.light .text-slate-100   { color: #1e293b !important; }
+html.light .text-slate-200   { color: #334155 !important; }
+html.light .text-slate-300   { color: #334155 !important; }
+html.light .text-slate-400   { color: #475569 !important; }
+html.light .text-slate-500   { color: #475569 !important; }
+html.light .text-gray-300    { color: #475569 !important; }
+html.light .text-gray-400    { color: #6b7280 !important; }
+html.light .text-gray-500    { color: #6b7280 !important; }
+
+/* ── Borders ── */
+html.light .border-slate-700 { border-color: #e2e8f0 !important; }
+html.light .border-slate-800 { border-color: #e2e8f0 !important; }
+html.light .border-slate-600 { border-color: #cbd5e1 !important; }
+
+/* ── Noise overlay: almost invisible in light ── */
+html.light .noise-overlay { opacity: 0.01 !important; }
+
+/* ── Hover states ── */
+html.light .hover\:bg-slate-800:hover { background-color: #e2e8f0 !important; }
+html.light .hover\:bg-slate-700:hover { background-color: #cbd5e1 !important; }
+html.light .hover\:bg-slate-600:hover { background-color: #94a3b8 !important; }
+html.light .hover\:text-white:hover   { color: #0f172a !important; }
+
+/* ── Placeholder text ── */
+html.light .placeholder-slate-600::placeholder { color: #94a3b8 !important; }
+html.light .placeholder-slate-500::placeholder { color: #94a3b8 !important; }
+
+/* ── Ring colors ── */
+html.light .ring-white\/30  { --tw-ring-color: rgb(15 23 42 / 0.15) !important; }
+html.light .focus\:ring-slate-600:focus { --tw-ring-color: #cbd5e1 !important; }
+html.light .focus\:border-slate-600:focus { border-color: #94a3b8 !important; }
+
+/* ── NavBar: stays dark in both modes ── */
+html.light nav.theme-stable {
+  background-color: rgb(15 23 42 / 0.95) !important;
+  border-color: #1e293b !important;
+}
+html.light nav.theme-stable .text-white { color: #ffffff !important; }
+html.light nav.theme-stable .text-pwc-white { color: #ffffff !important; }
+html.light nav.theme-stable .bg-slate-700 { background-color: #334155 !important; }
+html.light nav.theme-stable .bg-slate-800 { background-color: #1e293b !important; }
+html.light nav.theme-stable .border-slate-700 { border-color: #334155 !important; }
+html.light nav.theme-stable .border-slate-800 { border-color: #1e293b !important; }
+html.light nav.theme-stable .hover\:bg-slate-600:hover { background-color: #475569 !important; }
+html.light nav.theme-stable .hover\:text-white:hover { color: #ffffff !important; }
+html.light nav.theme-stable .text-slate-300 { color: #cbd5e1 !important; }
+html.light nav.theme-stable .text-slate-400 { color: #94a3b8 !important; }
+html.light nav.theme-stable .hover\:text-orange-300:hover { color: #fdba74 !important; }
+html.light nav.theme-stable .text-orange-300 { color: #fdba74 !important; }

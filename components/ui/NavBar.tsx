@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import {
   Activity,
   Layers,
@@ -15,6 +17,8 @@ import {
   Map,
   Database,
   GitBranch,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 // Pages where the global nav should be hidden (they have their own chrome)
@@ -73,6 +77,10 @@ function NavDropdown({
 
 export default function NavBar() {
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   // Hide on specific pages
   if (HIDDEN_ON.some((p) => pathname.startsWith(p))) {
@@ -82,7 +90,7 @@ export default function NavBar() {
   const isActive = (prefix: string) => pathname.startsWith(prefix);
 
   return (
-    <nav className="border-b border-slate-800 bg-slate-900/95 backdrop-blur-sm sticky top-0 z-50">
+    <nav className="theme-stable border-b border-slate-800 bg-slate-900/95 backdrop-blur-sm sticky top-0 z-50">
       {/* Skip to content — keyboard a11y */}
       <a
         href="#main-content"
@@ -174,6 +182,20 @@ export default function NavBar() {
           <BookOpen className="w-3.5 h-3.5" />
           <span>Playbook</span>
         </Link>
+
+        {/* Theme toggle */}
+        <button
+          type="button"
+          aria-label={mounted ? (theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode') : 'Toggle theme'}
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="ml-auto bg-slate-700 hover:bg-slate-600 text-white rounded-md p-1.5 transition-colors cursor-pointer"
+        >
+          {mounted ? (
+            theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />
+          ) : (
+            <Sun className="w-3.5 h-3.5 opacity-0" />
+          )}
+        </button>
       </div>
     </nav>
   );

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Space_Mono, Inter } from 'next/font/google'
 import './globals.css'
 import { ToastProvider } from '../components/ui/Toast'
+import { ThemeProvider } from '../components/ui/ThemeProvider'
 import NavBar from '../components/ui/NavBar'
 
 const spaceMono = Space_Mono({
@@ -26,12 +27,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${spaceMono.variable} ${inter.variable}`}>
+    <html lang="en" className={`${spaceMono.variable} ${inter.variable}`} suppressHydrationWarning>
       <body className="font-inter bg-pwc-black text-pwc-white antialiased overflow-x-hidden">
-        <ToastProvider>
-          <NavBar />
-          <main id="main-content">{children}</main>
-        </ToastProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <NavBar />
+            <main id="main-content">{children}</main>
+          </ToastProvider>
+        </ThemeProvider>
         <div className="noise-overlay" />
       </body>
     </html>

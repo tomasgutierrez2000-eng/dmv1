@@ -308,6 +308,8 @@ async function main() {
             console.log(`  ${c.table}: ${c.before} → ${c.after}`);
           }
         }
+        registry.save();
+        console.log(`Registry: saved reconciled state`);
       } else {
         console.log('Registry reconciled: all nextId values already current');
       }

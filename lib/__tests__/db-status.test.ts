@@ -1,77 +1,87 @@
 /**
- * Tests for db-status.ts pure helper functions.
- * The main getDbStatus() function requires PG — tested via integration tests.
- * Here we test the exported types and the module's internal pure helpers
- * by importing them indirectly through behavior.
+ * Tests for db-status.ts.
+ * Tests the no-DB fallback path and verifies correct summary/table construction.
+ * The live PG path is covered by integration tests.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { TableStatus, FieldDriftType, DbStatusSummary } from '../db-status';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Type-level tests — ensure the types are correct
-describe('db-status types', () => {
-  it('TableStatus has expected values', () => {
-    const statuses: TableStatus[] = ['has_data', 'empty', 'not_in_db', 'not_in_dd'];
-    expect(statuses).toHaveLength(4);
-  });
-
-  it('FieldDriftType has expected values', () => {
-    const drifts: FieldDriftType[] = ['in_dd_not_in_db', 'in_db_not_in_dd', 'type_mismatch'];
-    expect(drifts).toHaveLength(3);
-  });
-
-  it('DbStatusSummary has all required fields', () => {
-    const summary: DbStatusSummary = {
-      totalTablesInDd: 10,
-      totalTablesInDb: 8,
-      tablesWithData: 6,
-      tablesEmpty: 2,
-      tablesNotInDb: 2,
-      tablesNotInDd: 0,
-      tablesWithFieldDrift: 1,
-      totalFieldDrifts: 3,
-    };
-    expect(summary.totalTablesInDd).toBe(10);
-    expect(summary.tablesWithFieldDrift).toBe(1);
-  });
+beforeEach(() => {
+  vi.resetModules();
+  delete process.env.DATABASE_URL;
 });
 
-// Test getDbStatus without DATABASE_URL — should return all tables as not_in_db
-describe('getDbStatus without DATABASE_URL', () => {
-  beforeEach(() => {
-    delete process.env.DATABASE_URL;
+afterEach(() => {
+  vi.doUnmock('@/lib/data-dictionary');
+  vi.doUnmock('@/lib/introspect');
+});
+
+function mockDd(dd: unknown) {
+  vi.doMock('@/lib/data-dictionary', () => ({
+    readDataDictionary: () => dd,
+  }));
+  // formatPgType is imported by db-status — re-export the real one
+  vi.doMock('@/lib/introspect', async () => {
+    const actual = await vi.importActual<typeof import('@/lib/introspect')>('@/lib/introspect');
+    return actual;
   });
+}
 
-  it('returns connected=false and databaseUrl=false', async () => {
-    // Mock readDataDictionary to return a small DD
-    vi.doMock('@/lib/data-dictionary', () => ({
-      readDataDictionary: () => ({
-        L1: [{ name: 'counterparty', layer: 'L1', category: 'Entity masters', fields: [{ name: 'id' }] }],
-        L2: [],
-        L3: [],
-        relationships: [],
-        derivation_dag: {},
-      }),
-    }));
+/* ────────────────── getDbStatus — no DATABASE_URL ────────────────── */
 
-    // Re-import after mock
+describe('getDbStatus without DATABASE_URL', () => {
+  it('marks all DD tables as not_in_db', async () => {
+    mockDd({
+      L1: [
+        { name: 'counterparty', layer: 'L1', category: 'Entity masters', fields: [{ name: 'counterparty_id', data_type: 'BIGINT' }] },
+        { name: 'currency_dim', layer: 'L1', category: 'Reference', fields: [{ name: 'currency_code' }] },
+      ],
+      L2: [{ name: 'facility_exposure_snapshot', layer: 'L2', category: 'Exposure', fields: [] }],
+      L3: [],
+      relationships: [],
+      derivation_dag: {},
+    });
+
     const { getDbStatus } = await import('../db-status');
     const result = await getDbStatus();
 
     expect(result.connected).toBe(false);
     expect(result.databaseUrl).toBe(false);
-    expect(result.tables).toHaveLength(1);
-    expect(result.tables[0].status).toBe('not_in_db');
-    expect(result.summary.tablesNotInDb).toBe(1);
+    expect(result.tables).toHaveLength(3);
+    expect(result.tables.every(t => t.status === 'not_in_db')).toBe(true);
+    expect(result.tables.every(t => t.rowCount === null)).toBe(true);
 
-    vi.doUnmock('@/lib/data-dictionary');
+    // Summary should reflect DD contents
+    expect(result.summary.totalTablesInDd).toBe(3);
+    expect(result.summary.totalTablesInDb).toBe(0);
+    expect(result.summary.tablesNotInDb).toBe(3);
+    expect(result.summary.tablesWithData).toBe(0);
+    expect(result.summary.tablesEmpty).toBe(0);
+    expect(result.summary.tablesNotInDd).toBe(0);
   });
 
-  it('handles null data dictionary gracefully', async () => {
-    vi.doMock('@/lib/data-dictionary', () => ({
-      readDataDictionary: () => null,
-    }));
-    // Clear module cache so the new mock takes effect
-    vi.resetModules();
+  it('preserves layer and category from DD', async () => {
+    mockDd({
+      L1: [{ name: 'counterparty', layer: 'L1', category: 'Entity masters', fields: [{ name: 'id' }] }],
+      L2: [],
+      L3: [],
+      relationships: [],
+      derivation_dag: {},
+    });
+
+    const { getDbStatus } = await import('../db-status');
+    const result = await getDbStatus();
+    const table = result.tables[0];
+
+    expect(table.name).toBe('counterparty');
+    expect(table.layer).toBe('L1');
+    expect(table.schema).toBe('l1');
+    expect(table.category).toBe('Entity masters');
+    expect(table.fieldCount).toBe(1);
+    expect(table.fieldDrift).toEqual([]);
+  });
+
+  it('returns empty tables array when DD is null', async () => {
+    mockDd(null);
 
     const { getDbStatus } = await import('../db-status');
     const result = await getDbStatus();
@@ -79,7 +89,33 @@ describe('getDbStatus without DATABASE_URL', () => {
     expect(result.connected).toBe(false);
     expect(result.tables).toHaveLength(0);
     expect(result.summary.totalTablesInDd).toBe(0);
+    expect(result.summary.totalTablesInDb).toBe(0);
+  });
 
-    vi.doUnmock('@/lib/data-dictionary');
+  it('includes ISO timestamp', async () => {
+    mockDd({ L1: [], L2: [], L3: [], relationships: [], derivation_dag: {} });
+
+    const { getDbStatus } = await import('../db-status');
+    const result = await getDbStatus();
+
+    expect(result.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+  });
+
+  it('handles DD with tables across all 3 layers', async () => {
+    mockDd({
+      L1: [{ name: 'dim_a', layer: 'L1', category: 'Ref', fields: [{ name: 'a' }, { name: 'b' }] }],
+      L2: [{ name: 'snap_a', layer: 'L2', category: 'Exp', fields: [{ name: 'x' }] }],
+      L3: [{ name: 'calc_a', layer: 'L3', category: 'Metric', fields: [] }],
+      relationships: [],
+      derivation_dag: {},
+    });
+
+    const { getDbStatus } = await import('../db-status');
+    const result = await getDbStatus();
+
+    expect(result.tables).toHaveLength(3);
+    expect(result.tables.find(t => t.layer === 'L1')?.fieldCount).toBe(2);
+    expect(result.tables.find(t => t.layer === 'L2')?.fieldCount).toBe(1);
+    expect(result.tables.find(t => t.layer === 'L3')?.fieldCount).toBe(0);
   });
 });

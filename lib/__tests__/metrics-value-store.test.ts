@@ -37,6 +37,8 @@ describe('buildMetricValueRowsFromRunOutput', () => {
     expect(rows[0].metric_id).toBe('C001');
     expect(rows[0].as_of_date).toBe('2025-01-31');
     expect(rows[0].aggregation_level).toBe('facility');
+    // Scalar results set the key field to empty string (not null) — intentional for DB inserts
+    expect(rows[0].facility_id).toBe('');
   });
 
   it('maps dimension to correct key field for facility', () => {

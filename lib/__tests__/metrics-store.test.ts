@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import {
   readCustomMetrics,
@@ -10,13 +11,13 @@ import {
 } from '../metrics-store';
 import type { L3Metric } from '@/data/l3-metrics';
 
-const TEST_DIR = '/tmp/test-metrics-store';
-const TEST_METRICS_PATH = path.join(TEST_DIR, 'metrics-custom.json');
+let TEST_DIR: string;
+let TEST_METRICS_PATH: string;
 
-// Mock config to control paths
+// Mock config — paths set dynamically per test run
 vi.mock('@/lib/config', () => ({
-  getMetricsCustomPath: () => '/tmp/test-metrics-store/metrics-custom.json',
-  getProjectRoot: () => '/tmp/test-metrics-store',
+  getMetricsCustomPath: () => TEST_METRICS_PATH,
+  getProjectRoot: () => TEST_DIR,
 }));
 
 function makeMetric(id: string, name?: string): L3Metric {
@@ -33,12 +34,12 @@ function makeMetric(id: string, name?: string): L3Metric {
 }
 
 beforeEach(() => {
-  if (!fs.existsSync(TEST_DIR)) fs.mkdirSync(TEST_DIR, { recursive: true });
+  TEST_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'metrics-store-test-'));
+  TEST_METRICS_PATH = path.join(TEST_DIR, 'metrics-custom.json');
 });
 
 afterEach(() => {
-  if (fs.existsSync(TEST_METRICS_PATH)) fs.unlinkSync(TEST_METRICS_PATH);
-  try { fs.rmSync(TEST_DIR, { recursive: true }); } catch { /* ok */ }
+  fs.rmSync(TEST_DIR, { recursive: true, force: true });
 });
 
 /* ────────────────── readCustomMetrics ────────────────── */
@@ -72,6 +73,12 @@ describe('readCustomMetrics', () => {
     fs.writeFileSync(TEST_METRICS_PATH, '', 'utf-8');
     expect(readCustomMetrics()).toEqual([]);
   });
+
+  it('returns metrics array even without version field', () => {
+    fs.writeFileSync(TEST_METRICS_PATH, JSON.stringify({ metrics: [makeMetric('C001')] }), 'utf-8');
+    const result = readCustomMetrics();
+    expect(result).toHaveLength(1);
+  });
 });
 
 /* ────────────────── writeCustomMetrics ────────────────── */
@@ -86,9 +93,16 @@ describe('writeCustomMetrics', () => {
   });
 
   it('creates directory if missing', () => {
-    if (fs.existsSync(TEST_DIR)) fs.rmSync(TEST_DIR, { recursive: true });
+    fs.rmSync(TEST_DIR, { recursive: true, force: true });
     writeCustomMetrics([]);
     expect(fs.existsSync(TEST_METRICS_PATH)).toBe(true);
+  });
+
+  it('writes empty metrics array', () => {
+    writeCustomMetrics([]);
+    const raw = fs.readFileSync(TEST_METRICS_PATH, 'utf-8');
+    const parsed = JSON.parse(raw);
+    expect(parsed.metrics).toEqual([]);
   });
 });
 
@@ -118,6 +132,10 @@ describe('nextCustomMetricId', () => {
     expect(nextCustomMetricId([makeMetric('C001')])).toBe('C002');
     expect(nextCustomMetricId([makeMetric('C099')])).toBe('C100');
   });
+
+  it('handles IDs > 999', () => {
+    expect(nextCustomMetricId([makeMetric('C1000')])).toBe('C1001');
+  });
 });
 
 /* ────────────────── isReadOnlyFsError ────────────────── */
@@ -135,7 +153,7 @@ describe('isReadOnlyFsError', () => {
     expect(isReadOnlyFsError(err)).toBe(true);
   });
 
-  it('returns false for other errors', () => {
+  it('returns false for ENOENT', () => {
     const err = new Error('ENOENT');
     (err as NodeJS.ErrnoException).code = 'ENOENT';
     expect(isReadOnlyFsError(err)).toBe(false);
@@ -144,6 +162,8 @@ describe('isReadOnlyFsError', () => {
   it('returns false for non-Error values', () => {
     expect(isReadOnlyFsError('string error')).toBe(false);
     expect(isReadOnlyFsError(null)).toBe(false);
+    expect(isReadOnlyFsError(undefined)).toBe(false);
+    expect(isReadOnlyFsError(42)).toBe(false);
   });
 });
 
@@ -158,10 +178,17 @@ describe('getMergedMetrics', () => {
     expect(result[0].id).toBe('C001');
   });
 
-  it('falls back to YAML stubs when custom is empty', () => {
-    // No custom file → readCustomMetrics returns [] → falls through to YAML
-    // YAML dir doesn't exist in test env → returns []
+  it('returns empty array when no custom metrics and no YAML dir', () => {
+    // No custom file + YAML dir doesn't exist in test env
     const result = getMergedMetrics();
-    expect(Array.isArray(result)).toBe(true);
+    expect(result).toEqual([]);
+  });
+
+  it('prefers custom metrics over YAML stubs', () => {
+    // Write custom metrics — even with YAML stubs existing, custom wins
+    const data = { version: 1, metrics: [makeMetric('CUSTOM-1')] };
+    fs.writeFileSync(TEST_METRICS_PATH, JSON.stringify(data), 'utf-8');
+    const result = getMergedMetrics();
+    expect(result[0].id).toBe('CUSTOM-1');
   });
 });

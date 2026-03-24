@@ -231,11 +231,90 @@ describe('mergeIntoDataDictionary', () => {
     expect(fesField.pk_fk?.fk_target).toEqual({ layer: 'L1', table: 'fm', field: 'facility_id' });
   });
 
-  it('handles empty introspection gracefully', () => {
+  it('handles empty introspection gracefully — existing tables are removed', () => {
     const dd = emptyDd();
     dd.L1 = [{ name: 'existing', layer: 'L1', category: 'Test', fields: [] }];
     const report = mergeIntoDataDictionary(dd, emptyIntrospected());
     expect(report.tablesAdded).toHaveLength(0);
-    // existing table preserved (not removed — removal only reported, not enacted)
+    expect(report.tablesRemoved).toContain('L1.existing');
+    // Empty introspection = all DD tables get filtered out
+    expect(dd.L1).toHaveLength(0);
+  });
+
+  it('reports tables in DD but missing from DB as removed', () => {
+    const dd = emptyDd();
+    dd.L1 = [
+      { name: 'still_exists', layer: 'L1', category: 'Test', fields: [{ name: 'id' }] },
+      { name: 'gone_from_db', layer: 'L1', category: 'Test', fields: [{ name: 'id' }] },
+    ];
+    const introspected: IntrospectedData = {
+      tables: [{ table_schema: 'l1', table_name: 'still_exists' }],
+      columns: [
+        { table_schema: 'l1', table_name: 'still_exists', column_name: 'id', data_type: 'bigint', character_maximum_length: null, numeric_precision: null, numeric_scale: null, is_nullable: 'NO', column_default: null, ordinal_position: 1, udt_name: 'int8' },
+      ],
+      pks: [], fks: [],
+    };
+
+    const report = mergeIntoDataDictionary(dd, introspected);
+    expect(report.tablesRemoved).toContain('L1.gone_from_db');
+    // Table filtered from DD array (removed tables are dropped, not just reported)
+    expect(dd.L1).toHaveLength(1);
+    expect(dd.L1[0].name).toBe('still_exists');
+  });
+
+  it('detects fields removed from DB', () => {
+    const dd = emptyDd();
+    dd.L2 = [{ name: 'snap', layer: 'L2', category: 'Test', fields: [
+      { name: 'id', data_type: 'BIGINT' },
+      { name: 'old_field', data_type: 'VARCHAR(50)' },
+    ]}];
+    const introspected: IntrospectedData = {
+      tables: [{ table_schema: 'l2', table_name: 'snap' }],
+      columns: [
+        { table_schema: 'l2', table_name: 'snap', column_name: 'id', data_type: 'bigint', character_maximum_length: null, numeric_precision: null, numeric_scale: null, is_nullable: 'NO', column_default: null, ordinal_position: 1, udt_name: 'int8' },
+      ],
+      pks: [], fks: [],
+    };
+
+    const report = mergeIntoDataDictionary(dd, introspected);
+    expect(report.fieldsRemoved).toContain('L2.snap.old_field');
+  });
+
+  it('detects composite PK', () => {
+    const dd = emptyDd();
+    const introspected: IntrospectedData = {
+      tables: [{ table_schema: 'l2', table_name: 'fes' }],
+      columns: [
+        { table_schema: 'l2', table_name: 'fes', column_name: 'facility_id', data_type: 'bigint', character_maximum_length: null, numeric_precision: null, numeric_scale: null, is_nullable: 'NO', column_default: null, ordinal_position: 1, udt_name: 'int8' },
+        { table_schema: 'l2', table_name: 'fes', column_name: 'as_of_date', data_type: 'date', character_maximum_length: null, numeric_precision: null, numeric_scale: null, is_nullable: 'NO', column_default: null, ordinal_position: 2, udt_name: 'date' },
+      ],
+      pks: [
+        { table_schema: 'l2', table_name: 'fes', column_name: 'facility_id', ordinal_position: 1 },
+        { table_schema: 'l2', table_name: 'fes', column_name: 'as_of_date', ordinal_position: 2 },
+      ],
+      fks: [],
+    };
+
+    mergeIntoDataDictionary(dd, introspected);
+    expect(dd.L2[0].fields[0].pk_fk?.is_pk).toBe(true);
+    expect(dd.L2[0].fields[0].pk_fk?.is_composite).toBe(true);
+    expect(dd.L2[0].fields[1].pk_fk?.is_pk).toBe(true);
+    expect(dd.L2[0].fields[1].pk_fk?.is_composite).toBe(true);
+  });
+});
+
+/* ────────────────── schemaToLayer — additional edge cases ────────────────── */
+
+describe('schemaToLayer edge cases', () => {
+  it('throws on uppercase schema name', () => {
+    expect(() => schemaToLayer('L1')).toThrow('Unknown schema: L1');
+  });
+
+  it('throws on public schema', () => {
+    expect(() => schemaToLayer('public')).toThrow('Unknown schema: public');
+  });
+
+  it('throws on empty string', () => {
+    expect(() => schemaToLayer('')).toThrow('Unknown schema: ');
   });
 });

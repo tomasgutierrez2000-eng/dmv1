@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import {
   readDataDictionary,
@@ -11,14 +12,14 @@ import {
   type DataDictionaryTable,
 } from '../data-dictionary';
 
-// Mock config to control paths
-vi.mock('@/lib/config', () => ({
-  getDataDictionaryPath: () => '/tmp/test-dd/data-dictionary.json',
-  getDataDictionaryDir: () => '/tmp/test-dd',
-}));
+let TEST_DIR: string;
+let TEST_PATH: string;
 
-const TEST_DIR = '/tmp/test-dd';
-const TEST_PATH = path.join(TEST_DIR, 'data-dictionary.json');
+// Mock config — path is set dynamically per test run
+vi.mock('@/lib/config', () => ({
+  getDataDictionaryPath: () => TEST_PATH,
+  getDataDictionaryDir: () => TEST_DIR,
+}));
 
 function makeDd(overrides?: Partial<DataDictionary>): DataDictionary {
   return {
@@ -36,12 +37,12 @@ function makeTable(name: string, layer: 'L1' | 'L2' | 'L3'): DataDictionaryTable
 }
 
 beforeEach(() => {
-  if (!fs.existsSync(TEST_DIR)) fs.mkdirSync(TEST_DIR, { recursive: true });
+  TEST_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'dd-test-'));
+  TEST_PATH = path.join(TEST_DIR, 'data-dictionary.json');
 });
 
 afterEach(() => {
-  if (fs.existsSync(TEST_PATH)) fs.unlinkSync(TEST_PATH);
-  if (fs.existsSync(TEST_DIR)) fs.rmSync(TEST_DIR, { recursive: true });
+  fs.rmSync(TEST_DIR, { recursive: true, force: true });
 });
 
 /* ────────────────── readDataDictionary ────────────────── */
@@ -80,6 +81,15 @@ describe('readDataDictionary', () => {
     expect(readDataDictionary()).toBeNull();
     errorSpy.mockRestore();
   });
+
+  it('returns parsed object for valid JSON with wrong shape (no runtime validation)', () => {
+    // readDataDictionary does JSON.parse + type assertion — no shape validation
+    fs.writeFileSync(TEST_PATH, '{"foo": "bar"}', 'utf-8');
+    const result = readDataDictionary();
+    // Returns the object as-is (cast to DataDictionary)
+    expect(result).not.toBeNull();
+    expect((result as unknown as Record<string, string>).foo).toBe('bar');
+  });
 });
 
 /* ────────────────── writeDataDictionary ────────────────── */
@@ -94,7 +104,7 @@ describe('writeDataDictionary', () => {
   });
 
   it('creates directory if it does not exist', () => {
-    if (fs.existsSync(TEST_DIR)) fs.rmSync(TEST_DIR, { recursive: true });
+    fs.rmSync(TEST_DIR, { recursive: true, force: true });
     const dd = makeDd();
     writeDataDictionary(dd);
     expect(fs.existsSync(TEST_PATH)).toBe(true);
@@ -105,6 +115,14 @@ describe('writeDataDictionary', () => {
     writeDataDictionary(makeDd({ L1: [makeTable('new', 'L1')] }));
     const result = readDataDictionary();
     expect(result!.L1[0].name).toBe('new');
+  });
+
+  it('writes pretty-printed JSON (2-space indent)', () => {
+    writeDataDictionary(makeDd());
+    const raw = fs.readFileSync(TEST_PATH, 'utf-8');
+    // Pretty-printed JSON has newlines + indentation
+    expect(raw).toContain('\n');
+    expect(raw).toContain('  ');
   });
 });
 
@@ -119,12 +137,15 @@ describe('ensureEmptyDataDictionary', () => {
   });
 
   it('creates and returns empty DD if file does not exist', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const result = ensureEmptyDataDictionary();
     expect(result.L1).toEqual([]);
     expect(result.L2).toEqual([]);
     expect(result.L3).toEqual([]);
     expect(result.relationships).toEqual([]);
+    expect(result.derivation_dag).toEqual({});
     expect(fs.existsSync(TEST_PATH)).toBe(true);
+    warnSpy.mockRestore();
   });
 });
 

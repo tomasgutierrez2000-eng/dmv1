@@ -151,25 +151,60 @@ describe('field migration detection', () => {
   });
 });
 
+describe('rollup propagation detection', () => {
+  it('detects same field added to multiple rollup tables', () => {
+    const entries: ReleaseEntry[] = [
+      entry({ table: 'desk_summary', field: 'total_exposure_usd', changeType: 'Added' }),
+      entry({ table: 'portfolio_summary', field: 'total_exposure_usd', changeType: 'Added' }),
+      entry({ table: 'desk_summary', field: 'weighted_pd_pct', changeType: 'Added' }),
+      entry({ table: 'portfolio_summary', field: 'weighted_pd_pct', changeType: 'Added' }),
+    ];
+    const [summary] = generateSummaries(entries);
+    const rollupBullet = summary.bullets.find(b => b.category === 'Rollup Propagation');
+    expect(rollupBullet).toBeDefined();
+    expect(rollupBullet!.text).toContain('Propagated');
+    expect(rollupBullet!.text).toContain('rollup');
+  });
+});
+
 /* ────────────────── narrative generation ────────────────── */
 
 describe('narrative generation', () => {
-  it('generates concise narrative for small changes', () => {
+  it('generates descriptive narrative for small changes (ends with period)', () => {
     const entries: ReleaseEntry[] = [
       entry({ table: 'facility_master', field: 'new_col', changeType: 'Added' }),
     ];
     const [summary] = generateSummaries(entries);
-    expect(summary.narrative).toBeTruthy();
-    expect(summary.narrative.length).toBeGreaterThan(0);
+    expect(summary.narrative.length).toBeGreaterThan(5);
+    expect(summary.narrative).toMatch(/\.$/); // Ends with period
   });
 
-  it('generates multi-sentence narrative for large changesets', () => {
+  it('generates multi-sentence narrative for large changesets mentioning layer', () => {
     const entries: ReleaseEntry[] = [];
-    // Add 10 fields across different tables
     for (let i = 0; i < 10; i++) {
       entries.push(entry({ table: `table_${i}`, field: `field_${i}`, changeType: 'Added' }));
     }
     const [summary] = generateSummaries(entries);
-    expect(summary.narrative).toContain('.');
+    expect(summary.narrative).toMatch(/\.$/); // Ends with period
+    expect(summary.narrative).toContain('L2'); // References the layer
+  });
+
+  it('leads with schema expansion when many tables added', () => {
+    const entries: ReleaseEntry[] = [];
+    for (let i = 0; i < 5; i++) {
+      entries.push(entry({ table: `new_table_${i}`, field: '(new table)', changeType: 'Added' }));
+      entries.push(entry({ table: `new_table_${i}`, field: `col_a`, changeType: 'Added' }));
+    }
+    const [summary] = generateSummaries(entries);
+    expect(summary.narrative.toLowerCase()).toContain('expansion');
+  });
+
+  it('leads with simplification when many tables removed', () => {
+    const entries: ReleaseEntry[] = [];
+    for (let i = 0; i < 4; i++) {
+      entries.push(entry({ layer: 'L1', table: `old_table_${i}`, field: '(entire table)', changeType: 'Removed' }));
+    }
+    const [summary] = generateSummaries(entries);
+    expect(summary.narrative.toLowerCase()).toContain('simplification');
   });
 });

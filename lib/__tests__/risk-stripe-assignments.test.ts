@@ -49,4 +49,11 @@ describe('getRiskStripeForTable', () => {
     expect(getRiskStripeForTable('L3', 'Metrics')).toBe('Credit');
     expect(getRiskStripeForTable('L3', 'Aggregations')).toBe('Credit');
   });
+
+  // Edge cases
+  it('empty category string → falls through to default', () => {
+    expect(getRiskStripeForTable('L1', '')).toBe('Other');
+    expect(getRiskStripeForTable('L2', '')).toBe('Credit');
+    expect(getRiskStripeForTable('L3', '')).toBe('Credit');
+  });
 });

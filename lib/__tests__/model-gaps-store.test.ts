@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { readModelGaps, writeModelGaps, type ModelGap } from '../model-gaps-store';
 
-const TEST_DIR = '/tmp/test-model-gaps';
-const TEST_PATH = path.join(TEST_DIR, 'model-gaps.json');
+let TEST_DIR: string;
+let TEST_PATH: string;
 
 vi.mock('@/lib/config', () => ({
-  getModelGapsPath: () => '/tmp/test-model-gaps/model-gaps.json',
+  getModelGapsPath: () => TEST_PATH,
 }));
 
 function makeGap(item: string): ModelGap {
@@ -21,12 +22,12 @@ function makeGap(item: string): ModelGap {
 }
 
 beforeEach(() => {
-  if (!fs.existsSync(TEST_DIR)) fs.mkdirSync(TEST_DIR, { recursive: true });
+  TEST_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'gaps-test-'));
+  TEST_PATH = path.join(TEST_DIR, 'model-gaps.json');
 });
 
 afterEach(() => {
-  if (fs.existsSync(TEST_PATH)) fs.unlinkSync(TEST_PATH);
-  try { fs.rmSync(TEST_DIR, { recursive: true }); } catch { /* ok */ }
+  fs.rmSync(TEST_DIR, { recursive: true, force: true });
 });
 
 describe('readModelGaps', () => {
@@ -51,6 +52,19 @@ describe('readModelGaps', () => {
     fs.writeFileSync(TEST_PATH, '{"gaps": "not-array"}', 'utf-8');
     expect(readModelGaps()).toEqual([]);
   });
+
+  it('returns empty when gaps key is missing', () => {
+    fs.writeFileSync(TEST_PATH, '{"version": 1}', 'utf-8');
+    expect(readModelGaps()).toEqual([]);
+  });
+
+  it('reads multiple gaps preserving order', () => {
+    const data = { version: 1, gaps: [makeGap('Gap A'), makeGap('Gap B'), makeGap('Gap C')] };
+    fs.writeFileSync(TEST_PATH, JSON.stringify(data), 'utf-8');
+    const result = readModelGaps();
+    expect(result).toHaveLength(3);
+    expect(result.map(g => g.gapItem)).toEqual(['Gap A', 'Gap B', 'Gap C']);
+  });
 });
 
 describe('writeModelGaps', () => {
@@ -63,8 +77,17 @@ describe('writeModelGaps', () => {
   });
 
   it('creates directory if missing', () => {
-    if (fs.existsSync(TEST_DIR)) fs.rmSync(TEST_DIR, { recursive: true });
+    fs.rmSync(TEST_DIR, { recursive: true, force: true });
     writeModelGaps([]);
     expect(fs.existsSync(TEST_PATH)).toBe(true);
+  });
+
+  it('roundtrips through read', () => {
+    const gaps = [makeGap('Gap A'), makeGap('Gap B')];
+    writeModelGaps(gaps);
+    const result = readModelGaps();
+    expect(result).toHaveLength(2);
+    expect(result[0].gapItem).toBe('Gap A');
+    expect(result[1].impactedMetrics).toBe('DSCR, LTV');
   });
 });

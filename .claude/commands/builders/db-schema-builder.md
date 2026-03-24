@@ -348,7 +348,7 @@ logger = AuditLogger(agent_name="db-schema-builder", trigger_source="{user|orche
 
 ### Each DDL test
 ```python
-logger.write_reasoning_step(N, "Test {N}: {test_name}", "PASS|FAIL: {detail}", confidence="HIGH")
+logger.write_reasoning_step(step_num=N, thought="Test {N}: {test_name}", decision="PASS|FAIL: {detail}", confidence="HIGH")
 ```
 
 ### Schema change record (per DDL statement)
@@ -365,7 +365,7 @@ logger.write_schema_change(
 
 ### Session finalize
 ```python
-logger.finalize_session("{completed|failed|blocked_by_reviewer}", output_payload={
+logger.finalize_session(status="{completed|failed|blocked_by_reviewer}", output_payload={
     "migration_file": "sql/migrations/{NNN}-{desc}.sql",
     "changes_applied": N,
     "tests_passed": 6,

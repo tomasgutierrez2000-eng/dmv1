@@ -6,13 +6,11 @@
 **What:** Bring 3 DDL files (01-l1-ddl, 02-l2-ddl, 03-l3-ddl) into alignment with golden-source data dictionary.
 **Why:** 9 orphaned tables cause confusion for offline users and make DDL files unreliable as fallback.
 **Depends on:** Issue 2 (drop legacy FK) should complete first so the regenerated DDL doesn't include legacy columns.
-**Completed:** 2026-03-23 — DDL regenerated via `npm run db:export-ddl`. Now aligned: L1=75, L2=100, L3=83 tables (258 total, 268 FKs).
 
 ### 2. Drop legacy 'parent' VARCHAR column from taxonomy tables
 **What:** Write migration to remove VARCHAR 'parent' column and its FK from enterprise_business_taxonomy and enterprise_product_taxonomy.
 **Why:** VARCHAR↔BIGINT FK type mismatch is a crash risk on the rollup backbone. All code uses parent_segment_id (BIGINT).
 **Depends on:** Nothing.
-**Completed:** 2026-03-23 — Migration 026 applied. `parent` column dropped from both tables. Data dictionary updated via `db:introspect`.
 
 ### 3. Full migration framework
 **What:** Adopt a migration runner with schema_migrations version tracking table. Catalogue all 59 existing migrations.
@@ -24,61 +22,51 @@
 **What:** Delete ~140 lines of modulo arithmetic FK remapping. Fix L2 seed data to reference valid L1 IDs natively.
 **Why:** Exact anti-pattern CLAUDE.md warns against ("The Modular Arithmetic Trap — NEVER DO THIS"). Silently destroys narrative coherence.
 **Depends on:** May need L1 dim table expansion if L2 seed references IDs outside L1 range.
-**Completed:** Verified 2026-03-23 — `load-gsib-export.ts` is clean; no modulo FK remapping exists. L2 seed data references valid L1 IDs natively with ON CONFLICT DO NOTHING for composite PKs.
 
 ### 5. Document L3 FK-less design as ADR
 **What:** Write Architecture Decision Record explaining why L3 uses formula-driven joins (not DDL FKs).
 **Why:** 5 existing L3 FKs suggest partial intent that was never completed — confusing without documentation.
 **Depends on:** Nothing.
-**Completed:** `docs/adr/001-l3-formula-driven-joins.md` — documents formula-driven join rationale, L3 FK counts (5 vs L1's 76 and L2's 170), and compensating controls.
 
 ### 6. GitHub Actions CI workflow
 **What:** Create .github/workflows/ci.yml running typecheck, lint, test:metrics, test:calc-engine, validate on push/PR.
 **Why:** No CI/CD exists. Validation scripts exist but only run when manually invoked.
 **Depends on:** Nothing.
-**Completed:** 2026-03-23 — `.github/workflows/ci.yml` runs on push/PR to main: typecheck, lint, Vitest, test:metrics, test:calc-engine, validate, build.
 
 ### 7. Extract shared sql-value-formatter.ts + PG reserved words
 **What:** Consolidate 3 formatSqlValue() implementations (sql-emitter.ts, db-writer.ts, ddl-generator.ts) and 3 PG_RESERVED_WORDS copies into one module.
 **Why:** DRY violation that can cause silent data corruption. db-writer missing exception IDs and count rounding.
 **Depends on:** Nothing. Other items (4, 8, 9) benefit from this being done first.
-**Completed:** `lib/sql-value-formatter.ts` (162 LOC) — shared module with `formatSqlValue()`, `VARCHAR_EXCEPTION_IDS`, `PG_RESERVED_WORDS`, `quoteColumn()`. Consumed by `sql-emitter.ts` and `v2/db-writer.ts`.
 
 ### 8. Convert factory hard-coded SQL to structured data
 **What:** Replace FACTORY_COUNTRY_SETUP and FACTORY_CURRENCY_SETUP raw SQL strings in sql-emitter.ts with structured objects validated by SchemaValidator.
 **Why:** Hard-coded SQL bypasses schema validation. Schema changes would silently break these inserts.
 **Depends on:** Issue 7 (shared formatter) for consistent type formatting.
-**Completed:** `scenarios/factory/factory-prerequisites.ts` (95 LOC) — structured `PrerequisiteTable[]` objects for countries, currencies, thresholds. Uses `formatSqlValue()` and `ON CONFLICT DO NOTHING`.
 
 ### 9. Fix LOAD_ORDER schema labels
 **What:** Change 'l2.counterparty' → 'l1.counterparty' (and credit_agreement_master, facility_master) in sql-emitter.ts LOAD_ORDER.
 **Why:** Documentation bug — these are L1 tables labeled as L2. Would break schema-qualified lookups.
 **Depends on:** Nothing. 3-line fix.
-**Completed:** Verified 2026-03-23 — all 136 LOAD_ORDER entries in `sql-emitter.ts` have correct `l1./l2.` prefixes. No mislabeled tables found.
 
 ### 10. Add error logging to readDataDictionary
 **What:** Log parse errors in lib/data-dictionary.ts before returning null. Distinguish ENOENT from corruption.
 **Why:** Silent error swallowing masks DD file corruption. Downstream consumers operate on stale data with no diagnosis path.
 **Depends on:** Nothing. 3-line fix.
-**Completed:** 2026-03-23 — Added `console.warn` for ENOENT case; `console.error` for parse errors already existed.
 
 ### 11. Full Vitest framework migration
 **What:** Add Vitest, convert existing test scripts to test suites, add new tests for untested flows.
 **Why:** No test framework exists. Custom assert() scripts lack parallel execution, watch mode, coverage, test isolation.
 **Depends on:** Nothing (can start immediately).
-**Completed:** Vitest 4.1.0 integrated — 25 test files across `lib/__tests__/`, `lib/metrics-calculation/__tests__/`, `scenarios/factory/__tests__/`, `scripts/shared/__tests__/`. `npm test` runs full suite.
 
 ### 12. Comprehensive formatSqlValue test suite
 **What:** Write 30+ test cases covering all suffix rules, edge cases, exception IDs, NaN/null handling, boolean coercion.
 **Why:** formatSqlValue() is called for every INSERT row in the entire database pipeline. Zero tests today.
 **Depends on:** Issues 7 (shared module) and 11 (Vitest).
-**Completed:** `lib/__tests__/sql-value-formatter.test.ts` (359 LOC) — 77 test cases covering all suffix rules, exception IDs, NaN/Infinity, quote escaping, boolean coercion, reserved words.
 
 ### 13. Incremental introspection
 **What:** Parse DDL commands to identify affected tables, only re-introspect those instead of all 211.
 **Why:** db:introspect takes 10-30 seconds over GCP Cloud SQL network. PostToolUse hook blocks dev on every DDL change.
 **Depends on:** Nothing.
-**Completed:** `scripts/introspect-db.ts` supports `--tables=table1,table2` flag. PostToolUse hook (`.claude/hooks/post-db-change.sh`) auto-extracts affected table names from DDL commands and passes them for incremental introspection.
 
 ---
 
@@ -210,14 +198,10 @@
 **Context:** Current mitigation: `--scenario S35` flag runs a single scenario. But doesn't help with partial SQL file from a crash. Approach: write per-scenario SQL files, then concatenate at the end. Crash = re-run only the missing scenario.
 **Depends on:** Nothing.
 
----
-
-## Deferred (from Data Quality Audit 2026-03-23)
-
-### 31. Generate seed data for 32 empty product-specific L2 tables
-**What:** Write seed data generators (TypeScript or SQL) for 8 product families × 4 snapshot types: borrowings, debt, deposits, derivatives, equities, securities, SFT, and stock. Each table needs: realistic value distributions, correct FK chains to existing counterparties/facilities/instruments, temporal alignment with existing weekly snapshot dates (2024-07-05 to 2025-02-28), and inter-table consistency.
-**Why:** A GSIB has positions across all product types. Currently only loans (16K rows) and off-BS commitments (3.5K rows) have data. Product-specific risk metrics (derivatives CVA, SFT haircuts, securities market risk, deposit runoff) cannot be calculated. Regulators expect coverage across all Basel III exposure classes.
-**Pros:** Enables full GSIB metric coverage, realistic portfolio diversification, product-specific risk analytics.
-**Cons:** Significant effort (~8-12 hours CC). Each of the 32 tables has 5-204 fields. Derivatives and securities tables are particularly complex (54-65 fields each with specific financial instrument semantics).
-**Context:** Identified during PostgreSQL L1/L2 data quality audit. The outside voice reviewer correctly noted this is data *generation*, not data *quality* — it belongs as a separate workstream, not mixed into audit fixes. Start with derivatives (most critical for CVA/counterparty credit risk) and securities (most critical for market risk), then expand to remaining products.
-**Depends on:** Phase 0-3 audit fixes should complete first (dedup, FK fixes, drawn amounts) so new product data references clean counterparty/facility data.
+### 31. Extend YAML metric schema for SR 11-7 documentation fields
+**What:** Add `metadata.assumptions`, `metadata.limitations`, `metadata.owner` fields to the YAML metric config schema template.
+**Why:** The SR 11-7 documentation checker (`reviewers/sr-11-7-checker.md`) references these fields in its 12-item compliance checklist (items 4-5, 10-11). Without them, every SR 11-7 review reports these items as MISSING — creating noise in validation output.
+**Pros:** SR 11-7 checks produce actionable results instead of false-positive MISSING flags. Metrics gain structured documentation for model risk management compliance.
+**Cons:** All existing YAML metrics need the new fields added (can be automated via script). Slightly increases YAML file size.
+**Context:** Identified during S9 integration testing (cross-reference audit). The checker itself documents this as an expected gap (line 118). Fix: update `scripts/calc_engine/types/metric-definition.ts` and the YAML template, then backfill existing YAMLs.
+**Depends on:** Nothing.

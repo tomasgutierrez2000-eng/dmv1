@@ -271,7 +271,7 @@ At each major step, log to the audit trail:
 logger = AuditLogger(agent_name="data-model-expert", trigger_source="user|orchestrator")
 
 # Step 2: Each reasoning step
-logger.write_reasoning_step(1, "Mapping ingredients to schema", "3 FOUND, 1 PARTIAL, 2 MISSING", confidence="HIGH")
+logger.write_reasoning_step(step_num=1, thought="Mapping ingredients to schema", decision="3 FOUND, 1 PARTIAL, 2 MISSING", confidence="HIGH")
 
 # Step 3: Schema change proposals
 logger.write_action("PROPOSE_SCHEMA_CHANGE", "ALTER TABLE l2.facility_risk_snapshot ADD COLUMN pd_ttc_pct")
@@ -280,7 +280,7 @@ logger.write_action("PROPOSE_SCHEMA_CHANGE", "ALTER TABLE l2.facility_risk_snaps
 logger.write_action("CONFLICT_DETECTED", "pd_pct type mismatch — escalated to user")
 
 # Step 5: Session finalize
-logger.finalize_session("completed|blocked_by_reviewer", output_payload=recommendation_document)
+logger.finalize_session(status="completed|blocked_by_reviewer", output_payload=recommendation_document)
 ```
 
 Write a JSON session log to `.claude/audit/sessions/data-model-expert-{timestamp}.json` with:

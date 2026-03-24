@@ -367,7 +367,7 @@ At each major step, log to the audit trail:
 logger = AuditLogger(agent_name="reg-mapping-expert", trigger_source="user|orchestrator")
 
 # Step 2: Per-framework analysis
-logger.write_reasoning_step(1, "Analyzing FR Y-14Q Schedule H", "95 covered, 12 partial, 13 gaps", confidence="HIGH")
+logger.write_reasoning_step(step_num=1, thought="Analyzing FR Y-14Q Schedule H", decision="95 covered, 12 partial, 13 gaps", confidence="HIGH")
 
 # Step 3: Coverage scoring
 logger.write_action("COVERAGE_ASSESSMENT", "FR Y-14Q Schedule H: 84.2% (AMBER)")
@@ -376,7 +376,7 @@ logger.write_action("COVERAGE_ASSESSMENT", "FR Y-14Q Schedule H: 84.2% (AMBER)")
 logger.write_action("GAP_IDENTIFIED", "cecl_stage_code missing from l2.facility_risk_snapshot — P0 priority")
 
 # Step 5: Session finalize
-logger.finalize_session("completed", output_payload=coverage_report)
+logger.finalize_session(status="completed", output_payload=coverage_report)
 ```
 
 Write a JSON session log to `.claude/audit/sessions/reg-mapping-expert-{timestamp}.json` with:

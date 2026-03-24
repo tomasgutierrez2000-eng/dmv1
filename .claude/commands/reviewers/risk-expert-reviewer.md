@@ -426,6 +426,17 @@ finalize_session(
     "gate_decision": "APPROVED|APPROVED_WITH_CONDITIONS|BLOCKED",
     "dimension_results": {"dim_1": "PASS|PARTIAL|FAIL", ...},
     "findings_count": {"CRITICAL": N, "HIGH": N, "MEDIUM": N, "LOW": N, "INFO": N},
+    "findings": [
+      {
+        "finding_ref": "REV-001",
+        "severity": "CRITICAL|HIGH|MEDIUM|LOW|INFO",
+        "mra_classification": "MRA|MRIA|OFI|N/A",
+        "issue_description": "...",
+        "affected_objects": ["l2.table_name.column_name"],
+        "required_action": "...",
+        "dimension": "structural_integrity|data_type|referential_integrity|..."
+      }
+    ],
     "regulatory_coverage_score": NN,
     "rollback_recommended": true|false
   }

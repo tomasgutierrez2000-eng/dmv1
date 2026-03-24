@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: TypeScript typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx next lint
+
+      - name: Unit tests (Vitest)
+        run: npm test
+
+      - name: Metric definition tests
+        run: npm run test:metrics
+
+      - name: Calc engine tests
+        run: npm run test:calc-engine
+
+      - name: Data model validation
+        run: npm run validate
+
+      - name: Production build
+        run: npm run build

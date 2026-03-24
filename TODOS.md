@@ -36,6 +36,7 @@
 **What:** Create .github/workflows/ci.yml running typecheck, lint, test:metrics, test:calc-engine, validate on push/PR.
 **Why:** No CI/CD exists. Validation scripts exist but only run when manually invoked.
 **Depends on:** Nothing.
+**Completed:** 2026-03-23 — `.github/workflows/ci.yml` runs on push/PR to main: typecheck, lint, Vitest, test:metrics, test:calc-engine, validate, build.
 
 ### 7. Extract shared sql-value-formatter.ts + PG reserved words
 **What:** Consolidate 3 formatSqlValue() implementations (sql-emitter.ts, db-writer.ts, ddl-generator.ts) and 3 PG_RESERVED_WORDS copies into one module.

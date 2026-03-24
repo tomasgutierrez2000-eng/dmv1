@@ -6,6 +6,7 @@
 **What:** Bring 3 DDL files (01-l1-ddl, 02-l2-ddl, 03-l3-ddl) into alignment with golden-source data dictionary.
 **Why:** 9 orphaned tables cause confusion for offline users and make DDL files unreliable as fallback.
 **Depends on:** Issue 2 (drop legacy FK) should complete first so the regenerated DDL doesn't include legacy columns.
+**Completed:** 2026-03-23 — DDL regenerated via `npm run db:export-ddl`. Now aligned: L1=75, L2=100, L3=83 tables (258 total, 268 FKs).
 
 ### 2. Drop legacy 'parent' VARCHAR column from taxonomy tables
 **What:** Write migration to remove VARCHAR 'parent' column and its FK from enterprise_business_taxonomy and enterprise_product_taxonomy.

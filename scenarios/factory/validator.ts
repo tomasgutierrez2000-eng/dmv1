@@ -18,6 +18,7 @@ import type { IDRegistry } from './id-registry';
 import type { V2GeneratorOutput } from './v2/generators';
 import type { FacilityState, FacilityStateMap, TableData as V2TableData } from './v2/types';
 import { stateKey } from './v2/types';
+import { VALID_ENTITY_TYPE_CODES, VALID_NAICS_CODES, VALID_DPD_CODES } from './shared-constants';
 
 export interface ValidationResult {
   valid: boolean;
@@ -739,7 +740,6 @@ export function validateV2Output(
 
   // Entity type codes must exist in l1.entity_type_dim — invalid codes silently
   // drop counterparties from Basel III risk weight lookups and entity-type rollups.
-  const VALID_ENTITY_TYPE_CODES = new Set(['BANK', 'CORP', 'FI', 'FUND', 'INS', 'MDB', 'OTH', 'PE', 'PSE', 'RE', 'SOV', 'SPE']);
   for (const cp of chain.counterparties) {
     if (!VALID_ENTITY_TYPE_CODES.has(cp.entity_type_code)) {
       errors.push(
@@ -752,7 +752,6 @@ export function validateV2Output(
   // Industry IDs must be valid NAICS 2-digit codes (11-92) that exist in l1.industry_dim.
   // IDs 1-10 are invalid — the factory's internal industry mapping (1=TMT, 2=Healthcare, etc.)
   // must be translated to NAICS codes before emitting counterparty rows.
-  const VALID_NAICS_CODES = new Set([11, 21, 22, 23, 31, 32, 33, 42, 44, 45, 48, 49, 51, 52, 53, 54, 55, 56, 61, 62, 71, 72, 81, 92]);
   for (const cp of chain.counterparties) {
     if (!VALID_NAICS_CODES.has(cp.industry_id)) {
       errors.push(
@@ -797,31 +796,44 @@ export function validateV2Output(
     }
   }
 
-  // ── 11. FX Rate Coverage ──
-  // Every as_of_date in facility_exposure_snapshot must have corresponding fx_rate rows.
-  // Without this, metric formulas that JOIN on fx.as_of_date = fes.as_of_date return NULL
-  // for FX conversion at aggregate levels (audit finding: only 3 of 34 dates had FX rates).
+  // ── 11. FX Rate Coverage (per currency × date) ──
+  // Metric formulas JOIN: fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD'
+  //                       AND fx.as_of_date = fes.as_of_date
+  // Must validate per (currency, date) pair — not just per date — otherwise a facility
+  // with currency 'ZAR' would silently get NULL FX conversions even if USD has full coverage.
 
   const fxTable = output.tables.find(t => t.table === 'fx_rate');
   if (exposureTable && exposureTable.rows.length > 0) {
-    const exposureDates = new Set(exposureTable.rows.map(r => r.as_of_date as string));
-    const fxDates = new Set((fxTable?.rows ?? []).map(r => r.as_of_date as string));
-    const missingFxDates: string[] = [];
-    for (const date of exposureDates) {
-      if (!fxDates.has(date)) missingFxDates.push(date);
+    // Build set of (currency|date) pairs covered by FX rates (to_currency_code = 'USD')
+    const fxCoverage = new Set<string>();
+    for (const row of (fxTable?.rows ?? [])) {
+      if (row.to_currency_code === 'USD') {
+        fxCoverage.add(`${row.from_currency_code}|${row.as_of_date}`);
+      }
     }
-    if (missingFxDates.length > 0) {
+
+    // Check every (currency, date) pair in exposure data
+    const missingPairs: string[] = [];
+    const checkedPairs = new Set<string>();
+    for (const row of exposureTable.rows) {
+      const key = `${row.currency_code}|${row.as_of_date}`;
+      if (checkedPairs.has(key)) continue;
+      checkedPairs.add(key);
+      if (!fxCoverage.has(key)) {
+        missingPairs.push(key);
+      }
+    }
+    if (missingPairs.length > 0) {
       errors.push(
-        `FX coverage gap: ${missingFxDates.length} exposure dates have no FX rates: ` +
-        `${missingFxDates.slice(0, 5).join(', ')}${missingFxDates.length > 5 ? '...' : ''}. ` +
-        `Metric formulas JOINing on fx.as_of_date will return NULL for these dates.`
+        `FX coverage gap: ${missingPairs.length} (currency, date) pairs in exposure have no FX→USD rate: ` +
+        `${missingPairs.slice(0, 5).join(', ')}${missingPairs.length > 5 ? '...' : ''}. ` +
+        `Metric formulas JOINing on fx.from_currency_code + fx.as_of_date will return NULL.`
       );
     }
   }
 
   // ── 12. DPD Bucket Code Validation ──
   // Ensure generated DPD bucket codes match FFIEC standard codes in l1.dpd_bucket_dim.
-  const VALID_DPD_CODES = new Set(['CURRENT', '1-29', '30-59', '60-89', '90+']);
   const delinquencyTable = output.tables.find(t => t.table === 'facility_delinquency_snapshot');
   if (delinquencyTable) {
     const invalidDpdCodes = new Set<string>();

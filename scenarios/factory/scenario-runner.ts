@@ -352,10 +352,12 @@ async function main() {
       // entity_type_code, industry_id, and DPD bucket validation are all skipped,
       // which is exactly how the audit found 468 broken industry FKs and 15 leaked
       // entity_type codes. Use --skip-quality-controls only for development.
-      console.error(`✗ Could not load L1 registry: ${err instanceof Error ? err.message : String(err)}`);
-      console.error('  Quality controls cannot run without L1 reference data.');
-      console.error('  Fix the registry or use --skip-quality-controls to bypass (NOT recommended for production).');
-      process.exit(1);
+      // Throw instead of process.exit(1) to allow cleanup of open DB connections/file handles.
+      throw new Error(
+        `Cannot load L1 registry: ${err instanceof Error ? err.message : String(err)}. ` +
+        `Quality controls cannot run without L1 reference data. ` +
+        `Fix the registry or use --skip-quality-controls to bypass (NOT recommended for production).`
+      );
     }
   } else {
     console.log('Quality controls: SKIPPED (--skip-quality-controls)');

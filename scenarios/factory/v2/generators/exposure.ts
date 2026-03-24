@@ -7,11 +7,16 @@ import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round } from '../prng';
 
+/**
+ * @param bankShareMap - Map of facility_id → bank_share_pct from L1 lender allocations.
+ *   For syndicated facilities, bank_share < 1.0. If not provided or missing, defaults to 1.0.
+ */
 export function generateExposureRows(
   stateMap: FacilityStateMap,
   facilityIds: number[],
   dates: string[],
   registry: IDRegistry,
+  bankShareMap?: Map<number, number>,
 ): SqlRow[] {
   const rows: SqlRow[] = [];
 
@@ -43,7 +48,7 @@ export function generateExposureRows(
         undrawn_commitment_amt: undrawnAmt,
         gross_exposure_usd: round(state.ead, 2),
         exposure_amount_local: drawnAmt,
-        bank_share_pct: 1.000000,
+        bank_share_pct: bankShareMap?.get(state.facility_id) ?? 1.000000,
         source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',

@@ -65,16 +65,29 @@ export function generateFxRateRows(
   registry: IDRegistry,
 ): SqlRow[] {
   const rows: SqlRow[] = [];
-  const baseDateMs = new Date('2024-07-01').getTime();
+  // Use Date.UTC for consistent parsing regardless of local timezone.
+  // ISO date strings like '2024-07-01' parse as UTC midnight with new Date(),
+  // but being explicit prevents surprises if date formats ever change.
+  const baseDateMs = Date.UTC(2024, 6, 1); // July = month 6 (0-indexed)
   const msPerWeek = 7 * 24 * 3600 * 1000;
 
   for (const date of dates) {
-    const dateMs = new Date(date).getTime();
+    // Parse YYYY-MM-DD explicitly as UTC to avoid timezone drift
+    const [y, m, d] = date.split('-').map(Number);
+    const dateMs = Date.UTC(y, m - 1, d);
     const weeksFromBase = (dateMs - baseDateMs) / msPerWeek;
 
     for (const ccy of Array.from(currencies)) {
       const baseRate = BASE_FX_RATES[ccy];
-      if (baseRate === undefined) continue; // unknown currency, skip
+      if (baseRate === undefined) {
+        // Warn loudly — silent skip means this currency has no FX coverage and metric
+        // JOINs will return NULL. The validator checks per-(currency, date) pairs downstream.
+        console.warn(
+          `FX rate generator: unknown currency '${ccy}' — no base rate available. ` +
+          `Add it to BASE_FX_RATES in fx-rate.ts to prevent NULL FX conversions.`
+        );
+        continue;
+      }
 
       const drift = DRIFT_FACTORS[ccy] ?? 0;
       const rate = Math.max(round(baseRate * (1.0 + drift * weeksFromBase), 10), 0.000001);

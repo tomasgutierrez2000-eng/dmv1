@@ -20,6 +20,7 @@ import {
 } from '../../scripts/shared/mvp-config';
 import type { CounterpartyProfile } from './scenario-config';
 import { mulberry32, hashStr, pick } from './v2/prng';
+import { VALID_ENTITY_TYPE_CODES } from './shared-constants';
 
 /* ────────────────── Industry Mapping ────────────────── */
 
@@ -161,12 +162,22 @@ export function enrichCounterparty(
     lei += chars[Math.floor(rng() * chars.length)];
   }
 
+  // Validate entity_type_code if overridden from YAML — don't let invalid codes
+  // bypass enrichment and reach the validator only downstream (or not at all with --skip-quality-controls)
+  const entityTypeCode = profile.entity_type_code ?? industryMap.entityTypeCode;
+  if (!VALID_ENTITY_TYPE_CODES.has(entityTypeCode)) {
+    throw new Error(
+      `GSIB enrichment: entity_type_code '${entityTypeCode}' for counterparty '${profile.legal_name}' ` +
+      `is not a valid l1.entity_type_dim code. Valid: ${[...VALID_ENTITY_TYPE_CODES].join(', ')}`
+    );
+  }
+
   return {
     counterparty_id: counterpartyId,
     legal_name: profile.legal_name,
     counterparty_type: counterpartyType,
     country_code: profile.country,
-    entity_type_code: profile.entity_type_code ?? industryMap.entityTypeCode,
+    entity_type_code: entityTypeCode,
     // Emit NAICS 2-digit code (11-92) — NEVER the internal factory ID (1-10).
     // Internal IDs don't exist in l1.industry_dim and silently break industry rollups.
     industry_id: industryMap.naicsCode,

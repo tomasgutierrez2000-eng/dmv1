@@ -218,8 +218,14 @@ export function generateV2Data(
   tables.push({ schema: 'l2', table: 'fx_rate', rows: fxRateRows });
   tableBreakdown['fx_rate'] = fxRateRows.length;
 
-  // 1. Exposure
-  const exposureRows = generateExposureRows(stateMap, facilityIds, dates, registry);
+  // 1. Exposure — pass bank_share_pct from L1 lender allocations (syndicated facilities < 1.0)
+  const bankShareMap = new Map<number, number>();
+  if (chain.facility_lender_allocations) {
+    for (const alloc of chain.facility_lender_allocations) {
+      bankShareMap.set(alloc.facility_id, alloc.bank_share_pct);
+    }
+  }
+  const exposureRows = generateExposureRows(stateMap, facilityIds, dates, registry, bankShareMap);
   tables.push({ schema: 'l2', table: 'facility_exposure_snapshot', rows: exposureRows });
   tableBreakdown['facility_exposure_snapshot'] = exposureRows.length;
 

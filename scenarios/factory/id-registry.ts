@@ -56,6 +56,10 @@ const DEFAULT_STARTS: Record<string, number> = {
   facility_exposure_snapshot:     50001,  // seed 1-10000
   position:                       50001,
   position_detail:                50001,
+
+  // Non-credit product positions (standalone, no facility chain)
+  nc_position:                    800001, // above SEED_035 max ~707K, factory max ~601K
+  nc_position_detail:             900001,
   cash_flow:                      50001,
   facility_lender_allocation:     100001, // gsib-enrichment was using module-level counter
 };

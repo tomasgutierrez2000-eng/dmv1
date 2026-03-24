@@ -11,27 +11,10 @@
 import pg from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
 import { formatSqlValue } from './sql-emitter';
+import { loadEnvOrDie } from './load-env';
 
-// ── Env setup ────────────────────────────────────────────────
-const envPaths = [
-  path.resolve(process.cwd(), '.env.local'),
-  path.resolve(process.cwd(), '../../.env.local'),
-  '/Users/tomas/120/.env.local',
-];
-for (const p of envPaths) {
-  if (fs.existsSync(p)) {
-    dotenv.config({ path: p });
-    break;
-  }
-}
-
-const DATABASE_URL = process.env.DATABASE_URL;
-if (!DATABASE_URL) {
-  console.error('ERROR: DATABASE_URL not set');
-  process.exit(1);
-}
+const DATABASE_URL = loadEnvOrDie();
 
 const AS_OF_DATE = '2025-01-31';
 const BASE_RATE = 0.0530;

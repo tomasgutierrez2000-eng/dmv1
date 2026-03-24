@@ -15,6 +15,7 @@ import type { StoryArc, RatingTier } from '../../../scripts/shared/mvp-config';
 import type {
   ProductType, FacilityState, AmortizationEntry, LifecycleStage,
 } from './types';
+import type { DrawBehaviorInput } from './stage-types';
 import { clamp, range, round } from './prng';
 import { sampleUtilization, seasonalMultiplier, CCF_BY_PRODUCT } from './distributions';
 import { interpolateArcValue, getMonth } from './time-series';
@@ -145,7 +146,7 @@ export function utilizationSpreadAdder(utilization: number): number {
  */
 export function applyDrawBehavior(
   rng: () => number,
-  state: FacilityState,
+  state: DrawBehaviorInput,
   date: string,
   dates: string[],
   storyUtilCurve: readonly number[],
@@ -230,7 +231,7 @@ export function applyDrawBehavior(
  * Apply amortization to a term loan.
  * Returns the new drawn amount after amortization.
  */
-function applyAmortization(state: FacilityState, config: ProductConfig): number {
+function applyAmortization(state: Pick<FacilityState, 'drawn_amount' | 'original_committed'>, config: ProductConfig): number {
   if (!config.amortizes && config.amortizationRate === 0) {
     return state.drawn_amount;
   }

@@ -15,6 +15,7 @@ import type {
   CovenantType, CovenantDefinition, CovenantPackage, CovenantState,
   FacilityState, FacilityEvent, CounterpartyFinancials,
 } from './types';
+import type { CovenantTestInput } from './stage-types';
 import { clamp } from './prng';
 
 // ─── Default Covenant Packages by Rating Tier ──────────────────────────
@@ -213,7 +214,7 @@ export function nextTestDate(
  */
 export function computeCovenantMetric(
   covenantType: CovenantType,
-  state: FacilityState,
+  state: Pick<FacilityState, 'collateral_value' | 'drawn_amount'>,
   financials: CounterpartyFinancials,
 ): number {
   switch (covenantType) {
@@ -276,7 +277,7 @@ export interface CovenantTestResult {
  */
 export function testCovenants(
   rng: () => number,
-  state: FacilityState,
+  state: CovenantTestInput,
   financials: CounterpartyFinancials,
   date: string,
   previousDate?: string,

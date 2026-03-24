@@ -13,6 +13,7 @@
 import type { FacilityState, FacilityStateMap, SqlRow } from '../types';
 import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import { round, seededRng } from '../prng';
+import { safePush } from '../safe-collections';
 
 // ─── Types ──────────────────────────────────────────────────────────────
 
@@ -276,17 +277,17 @@ export function generateProductTableRows(
 
       switch (category) {
         case 'loans':
-          tables.get('loans_indicative_snapshot')!.push(loansIndicative(state, posId, date));
-          tables.get('loans_accounting_snapshot')!.push(loansAccounting(state, posId, date));
-          tables.get('loans_classification_snapshot')!.push(loansClassification(state, posId, date));
-          tables.get('loans_risk_snapshot')!.push(loansRisk(state, posId, date));
+          safePush(tables, 'loans_indicative_snapshot', loansIndicative(state, posId, date), 'product-tables');
+          safePush(tables, 'loans_accounting_snapshot', loansAccounting(state, posId, date), 'product-tables');
+          safePush(tables, 'loans_classification_snapshot', loansClassification(state, posId, date), 'product-tables');
+          safePush(tables, 'loans_risk_snapshot', loansRisk(state, posId, date), 'product-tables');
           break;
 
         case 'offbs_commitments':
-          tables.get('offbs_commitments_indicative_snapshot')!.push(offbsIndicative(state, posId, date));
-          tables.get('offbs_commitments_accounting_snapshot')!.push(offbsAccounting(state, posId, date));
-          tables.get('offbs_commitments_classification_snapshot')!.push(offbsClassification(state, posId, date));
-          tables.get('offbs_commitments_risk_snapshot')!.push(offbsRisk(state, posId, date));
+          safePush(tables, 'offbs_commitments_indicative_snapshot', offbsIndicative(state, posId, date), 'product-tables');
+          safePush(tables, 'offbs_commitments_accounting_snapshot', offbsAccounting(state, posId, date), 'product-tables');
+          safePush(tables, 'offbs_commitments_classification_snapshot', offbsClassification(state, posId, date), 'product-tables');
+          safePush(tables, 'offbs_commitments_risk_snapshot', offbsRisk(state, posId, date), 'product-tables');
           break;
 
         // Future: add Derivatives, SFT, Securities, Deposits, Borrowings, Debt, Equities, Stock

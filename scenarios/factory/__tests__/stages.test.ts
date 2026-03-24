@@ -56,12 +56,12 @@ describe('Stage 3: Collateral Revaluation', () => {
     expect(result.ltv_ratio).toBeCloseTo(0.5, 4);
   });
 
-  it('returns ltv_ratio = 1.0 when collateral is 0', () => {
+  it('returns ltv_ratio = 999.0 when collateral is 0 and drawn > 0', () => {
     const result = applyCollateralRevaluation(
       { collateral_value: 0, collateral_type: 'NONE', drawn_amount: 1_000_000 },
       makeCtx(),
     );
-    expect(result.ltv_ratio).toBe(1.0);
+    expect(result.ltv_ratio).toBe(999.0);
   });
 
   it('evolves RE collateral over time', () => {

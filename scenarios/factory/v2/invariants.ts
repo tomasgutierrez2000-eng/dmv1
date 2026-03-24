@@ -103,6 +103,23 @@ export function checkInvariants(
     fail('rwa', 'Negative RWA', state.rwa);
   }
 
+  // Cross-field consistency (lessons learned from eng review)
+  // DPD > 90 should correlate with IFRS 9 stage 3
+  if (state.days_past_due > 90 && state.ifrs9_stage === 1) {
+    fail('ifrs9_stage', `DPD=${state.days_past_due} but IFRS9 stage=1 (should be 2 or 3)`, state.ifrs9_stage);
+  }
+
+  // DEFAULT credit status should have elevated PD
+  if (state.credit_status === 'DEFAULT' && state.pd_annual < 0.10) {
+    fail('pd_annual', `Credit status=DEFAULT but PD=${state.pd_annual} (<10%)`, state.pd_annual);
+  }
+
+  // Undrawn identity: committed - drawn should approximately equal undrawn
+  const expectedUndrawn = state.committed_amount - state.drawn_amount;
+  if (Math.abs(state.undrawn_amount - expectedUndrawn) > 1) {
+    fail('undrawn_amount', `Undrawn (${state.undrawn_amount}) != committed-drawn (${expectedUndrawn})`, state.undrawn_amount);
+  }
+
   return violations;
 }
 

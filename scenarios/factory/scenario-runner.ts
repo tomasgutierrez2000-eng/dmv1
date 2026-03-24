@@ -503,6 +503,15 @@ async function main() {
       const allTables = [...l1Tables, ...v2Output.tables];
       const scenarioRows = v2Output.stats.totalRows + l1Tables.reduce((s, t) => s + t.rows.length, 0);
 
+      // Check invariant violations from state evolution
+      if (v2Output.stats.invariantViolations > 0) {
+        console.log(`   ⚠ ${v2Output.stats.invariantViolations} invariant violation(s) in state evolution`);
+        if (args.failFast) {
+          console.log(`   --fail-fast: stopping on invariant violations.`);
+          process.exit(1);
+        }
+      }
+
       // Show stats
       const { tableBreakdown } = v2Output.stats;
       console.log(`   ✓ Validated + Generated | ${scenarioRows} rows across ${allTables.length} tables`);

@@ -17,6 +17,7 @@ import type {
 
 import type { L1Chain } from '../../chain-builder';
 import type { IDRegistry } from '../../id-registry';
+import { reportInvariants, type InvariantViolation } from '../invariants';
 
 import { FacilityStateManager } from '../facility-state';
 import { MarketEnvironment } from '../market-environment';
@@ -135,6 +136,7 @@ export interface V2GeneratorOutput {
     dateCount: number;
     totalRows: number;
     tableBreakdown: Record<string, number>;
+    invariantViolations: number;
   };
 }
 
@@ -191,6 +193,17 @@ export function generateV2Data(
   const stateMap = manager.getStateMap();
   const financials = manager.getAllFinancials();
   const facilityIds = chain.facilities.map(f => f.facility_id);
+
+  // ── Step 4b: Aggregate invariant violations from state evolution ──
+  const allViolations: InvariantViolation[] = [];
+  for (const [, state] of stateMap) {
+    if (state._invariantViolations && state._invariantViolations.length > 0) {
+      allViolations.push(...state._invariantViolations);
+    }
+  }
+  if (allViolations.length > 0) {
+    reportInvariants(allViolations, true);
+  }
 
   // ── Step 5: Run all generators ──
   const tables: TableData[] = [];
@@ -367,6 +380,7 @@ export function generateV2Data(
       dateCount: dates.length,
       totalRows,
       tableBreakdown,
+      invariantViolations: allViolations.length,
     },
   };
 }

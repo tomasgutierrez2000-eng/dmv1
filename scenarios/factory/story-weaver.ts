@@ -1,15 +1,17 @@
 /**
- * Story Weaver — entity-centric narrative engine for GSIB-quality data generation.
+ * Story Weaver — narrative layer on top of FacilityStateManager.
  *
- * THE CORE AGENT. Makes data narratively coherent by generating facility
- * STORIES (one state per entity), then projecting to table rows. All tables
- * derive from the same state — no independent column generation.
+ * DELEGATES evolution to the V2 FacilityStateManager (10-stage pipeline).
+ * Adds narrative analysis on top:
+ *   - Health state derivation from FacilityState
+ *   - Story template assignment with state-aware guards
+ *   - Cross-entity coherence checks
+ *   - Risk flag and event generation from state transitions
+ *   - Temporal monotonicity enforcement
  *
- * Wraps (does NOT replace) FacilityStateManager. Adds a narrative layer:
- *   - Health state machine (PERFORMING → WATCH → DETERIORATING → ...)
- *   - Causal graph (root_cause → PD → rating → pricing → flags → events)
- *   - Cross-entity coherence (same counterparty = same PD/rating)
- *   - Temporal monotonicity (worsening trajectory never reverses)
+ * SINGLE STATE MACHINE: StoryWeaver reads FROM FacilityState, it does NOT
+ * maintain its own parallel evolution. This prevents drift between the V2
+ * pipeline and agent-driven generation.
  */
 
 import type { HealthState } from './gsib-calibration';
@@ -17,20 +19,17 @@ import {
   PD_BY_RATING_TIER,
   UTILIZATION_BY_HEALTH,
   SPREAD_BY_RATING_TIER,
-  DPD_BY_HEALTH,
   TEMPORAL_LIMITS,
   type RatingTierName,
 } from './gsib-calibration';
 
 import {
   STORY_TEMPLATES,
-  CAUSAL_CHAIN,
   ratingFromPD,
   tierFromPD,
   healthStateFromPDandDPD,
   type StoryType,
   type StoryPhase,
-  type StoryTemplate,
 } from './story-templates';
 
 import type { CreditStatus, FacilityState } from './v2/types';
@@ -38,13 +37,13 @@ import type { CreditStatus, FacilityState } from './v2/types';
 /* ────────────────── Facility Story ────────────────── */
 
 /**
- * Extended facility state with narrative tracking.
- * This is the single source of truth for one facility at one point in time.
+ * Narrative analysis of a FacilityState at a point in time.
+ * This is a READ-ONLY view derived from FacilityState — not a parallel state.
  */
 export interface FacilityStory {
   facilityId: number;
   counterpartyId: number;
-  /** Current health state */
+  /** Current health state (derived from PD + DPD) */
   healthState: HealthState;
   /** Previous month's health state */
   previousHealthState: HealthState;
@@ -61,7 +60,7 @@ export interface FacilityStory {
   /** Whether the trajectory is worsening, improving, or stable */
   trajectory: 'WORSENING' | 'IMPROVING' | 'STABLE';
 
-  // Causal chain values (derived in order)
+  // Values derived from FacilityState (not independently generated)
   pdAnnual: number;
   previousPD: number;
   internalRating: string;
@@ -95,6 +94,18 @@ export interface StoryAssignment {
   speed: number;
 }
 
+/**
+ * Story types that require the facility to already be in a distressed state.
+ * If assigned to a PERFORMING facility, these are reassigned to STABLE.
+ */
+const DISTRESSED_ONLY_STORIES: Set<StoryType> = new Set(['RECOVERY', 'DEFAULT_WORKOUT']);
+
+/**
+ * Minimum PD threshold for a facility to be eligible for distressed-only stories.
+ * Facilities below this are reassigned to STABLE.
+ */
+const DISTRESSED_PD_THRESHOLD = 5.0; // 5% PD = SUBSTANDARD or worse
+
 /* ────────────────── Story Weaver ────────────────── */
 
 export class StoryWeaver {
@@ -113,15 +124,36 @@ export class StoryWeaver {
 
   /**
    * Assign story arcs to counterparties.
-   * Call this once before evolving any facilities.
+   * Call this once before analyzing any facilities.
+   *
+   * STATE-AWARE: RECOVERY and DEFAULT_WORKOUT are only assigned to facilities
+   * already in distressed state (PD >= 5%). If randomly selected for a healthy
+   * facility, falls back to STABLE to prevent nonsensical narratives.
    */
   assignStories(
     counterpartyIds: number[],
     overrides?: Map<number, StoryAssignment>,
+    /** Optional: current PD per counterparty for state-aware assignment */
+    currentPDs?: Map<number, number>,
   ): void {
     for (const cpId of counterpartyIds) {
       if (overrides?.has(cpId)) {
-        this.assignments.set(cpId, overrides.get(cpId)!);
+        const override = overrides.get(cpId)!;
+        // Even overrides get state-checked for distressed-only stories
+        if (DISTRESSED_ONLY_STORIES.has(override.storyType)) {
+          const currentPD = currentPDs?.get(cpId) ?? 0;
+          if (currentPD < DISTRESSED_PD_THRESHOLD) {
+            // Override requests RECOVERY/DEFAULT_WORKOUT but facility is healthy
+            // Fall back to CREDIT_DETERIORATION (closest alternative)
+            this.assignments.set(cpId, {
+              ...override,
+              storyType: 'CREDIT_DETERIORATION',
+              rootCause: override.rootCause ?? 'Reassigned from ' + override.storyType,
+            });
+            continue;
+          }
+        }
+        this.assignments.set(cpId, override);
         continue;
       }
 
@@ -141,6 +173,14 @@ export class StoryWeaver {
         }
       }
 
+      // STATE-AWARE GUARD: RECOVERY/DEFAULT_WORKOUT only for distressed facilities
+      if (DISTRESSED_ONLY_STORIES.has(selectedType)) {
+        const currentPD = currentPDs?.get(cpId) ?? 0;
+        if (currentPD < DISTRESSED_PD_THRESHOLD) {
+          selectedType = 'STABLE'; // Safe fallback
+        }
+      }
+
       this.assignments.set(cpId, {
         counterpartyId: cpId,
         storyType: selectedType,
@@ -152,35 +192,98 @@ export class StoryWeaver {
   }
 
   /**
-   * Initialize a facility story from existing FacilityState.
+   * Derive a FacilityStory from a FacilityState.
+   *
+   * This is a READ-ONLY derivation — it analyzes the FacilityState produced by
+   * the V2 pipeline and adds narrative context (health state, flags, trajectory).
+   * It does NOT evolve the state.
    */
-  initializeFromState(state: FacilityState, date: string): FacilityStory {
+  deriveStoryFromState(state: FacilityState, date: string, previousStory?: FacilityStory): FacilityStory {
     const assignment = this.assignments.get(state.counterparty_id);
     const storyType = assignment?.storyType ?? 'STABLE';
+
+    const healthState = healthStateFromPDandDPD(state.pd_annual, state.days_past_due);
+    const prevHealth = previousStory?.healthState ?? 'PERFORMING';
+
+    // Derive trajectory from PD change
+    const prevPD = previousStory?.pdAnnual ?? state.pd_annual;
+    let trajectory: FacilityStory['trajectory'];
+    if (state.pd_annual > prevPD * 1.1) trajectory = 'WORSENING';
+    else if (state.pd_annual < prevPD * 0.9) trajectory = 'IMPROVING';
+    else trajectory = 'STABLE';
+
+    // Phase tracking
+    let currentPhaseIndex = previousStory?.currentPhaseIndex ?? 0;
+    let monthsInPhase = (previousStory?.monthsInPhase ?? 0) + 1;
+    let phaseDuration = previousStory?.phaseDuration ?? this.getPhaseDuration(storyType, 0);
+
+    const template = STORY_TEMPLATES[storyType];
+    if (monthsInPhase >= phaseDuration && currentPhaseIndex < template.phases.length - 1) {
+      currentPhaseIndex++;
+      monthsInPhase = 0;
+      phaseDuration = this.getPhaseDuration(storyType, currentPhaseIndex);
+    }
+
+    // Risk flags from threshold crossings
+    const riskFlags: string[] = [...(previousStory?.riskFlags ?? [])];
+    const activePhase = template.phases[currentPhaseIndex];
+
+    // Auto-derive flags from state
+    if (healthState !== 'PERFORMING' && !riskFlags.includes('WATCH_LIST')) {
+      riskFlags.push('WATCH_LIST');
+    }
+    if (state.days_past_due > 0 && !riskFlags.includes('DELINQUENT')) {
+      riskFlags.push('DELINQUENT');
+    }
+    const util = state.committed_amount > 0 ? (state.drawn_amount / state.committed_amount) * 100 : 0;
+    if (util > 70 && !riskFlags.includes('HIGH_UTILIZATION')) {
+      riskFlags.push('HIGH_UTILIZATION');
+    }
+    if (healthState === 'DETERIORATING' && !riskFlags.includes('DETERIORATING')) {
+      riskFlags.push('DETERIORATING');
+    }
+
+    // Add phase-specific flags
+    if (activePhase) {
+      for (const flag of activePhase.flagsToAdd) {
+        if (!riskFlags.includes(flag)) riskFlags.push(flag);
+      }
+    }
+
+    // Events from state transitions
+    const pendingEvents: string[] = [];
+    if (healthState !== prevHealth) {
+      if (state.pd_annual > prevPD * 1.5) pendingEvents.push('RATING_CHANGE');
+      if (state.days_past_due > 0 && (previousStory?.daysPastDue ?? 0) === 0) pendingEvents.push('DELINQUENCY');
+      if (healthState === 'DEFAULT') pendingEvents.push('DEFAULT');
+    }
+    if (activePhase) {
+      for (const evt of activePhase.eventsToGenerate) {
+        if (!pendingEvents.includes(evt)) pendingEvents.push(evt);
+      }
+    }
 
     const story: FacilityStory = {
       facilityId: state.facility_id,
       counterpartyId: state.counterparty_id,
-      healthState: healthStateFromPDandDPD(state.pd_annual, state.days_past_due),
-      previousHealthState: 'PERFORMING',
+      healthState,
+      previousHealthState: prevHealth,
       storyType,
-      currentPhaseIndex: 0,
-      monthsInPhase: 0,
-      phaseDuration: this.getPhaseDuration(storyType, 0),
+      currentPhaseIndex,
+      monthsInPhase,
+      phaseDuration,
       rootCause: assignment?.rootCause ?? null,
-      trajectory: 'STABLE',
+      trajectory,
       pdAnnual: state.pd_annual,
-      previousPD: state.pd_annual,
-      internalRating: state.internal_rating,
+      previousPD: prevPD,
+      internalRating: state.internal_rating ?? ratingFromPD(state.pd_annual),
       creditStatus: state.credit_status,
       spreadBps: state.spread_bps,
-      utilization: state.committed_amount > 0
-        ? (state.drawn_amount / state.committed_amount) * 100
-        : 0,
+      utilization: util,
       daysPastDue: state.days_past_due,
       dpdBucket: this.dpdToBucket(state.days_past_due),
-      riskFlags: [],
-      pendingEvents: [],
+      riskFlags,
+      pendingEvents,
       committedAmount: state.committed_amount,
       drawnAmount: state.drawn_amount,
       currencyCode: state.currency_code,
@@ -195,8 +298,20 @@ export class StoryWeaver {
   }
 
   /**
-   * Evolve a facility story one month forward.
-   * This is the core: walks the causal graph to derive all values.
+   * Backwards-compatible: Initialize a facility story from FacilityState.
+   * Alias for deriveStoryFromState (used by tests and direct callers).
+   */
+  initializeFromState(state: FacilityState, date: string): FacilityStory {
+    return this.deriveStoryFromState(state, date);
+  }
+
+  /**
+   * Backwards-compatible: Evolve a facility story one month forward.
+   *
+   * For standalone use (without FacilityStateManager), this creates a synthetic
+   * next state by applying the story template's phase parameters.
+   * When used with the full pipeline, prefer deriveStoryFromState() after
+   * FacilityStateManager.step() instead.
    */
   evolveOneMonth(
     facilityId: number,
@@ -241,9 +356,8 @@ export class StoryWeaver {
     // Clamp PD to valid range
     newPD = Math.max(0.01, Math.min(100, newPD));
     // Enforce temporal constraint — EVENT_DRIVEN stories bypass the cap
-    // to allow sudden spikes (fraud, regulatory action, etc.)
     const maxFactor = prevStory.storyType === 'EVENT_DRIVEN'
-      ? TEMPORAL_LIMITS.pd_max_monthly_factor * 3  // allow up to 9x for events
+      ? TEMPORAL_LIMITS.pd_max_monthly_factor * 3
       : TEMPORAL_LIMITS.pd_max_monthly_factor;
     const pdRatio = newPD / prevStory.pdAnnual;
     if (pdRatio > maxFactor) {
@@ -256,22 +370,21 @@ export class StoryWeaver {
     // 2. Rating (derived from PD)
     const newRating = ratingFromPD(newPD);
 
-    // 3. Credit status (derived from rating + DPD)
-    const newCreditStatus = this.deriveCreditStatus(newPD, prevStory.daysPastDue, activePhase);
+    // 3. Credit status
+    const newCreditStatus = this.deriveCreditStatus(newPD, prevStory.daysPastDue);
 
-    // 4. Spread (derived from rating tier, with lag)
+    // 4. Spread
     let newSpread: number;
     if (activePhase.pricingReprices && storyActive) {
       const tier = tierFromPD(newPD);
       const tierSpread = SPREAD_BY_RATING_TIER[tier];
       newSpread = this.interpolate(tierSpread.min, tierSpread.max);
     } else {
-      // No repricing — drift slightly
       newSpread = prevStory.spreadBps + this.interpolate(-5, 5);
     }
     newSpread = Math.max(0, Math.min(5000, newSpread));
 
-    // 5. Utilization (derived from health state)
+    // 5. Utilization
     const newHealthState = storyActive ? activePhase.toState : prevStory.healthState;
     const healthUtil = UTILIZATION_BY_HEALTH[newHealthState];
     let newUtilization: number;
@@ -281,47 +394,36 @@ export class StoryWeaver {
     } else {
       newUtilization = prevStory.utilization + this.interpolate(-2, 2);
     }
-    // Clamp to health-appropriate range
     newUtilization = Math.max(healthUtil.min, Math.min(healthUtil.max, newUtilization));
 
-    // 6. Days Past Due (derived from health state)
+    // 6. Days Past Due
     let newDPD = prevStory.daysPastDue;
     if (storyActive && activePhase.dpdBucketAdvance !== 0) {
       newDPD = this.advanceDPD(prevStory.daysPastDue, activePhase.dpdBucketAdvance);
     }
-    // Enforce: DPD can't decrease without recovery event
-    if (prevStory.trajectory === 'WORSENING' && newDPD < prevStory.daysPastDue && !activePhase.eventsToGenerate.includes('RESTRUCTURING_COMPLETE')) {
+    if (prevStory.trajectory === 'WORSENING' && newDPD < prevStory.daysPastDue
+        && !activePhase.eventsToGenerate.includes('RESTRUCTURING_COMPLETE')) {
       newDPD = prevStory.daysPastDue;
     }
 
-    // 7. DPD Bucket
+    // 7-9. DPD Bucket, Risk flags, Events
     const newDPDBucket = this.dpdToBucket(newDPD);
-
-    // 8. Risk flags
     const newFlags = [...prevStory.riskFlags];
     if (storyActive) {
       for (const flag of activePhase.flagsToAdd) {
         if (!newFlags.includes(flag)) newFlags.push(flag);
       }
     }
-    // Auto-flags from threshold crossings
-    if (newUtilization > 70 && !newFlags.includes('HIGH_UTILIZATION')) {
-      newFlags.push('HIGH_UTILIZATION');
-    }
-    if (newDPD > 0 && !newFlags.includes('DELINQUENT')) {
-      newFlags.push('DELINQUENT');
-    }
+    if (newUtilization > 70 && !newFlags.includes('HIGH_UTILIZATION')) newFlags.push('HIGH_UTILIZATION');
+    if (newDPD > 0 && !newFlags.includes('DELINQUENT')) newFlags.push('DELINQUENT');
 
-    // 9. Events
     const pendingEvents = storyActive ? [...activePhase.eventsToGenerate] : [];
 
-    // Determine trajectory
     let trajectory: FacilityStory['trajectory'];
     if (newPD > prevStory.pdAnnual * 1.1) trajectory = 'WORSENING';
     else if (newPD < prevStory.pdAnnual * 0.9) trajectory = 'IMPROVING';
     else trajectory = 'STABLE';
 
-    // Derive drawn amount from utilization
     const newDrawn = (newUtilization / 100) * prevStory.committedAmount;
 
     const story: FacilityStory = {
@@ -366,7 +468,6 @@ export class StoryWeaver {
     facilityIds: number[],
     date: string,
   ): void {
-    // Group by counterparty
     const cpFacilities = new Map<number, FacilityStory[]>();
     for (const fid of facilityIds) {
       const story = this.stories.get(`${fid}|${date}`);
@@ -376,11 +477,8 @@ export class StoryWeaver {
       cpFacilities.set(story.counterpartyId, group);
     }
 
-    // For each counterparty, make PD and rating consistent
     for (const [, facilities] of cpFacilities) {
       if (facilities.length <= 1) continue;
-
-      // Use the first facility's PD/rating as the reference
       const refPD = facilities[0].pdAnnual;
       const refRating = facilities[0].internalRating;
       const refCreditStatus = facilities[0].creditStatus;
@@ -391,30 +489,20 @@ export class StoryWeaver {
         facilities[i].internalRating = refRating;
         facilities[i].creditStatus = refCreditStatus;
         facilities[i].healthState = refHealthState;
-        // Utilization, DPD, LGD can differ per facility
       }
     }
   }
 
-  /**
-   * Get a story for a facility at a date.
-   */
   getStory(facilityId: number, date: string): FacilityStory | undefined {
     return this.stories.get(`${facilityId}|${date}`);
   }
 
-  /**
-   * Get all stories for a date.
-   */
   getStoriesForDate(facilityIds: number[], date: string): FacilityStory[] {
     return facilityIds
       .map(fid => this.stories.get(`${fid}|${date}`))
       .filter((s): s is FacilityStory => !!s);
   }
 
-  /**
-   * Get story assignment for a counterparty.
-   */
   getAssignment(counterpartyId: number): StoryAssignment | undefined {
     return this.assignments.get(counterpartyId);
   }
@@ -432,7 +520,7 @@ export class StoryWeaver {
     return Math.round(this.interpolate(phase.durationMonths.min, phase.durationMonths.max));
   }
 
-  private deriveCreditStatus(pd: number, dpd: number, phase: StoryPhase): CreditStatus {
+  private deriveCreditStatus(pd: number, dpd: number): CreditStatus {
     if (dpd >= 90 || pd >= 30) return 'DEFAULT';
     if (dpd >= 60 || pd >= 10) return 'DOUBTFUL';
     if (dpd >= 30 || pd >= 5) return 'SUBSTANDARD';
@@ -456,7 +544,6 @@ export class StoryWeaver {
       : currentDPD <= 59 ? 2
       : currentDPD <= 89 ? 3
       : 4;
-
     const newIdx = Math.max(0, Math.min(4, currentBucketIdx + bucketAdvance));
     return buckets[newIdx];
   }
@@ -470,7 +557,6 @@ export class StoryWeaver {
       SEASONAL: [],
       DEFAULT_WORKOUT: ['Cash flow exhaustion', 'Covenant breaches', 'Market collapse'],
     };
-
     const options = causes[storyType];
     if (!options || options.length === 0) return null;
     return options[Math.floor(this.rng() * options.length)];

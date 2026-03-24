@@ -106,6 +106,11 @@ export class SchemaAnalyzer {
     'stress-test':    ['l2.stress_test_result', 'l2.stress_test_breach'],
   };
 
+  /** Cached FK dependency DAG (lazy, built once) */
+  private cachedDAG: FKDependencyDAG | null = null;
+  /** Cached contracts map (lazy, built once) */
+  private cachedContracts: Map<string, SchemaContract> | null = null;
+
   private constructor(dd: DataDictionary, ddPath: string, registry: SchemaRegistry) {
     this.dd = dd;
     this.ddPath = ddPath;
@@ -269,6 +274,8 @@ export class SchemaAnalyzer {
    * Returns a DAG with topological ordering.
    */
   buildFKDependencyDAG(): FKDependencyDAG {
+    // Return cached DAG if available
+    if (this.cachedDAG) return this.cachedDAG;
     const nodes = new Map<string, FKDAGNode>();
 
     // Initialize all nodes
@@ -355,7 +362,8 @@ export class SchemaAnalyzer {
       }
     }
 
-    return { nodes, sortedOrder, roots, leaves };
+    this.cachedDAG = { nodes, sortedOrder, roots, leaves };
+    return this.cachedDAG;
   }
 
   /**
@@ -401,6 +409,8 @@ export class SchemaAnalyzer {
    * Generate schema contracts for all tables (or a subset).
    */
   generateSchemaContracts(tableFilter?: string[]): Map<string, SchemaContract> {
+    // Return cached contracts if no filter and cache exists
+    if (!tableFilter && this.cachedContracts) return this.cachedContracts;
     const contracts = new Map<string, SchemaContract>();
     const dag = this.buildFKDependencyDAG();
 
@@ -469,6 +479,8 @@ export class SchemaAnalyzer {
       });
     }
 
+    // Cache if unfiltered (full set)
+    if (!tableFilter) this.cachedContracts = contracts;
     return contracts;
   }
 

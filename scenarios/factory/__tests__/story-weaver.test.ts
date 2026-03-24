@@ -104,6 +104,37 @@ describe('assignStories', () => {
     ]));
     expect(weaver.getAssignment(100)!.storyType).toBe('CREDIT_DETERIORATION');
   });
+
+  it('should NOT assign RECOVERY to PERFORMING facilities (state guard)', () => {
+    // Assign RECOVERY with low PD — should be reassigned
+    const cpIds = Array.from({ length: 50 }, (_, i) => i + 1);
+    const lowPDs = new Map(cpIds.map(id => [id, 0.20])); // All performing
+    weaver.assignStories(cpIds, undefined, lowPDs);
+
+    for (const cpId of cpIds) {
+      const assignment = weaver.getAssignment(cpId)!;
+      // RECOVERY and DEFAULT_WORKOUT should never be assigned to low-PD facilities
+      expect(['RECOVERY', 'DEFAULT_WORKOUT']).not.toContain(assignment.storyType);
+    }
+  });
+
+  it('should ALLOW RECOVERY for distressed facilities', () => {
+    const highPDs = new Map([[100, 8.0]]); // Distressed PD
+    weaver.assignStories([100], new Map([
+      [100, { counterpartyId: 100, storyType: 'RECOVERY', rootCause: 'Restructuring', startMonth: 0, speed: 1.0 }],
+    ]), highPDs);
+    // Should keep RECOVERY since facility is distressed
+    expect(weaver.getAssignment(100)!.storyType).toBe('RECOVERY');
+  });
+
+  it('should reassign RECOVERY override to CREDIT_DETERIORATION for healthy facilities', () => {
+    const lowPDs = new Map([[100, 0.20]]); // Healthy
+    weaver.assignStories([100], new Map([
+      [100, { counterpartyId: 100, storyType: 'RECOVERY', rootCause: 'Test', startMonth: 0, speed: 1.0 }],
+    ]), lowPDs);
+    // Should be reassigned since facility is healthy
+    expect(weaver.getAssignment(100)!.storyType).toBe('CREDIT_DETERIORATION');
+  });
 });
 
 /* ────────────────── Initialization ────────────────── */

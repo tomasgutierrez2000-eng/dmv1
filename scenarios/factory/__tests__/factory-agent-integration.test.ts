@@ -335,9 +335,10 @@ describe('Edge cases', () => {
 
   it('should handle RECOVERY story with improving trajectory', () => {
     const weaver = new StoryWeaver(42);
+    // Pass currentPDs so the state guard allows RECOVERY
     weaver.assignStories([1], new Map([
       [1, { counterpartyId: 1, storyType: 'RECOVERY' as const, rootCause: 'Restructuring', startMonth: 0, speed: 1.0 }],
-    ]));
+    ]), new Map([[1, 8.0]]));
 
     // Start from distressed state
     const fac = makeFacilityState(1, 10, 8.0);

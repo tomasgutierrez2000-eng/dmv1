@@ -16,6 +16,7 @@
 **What:** Adopt a migration runner with schema_migrations version tracking table. Catalogue all 59 existing migrations.
 **Why:** No way to know which migrations have been applied. Manual psql -f is error-prone for team scaling.
 **Depends on:** Nothing.
+**Completed:** S3 session (2026-03-24) — Migration Manager agent with `audit.schema_migrations` tracking table, bootstrap logic for 68+ existing migrations, status reporting, ordering validation, apply/rollback workflows.
 
 ### 4. Remove modulo capping from load-gsib-export.ts
 **What:** Delete ~140 lines of modulo arithmetic FK remapping. Fix L2 seed data to reference valid L1 IDs natively.

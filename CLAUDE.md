@@ -1026,65 +1026,252 @@ source /Users/tomas/120/.env && /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql
 
 ## Agent Suite Architecture
 
+A 3-layer agent system for GSIB credit risk metric decomposition, schema management, data generation, and regulatory compliance. 20 agents across experts, builders, and reviewers, coordinated by a master orchestrator.
+
 ### Directory Structure
 ```
 .claude/
   commands/
-    add-metric.md          # Metric addition workflow
-    fix-metric.md          # Metric debugging workflow
-    review-pr.md           # PR review workflow
-    experts/               # Domain decomposition agents (metric-decomp, schema-advisor, etc.)
-    builders/              # Schema/data/metric builder agents
-    reviewers/             # Reviewer gate agents (pre/post-execution validation)
+    add-metric.md              # 10-phase metric addition workflow (entry point)
+    fix-metric.md              # Metric debugging workflow
+    review-pr.md               # PR review workflow
+    experts/                   # Layer 1: Domain decomposition agents
+      decomp-credit-risk.md    # Credit risk (PD, LGD, EAD, EL, DSCR, LTV, CECL)
+      decomp-capital.md        # Capital adequacy (CET1, RWA, SLR, TLAC, SCB)
+      decomp-ccr.md            # Counterparty credit risk (SA-CCR, CVA, PFE)
+      decomp-liquidity.md      # Liquidity (LCR, NSFR, HQLA, FR 2052a)
+      decomp-market-risk.md    # Market risk (FRTB, VaR, ES, SBM, DRC)
+      decomp-irrbb-alm.md      # Interest rate risk (NII, EVE, FTP, duration gap)
+      decomp-oprisk.md         # Operational risk (SMA, KRI, RCSA)
+      decomp-compliance.md     # Compliance (DFAST/CCAR, Volcker, BSA/AML)
+      data-model-expert.md     # Schema gap analysis (DDL recommendations)
+      reg-mapping-expert.md    # Regulatory coverage mapping (FR Y-14Q, FFIEC)
+    builders/                  # Layer 2: Execution agents
+      db-schema-builder.md     # DDL validation (6-test battery) + transactional apply
+      migration-manager.md     # Migration lifecycle (ordering, rollback, registry)
+      data-factory-builder.md  # GSIB-quality synthetic L2 data generation
+      metric-config-writer.md  # Decomposition → YAML metric config translator
+    reviewers/                 # Layer 3: Quality gate agents
+      risk-expert-reviewer.md  # PRE/POST execution gate (10-dimension assessment)
+      sr-11-7-checker.md       # SR 11-7 / OCC 2011-12 documentation completeness
+      drift-monitor.md         # Schema divergence detection (manifest vs live DB)
+      audit-reporter.md        # Audit trail reporting (activity, findings, coverage)
   config/
-    bank-profile.yaml      # Institutional config: tier, jurisdiction, risk stripes, DB settings
-    schema-manifest.yaml   # Auto-generated schema summary (from data dictionary)
-    generate-schema-manifest.ts  # Generator script for schema-manifest.yaml
+    bank-profile.yaml          # Institutional config (tier, stripes, DB, agent defaults)
+    generate-schema-manifest.ts # Generator: DD → schema-manifest.yaml
   audit/
-    sessions/              # JSON session logs (one file per agent run)
-    schema-changes/        # JSON records of DDL changes (one file per change)
+    sessions/                  # JSON session logs (one file per agent run)
+    schema-changes/            # JSON records of DDL changes (one per change)
     schema/
-      audit_ddl.sql        # DDL for postgres_audit database
-    audit_logger.py        # Python utility for writing audit records
+      audit_ddl.sql            # DDL for postgres_audit database (5 tables, 3 views)
+    audit_logger.py            # Python utility for dual-destination audit writes
+```
+
+### Complete Agent Inventory
+
+#### Layer 1 — Experts (Decomposition & Analysis)
+
+| Agent | File | Invocation | Description |
+|-------|------|------------|-------------|
+| Credit Risk Decomp | `experts/decomp-credit-risk.md` | `/experts:decomp-credit-risk EL` | Reference implementation. Decomposes credit risk metrics into atomic ingredients, formulas, rollup architecture, schema gaps. Covers PD, LGD, EAD, EL, DSCR, LTV, CECL, NPL, migration matrices. |
+| Capital Decomp | `experts/decomp-capital.md` | `/experts:decomp-capital CET1` | Capital adequacy: CET1, Tier 1, Total Capital ratios, RWA, SLR, TLAC, capital buffers, SCB, binding constraint. |
+| CCR Decomp | `experts/decomp-ccr.md` | `/experts:decomp-ccr SA-CCR` | Counterparty credit risk: SA-CCR, CVA, PFE, EPE, wrong-way risk, netting, central clearing. |
+| Liquidity Decomp | `experts/decomp-liquidity.md` | `/experts:decomp-liquidity LCR` | Liquidity: LCR, NSFR, HQLA, FR 2052a, intraday liquidity, funding concentration. |
+| Market Risk Decomp | `experts/decomp-market-risk.md` | `/experts:decomp-market-risk FRTB` | Market risk: FRTB (IMA+SA), VaR, ES, SBM, DRC, RRAO, P&L attribution, backtesting. |
+| IRRBB & ALM Decomp | `experts/decomp-irrbb-alm.md` | `/experts:decomp-irrbb-alm NII` | Interest rate risk: NII/EVE sensitivity, repricing gap, basis risk, FTP, duration gap. |
+| OpRisk Decomp | `experts/decomp-oprisk.md` | `/experts:decomp-oprisk SMA` | Operational risk: SMA (Basel IV), Business Indicator, ILM, loss events, KRI, RCSA. |
+| Compliance Decomp | `experts/decomp-compliance.md` | `/experts:decomp-compliance DFAST` | Compliance: DFAST/CCAR, FR Y-14, living wills, LEX, Volcker, BSA/AML, CRA. |
+| Data Model Expert | `experts/data-model-expert.md` | `/experts:data-model-expert` | Analyzes schema gaps from decompositions. Produces DDL recommendations for DB Schema Builder. |
+| Reg Mapping Expert | `experts/reg-mapping-expert.md` | `/experts:reg-mapping-expert` | Maps data model against US + BCBS regulatory requirements. Quantified coverage scores per schedule. |
+
+#### Layer 2 — Builders (Execution & Implementation)
+
+| Agent | File | Invocation | Description |
+|-------|------|------------|-------------|
+| DB Schema Builder | `builders/db-schema-builder.md` | `/builders:db-schema-builder` | Validates DDL with 6-test battery (syntax, duplicates, FK integrity, data types, naming, constraint lengths). Applies transactionally with rollback DDL. Requires PRE_EXECUTION reviewer gate. |
+| Migration Manager | `builders/migration-manager.md` | `/builders:migration-manager` | Tracks migration lifecycle: ordering, dependencies, applied vs pending status, rollback scripts. Manages `sql/migrations/` directory. |
+| Data Factory Builder | `builders/data-factory-builder.md` | `/builders:data-factory-builder` | Generates GSIB-quality synthetic L2 data via V2 state-machine engine. Schema-validated against DD. Correlation-aware (PD-LGD-EAD triangles). |
+| Metric Config Writer | `builders/metric-config-writer.md` | `/builders:metric-config-writer` | Translates decomposition JSON into executable YAML metric configs. Runs calc:sync, calc:demo, PG validation. Bridges analysis → code. |
+
+#### Layer 3 — Reviewers (Quality Gates & Compliance)
+
+| Agent | File | Invocation | Description |
+|-------|------|------------|-------------|
+| Risk Expert Reviewer | `reviewers/risk-expert-reviewer.md` | `/reviewers:risk-expert-reviewer DDL path/to/file.sql` | Dual-mode gate: PRE_EXECUTION (blocks bad changes) + POST_EXECUTION (catches regressions). 10-dimension assessment. Returns APPROVED / BLOCKED / APPROVED_WITH_CONDITIONS. |
+| SR 11-7 Checker | `reviewers/sr-11-7-checker.md` | `/reviewers:sr-11-7-checker` | Validates SR 11-7 / OCC 2011-12 model risk management documentation completeness. Checks required artifacts exist and are populated. |
+| Drift Monitor | `reviewers/drift-monitor.md` | `/reviewers:drift-monitor` | Detects schema divergence between data dictionary/manifest and live PostgreSQL. Catches out-of-pipeline changes (manual psql, raw migrations). |
+| Audit Reporter | `reviewers/audit-reporter.md` | `/reviewers:audit-reporter` | Generates audit reports from JSON + postgres_audit. Activity patterns, schema change velocity, finding resolution rates, regulatory coverage gaps. |
+
+#### Orchestrator
+
+| Agent | File | Invocation | Description |
+|-------|------|------------|-------------|
+| Master Orchestrator | `commands/orchestrate.md` | `/orchestrate add CECL allowance` | Coordinates multi-agent workflows end-to-end. 6 modes: DECOMPOSE, BUILD, FULL, REVIEW, MONITOR, DRY_RUN. Session resume, failure handling (retry/skip/abort), blocking reviewer gates. |
+
+### Pipeline Flow
+
+```
+User: "Add CECL allowance metric"
+  │
+  ├─ 1. DECOMPOSE ──→ /experts:decomp-credit-risk CECL
+  │     Output: metric_definition, ingredients, schema_gaps, rollup_architecture, regulatory_mapping
+  │
+  ├─ 2. REVIEW (PRE) ──→ /reviewers:risk-expert-reviewer (mode: pre_execution)
+  │     Output: APPROVED | BLOCKED | APPROVED_WITH_CONDITIONS
+  │     If BLOCKED → remediate → re-submit
+  │
+  ├─ 3. SCHEMA GAP ──→ /experts:data-model-expert → DDL recommendations
+  │     ├──→ /builders:db-schema-builder → 6-test battery → apply DDL
+  │     └──→ /builders:migration-manager → track migration
+  │
+  ├─ 4. REVIEW (POST) ──→ /reviewers:risk-expert-reviewer (mode: post_execution)
+  │     Verify DDL applied correctly, no regressions
+  │
+  ├─ 5. DATA ──→ /builders:data-factory-builder → generate L2 test data
+  │
+  ├─ 6. METRIC ──→ /builders:metric-config-writer → YAML + calc:sync + calc:demo
+  │
+  ├─ 7. DOCS ──→ /reviewers:sr-11-7-checker → documentation completeness
+  │
+  └─ 8. AUDIT ──→ /reviewers:audit-reporter → session summary
 ```
 
 ### Configuration Files
 
-**bank-profile.yaml** — Institutional configuration that drives tier-aware behavior across all agents. Contains:
-- Institution tier (GSIB/Large Regional/Regional) and jurisdiction
-- Active risk stripes with live/planned status
-- Database connection details and schema conventions
-- Data factory tooling preferences
-- Agent defaults (confidence thresholds, reviewer gates)
+**bank-profile.yaml** — Institutional configuration read by ALL agents. Key fields:
+- `institution_tier`: GSIB (drives severity thresholds, regulatory scope)
+- `active_risk_stripes[]`: 9 stripes (credit_risk live; 8 others planned) — filters domain routing
+- `database.primary/capital/audit`: Connection details, schemas, conventions
+- `migration_tooling`: psql path, env file, migration directory
+- `agent_defaults.require_reviewer_gate`: true (non-bypassable)
+- `agent_defaults.default_confidence_threshold`: MEDIUM
 
-**schema-manifest.yaml** — Living schema summary auto-generated from the golden-source data dictionary. Contains every table, column, type, FK reference, and risk stripe classification. Regenerate with:
+**schema-manifest.yaml** — Auto-generated from data dictionary. Contains every table, column, type, FK. Regenerate:
 ```bash
 npx tsx .claude/config/generate-schema-manifest.ts
 ```
-This file is maintained by the DB Schema Builder agent after any schema change.
 
 ### 4-Layer Audit Trail
 
-1. **Local JSON** (`.claude/audit/sessions/`) — Immediate, always-available log of every agent run. One JSON file per execution with reasoning chain, actions, and output.
-2. **Schema Change JSON** (`.claude/audit/schema-changes/`) — Individual DDL change records with before/after state and rollback DDL.
-3. **PostgreSQL Audit DB** (`postgres_audit`) — Structured relational store with 5 tables: `agent_runs`, `schema_changes`, `metric_decompositions`, `review_findings`, `data_lineage`. Supports queries, dashboards, and regulatory reporting.
-4. **Git History** — All code/config changes tracked via standard git commits with descriptive messages.
+| Layer | Location | What Gets Logged | When |
+|-------|----------|-----------------|------|
+| **Local JSON** | `.claude/audit/sessions/{session_id}_{agent}_{timestamp}.json` | Full reasoning chain, actions, output payload, duration | Every agent run |
+| **Schema Changes** | `.claude/audit/schema-changes/{change_id}.json` | Before/after DDL, rollback script, reviewer approval | Every DDL change |
+| **PostgreSQL** | `postgres_audit.audit.*` (5 tables) | `agent_runs`, `schema_changes`, `metric_decompositions`, `review_findings`, `data_lineage` | Best-effort DB write alongside local JSON |
+| **Git** | Standard commit history | Code/config changes with descriptive messages | Every commit |
 
-### Session Sequencing (Agent Build Order)
+**AuditLogger API** (`.claude/audit/audit_logger.py`):
+```python
+logger = AuditLogger(agent_name="decomp-credit-risk", trigger_source="user")
+logger.write_reasoning_step(1, "Analyzing CECL ingredients", "PD, LGD, EAD required", confidence="HIGH")
+logger.write_action("DECOMPOSITION_COMPLETE", "8 ingredients identified")
+logger.write_schema_change("ADD_COLUMN", "l2", "facility_risk_snapshot", ddl_statement="ALTER TABLE...")
+logger.write_finding("F-001", "SCHEMA_GAP", "HIGH", "credit_risk", "Missing lifetime_pd column")
+logger.finalize_session("completed", output_payload={...})
+```
 
-| Session | Agent | Purpose |
-|---------|-------|---------|
-| S0 (this) | Foundation | Directory scaffolding, configs, audit DDL, logger |
-| S1 | Metric Decomp Expert | Domain expert that decomposes metrics into ingredients |
-| S2 | DB Schema Builder | Proposes and applies DDL changes with reviewer gate |
-| S3 | Data Factory Agent | Generates GSIB-quality synthetic data |
-| S4 | Pre-Execution Reviewer | Validates proposed changes before execution |
-| S5 | Post-Execution Reviewer | Validates applied changes after execution |
-| S6 | Orchestrator | Coordinates multi-agent workflows end-to-end |
+### Session Sequencing (Build Order)
 
-### Agent Conventions
-- All agents call `AuditLogger` to record reasoning and actions
-- Agents read `bank-profile.yaml` to determine tier-appropriate behavior
-- Agents read `schema-manifest.yaml` for current schema state
-- Builder agents require reviewer gate approval before applying DDL changes (`require_reviewer_gate: true`)
-- Confidence levels: HIGH (>90% certainty), MEDIUM (70-90%), LOW (<70% — requires human review)
+| Session | Agents Built | Depends On | File(s) Created |
+|---------|-------------|------------|-----------------|
+| S0 | Foundation | — | `bank-profile.yaml`, `audit_ddl.sql`, `audit_logger.py` |
+| S1 | Credit Risk Decomp Expert | S0 | `experts/decomp-credit-risk.md` (reference implementation) |
+| S2 | Data Model Expert + Reg Mapping Expert | S0 | `experts/data-model-expert.md`, `experts/reg-mapping-expert.md` |
+| S2.5 | 7 Domain Decomp Experts | S1 (pattern) | `experts/decomp-{capital,ccr,liquidity,market-risk,irrbb-alm,oprisk,compliance}.md` |
+| S3 | DB Schema Builder + Migration Manager | S2 | `builders/db-schema-builder.md`, `builders/migration-manager.md` |
+| S4 | Risk Expert Reviewer + SR 11-7 Checker | S1 | `reviewers/risk-expert-reviewer.md`, `reviewers/sr-11-7-checker.md` |
+| S5 | Data Factory Builder + Metric Config Writer | S3 | `builders/data-factory-builder.md`, `builders/metric-config-writer.md` |
+| S6 | Dashboard Generator (stretch) | S1, S3 | `builders/dashboard-generator.md` (**NOT BUILT**) |
+| S7 | Drift Monitor + Audit Reporter | S3, S0 | `reviewers/drift-monitor.md`, `reviewers/audit-reporter.md` |
+| S8 | Master Orchestrator | All prior | `commands/orchestrate.md` |
+| S9 | Integration test + CLAUDE.md update | S8 | This section |
+
+### Adding a New Risk Stripe Expert
+
+To add a new decomposition expert (e.g., for a new risk stripe):
+
+1. Copy `experts/decomp-credit-risk.md` as template (reference implementation)
+2. Replace domain-specific content: metric coverage list, ingredient patterns, regulatory references
+3. Preserve the interface contract:
+   - **Mode A** (direct): intake questions → structured decomposition JSON
+   - **Mode B** (orchestrator): receives `{mode: "orchestrator", session_id, metric_name, ...}` → returns JSON
+4. Include audit logging: `AuditLogger(agent_name="decomp-{stripe}")` with `write_reasoning_step()`, `write_action()`, `finalize_session()`
+5. Add the stripe to `bank-profile.yaml` under `active_risk_stripes`
+6. Register in orchestrator's agent map (when built)
+
+### Agent Invocation Modes
+
+All agents support two invocation modes:
+
+**Mode A — Direct (user-facing):**
+```
+/experts:decomp-credit-risk EL
+/builders:db-schema-builder
+/reviewers:risk-expert-reviewer DDL sql/migrations/005.sql
+/reviewers:risk-expert-reviewer metric EXP-001
+/reviewers:drift-monitor
+/reviewers:audit-reporter
+```
+
+**Mode B — Orchestrator (structured JSON):**
+```json
+{
+  "mode": "orchestrator",
+  "session_id": "uuid",
+  "metric_name": "Expected Loss",
+  "risk_stripe": "credit_risk",
+  ...
+}
+```
+
+### Payload Contracts Between Agents
+
+**Decomp Expert → Metric Config Writer:**
+```json
+{
+  "metric_definition": { "name": "...", "class": "CALCULATED", "direction": "..." },
+  "ingredients": [{ "field": "...", "table": "...", "schema": "l2", "role": "MEASURE" }],
+  "schema_gaps": [{ "type": "MISSING_COLUMN", "table": "...", "column": "...", "blocking": true }],
+  "rollup_architecture": { "strategy": "sum-ratio", "levels": { "facility": "...", "counterparty": "..." } },
+  "regulatory_mapping": { "fr_y14q": "...", "bcbs": "..." }
+}
+```
+
+**Data Model Expert → DB Schema Builder:**
+```json
+{
+  "mode": "orchestrator",
+  "session_id": "uuid",
+  "changes": [{ "change_type": "ADD_COLUMN", "object_schema": "l2", "object_name": "table", "ddl_statement": "ALTER TABLE..." }],
+  "auto_execute": false
+}
+```
+
+**Builder → Risk Expert Reviewer:**
+```json
+{
+  "mode": "pre_execution",
+  "review_target_type": "schema_change",
+  "payload": { ... },
+  "session_id": "uuid"
+}
+```
+Reviewer returns: `{ "gate_decision": "APPROVED|BLOCKED|APPROVED_WITH_CONDITIONS", "findings": [...], "regulatory_coverage_score": 85 }`
+
+### Known Issues (S9 Integration Test)
+
+| Issue | Severity | Status |
+|-------|----------|--------|
+| `dashboard-generator.md` not built | LOW | S6 stretch goal; not required for pipeline |
+
+### Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Agent can't load schema-manifest.yaml | File not generated | Run `npx tsx .claude/config/generate-schema-manifest.ts` |
+| Audit writes fail silently | `postgres_audit` DB not created | Apply `audit_ddl.sql`: `psql -d postgres_audit -f .claude/audit/schema/audit_ddl.sql` |
+| Reviewer returns unexpected mode error | Mode string format mismatch | Use snake_case in JSON: `"pre_execution"`, not `"PRE_EXECUTION"` |
+| DB Schema Builder skips reviewer gate | Never happens — gate is non-bypassable | If gate logic is missing, check `require_reviewer_gate: true` in bank-profile.yaml |
+| Decomp expert routes to wrong domain | Stripe not in `active_risk_stripes` | Add stripe to bank-profile.yaml with `status: live` |
+| Pipeline halts at Data Factory | Source tables have 0 rows | Metric Config Writer returns `"data_needed"` — orchestrator must sequence Data Factory first |
+| Metric formula passes sql.js but fails PG | Schema drift between sql.js sample and PG | Always test `formula_sql` against PostgreSQL (Phase 5A) |

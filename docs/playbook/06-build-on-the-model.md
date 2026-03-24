@@ -788,10 +788,10 @@ Use the block allocation pattern: `base = 2000 + (stripe_number * 500)` to keep 
 
 <!-- AUTO:TABLE_COUNTS -->
 The current data model contains:
-- **L1 — Reference Data (72 tables):** Dimensions, masters, lookups, hierarchies
+- **L1 — Reference Data (73 tables):** Dimensions, masters, lookups, hierarchies
 - **L2 — Atomic Data (61 tables):** Raw snapshots and events
 - **L3 — Derived Data (79 tables):** Calculated and aggregated data
-- **Total: all 212+ tables** across the three layers
+- **Total: all 213+ tables** across the three layers
 <!-- /AUTO:TABLE_COUNTS -->
 
 ## Appendix C: Current Metric Domains

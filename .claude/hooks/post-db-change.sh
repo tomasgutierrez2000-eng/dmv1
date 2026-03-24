@@ -79,4 +79,11 @@ if tables:
   echo "  [hook] Syncing doc counts (CLAUDE.md + playbook)..."
   npm run doc:sync 2>&1 | tail -5
   echo "  [hook] Doc counts synced."
+
+  # Regenerate schema manifest for agent suite (decomp experts use this for DD validation)
+  if [ -f ".claude/config/generate-schema-manifest.ts" ]; then
+    echo "  [hook] Regenerating schema manifest..."
+    npx tsx .claude/config/generate-schema-manifest.ts 2>&1 | tail -3
+    echo "  [hook] Schema manifest regenerated."
+  fi
 fi

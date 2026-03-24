@@ -6,7 +6,7 @@ The data model is organized into three layers. Every table, every field, and eve
 
 ```
  ┌─────────────────────────────────────────────────────────┐
- │  L1 -- REFERENCE DATA  (75 tables)                     │
+ │  L1 -- REFERENCE DATA  (77 tables)                     │
  │  Dimensions, masters, lookups, hierarchies, config      │
  │  Rarely changes. Shared across all risk stripes.        │
  │  Examples: currency_dim, country_dim, scenario_dim      │
@@ -99,7 +99,7 @@ The hierarchy is driven by `l1.enterprise_business_taxonomy`, a self-referencing
 
 This is the "shopping list" for onboarding teams. Check which tables your risk stripe can reuse before proposing new ones.
 
-### L1 -- REFERENCE DATA  (75 tables)
+### L1 -- REFERENCE DATA  (77 tables)
 
 | Category | Tables |
 |----------|--------|

@@ -9339,6 +9339,172 @@
           "data_type": "TIMESTAMP"
         }
       ]
+    },
+    {
+      "name": "product_attribute_mapping",
+      "layer": "L1",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "attribute_mapping_id",
+          "description": "",
+          "data_type": "BIGSERIAL",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "product_table_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "product_table_registry",
+              "field": "product_table_id"
+            }
+          }
+        },
+        {
+          "name": "source_field_name",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "target_view_code",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "target_field_name",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "mapping_type_code",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "transform_expression",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "priority",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "data_type_code",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "is_nullable_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "description",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "is_active_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "source_snapshot_type",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        }
+      ]
+    },
+    {
+      "name": "product_table_registry",
+      "layer": "L1",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "product_table_id",
+          "description": "",
+          "data_type": "BIGSERIAL",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "product_code",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "snapshot_type_code",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "table_schema",
+          "description": "",
+          "data_type": "VARCHAR(10)"
+        },
+        {
+          "name": "table_name",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "field_count",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "pk_fields",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "regulatory_schedule",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "description",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "is_active_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
     }
   ],
   "L2": [
@@ -44054,6 +44220,14 @@
       "to_layer": "L1",
       "to_table": "portfolio_dim",
       "to_field": "portfolio_id"
+    },
+    {
+      "from_layer": "L1",
+      "from_table": "product_attribute_mapping",
+      "from_field": "product_table_id",
+      "to_layer": "L1",
+      "to_table": "product_table_registry",
+      "to_field": "product_table_id"
     },
     {
       "from_layer": "L1",

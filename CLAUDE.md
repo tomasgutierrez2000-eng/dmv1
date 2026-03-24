@@ -16,8 +16,8 @@ In QA mode, flag any code that doesn't match DESIGN.md.
 Banking data model visualization platform with metrics calculation engine. Next.js 14 App Router, TypeScript, Tailwind CSS, Zustand, Recharts. PostgreSQL + sql.js for calculations.
 
 ## Architecture: Three-Layer Data Model
-- **L1 — Reference Data (75 tables):** Dimensions, lookups, hierarchies, configuration. Rarely changes. Examples: `currency_dim`, `metric_threshold`, `enterprise_business_taxonomy`, `rating_scale_dim`
-- **L2 — Atomic Data (101 tables):** Raw source-system snapshots, events, and master tables. Point-in-time observations, not computed. Examples: `counterparty`, `facility_master`, `credit_agreement_master`, `facility_exposure_snapshot`, `credit_event`, `position`
+- **L1 — Reference Data (77 tables):** Dimensions, lookups, hierarchies, configuration. Rarely changes. Examples: `currency_dim`, `metric_threshold`, `enterprise_business_taxonomy`, `rating_scale_dim`
+- **L2 — Atomic Data (102 tables):** Raw source-system snapshots, events, and master tables. Point-in-time observations, not computed. Examples: `counterparty`, `facility_master`, `credit_agreement_master`, `facility_exposure_snapshot`, `credit_event`, `position`
 - **L3 — Derived Data (83 tables):** Anything calculated, aggregated, or computed from L1+L2. Examples: `exposure_metric_cube`, `facility_financial_calc`, `stress_test_result`
 
 Rollup hierarchy: **Facility → Counterparty → Desk (L3) → Portfolio (L2) → Business Segment (L1)**

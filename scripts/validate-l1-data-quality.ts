@@ -766,6 +766,44 @@ async function runChecks(client: pg.Client): Promise<CheckResult[]> {
       'Table l1.ledger_account_dim does not exist.'));
   }
 
+  // ─────────────────────────────────────────────────────────────────────
+  // H19: Product Attribute Mapping — Source Field Validation
+  // Verify every source_field_name in product_attribute_mapping actually
+  // exists in the referenced table's information_schema.columns.
+  // Catches typos that would silently produce NULLs in L3 cross-product views.
+  // ─────────────────────────────────────────────────────────────────────
+  if (await tableExists(client, 'l1', 'product_attribute_mapping') &&
+      await tableExists(client, 'l1', 'product_table_registry')) {
+    const invalidFieldsQ = await client.query(`
+      SELECT ptr.table_name, ptr.table_schema, pam.source_field_name,
+             pam.target_view_code, pam.target_field_name
+      FROM l1.product_attribute_mapping pam
+      JOIN l1.product_table_registry ptr ON ptr.product_table_id = pam.product_table_id
+      WHERE pam.is_active_flag = TRUE
+        AND NOT EXISTS (
+          SELECT 1 FROM information_schema.columns isc
+          WHERE isc.table_schema = ptr.table_schema
+            AND isc.table_name = ptr.table_name
+            AND isc.column_name = pam.source_field_name
+        )
+      ORDER BY ptr.table_name, pam.source_field_name
+    `);
+    if (invalidFieldsQ.rowCount && invalidFieldsQ.rowCount > 0) {
+      const invalid = invalidFieldsQ.rows.map((r: { table_name: string; source_field_name: string; target_field_name: string }) =>
+        `${r.table_name}.${r.source_field_name} → ${r.target_field_name}`).join('; ');
+      results.push(check('H19', 'Product Attribute Mapping Fields', 'HIGH', false,
+        `${invalidFieldsQ.rowCount} mapping(s) reference non-existent source fields: ${invalid}`));
+    } else {
+      const totalQ = await client.query(`SELECT COUNT(*) AS cnt FROM l1.product_attribute_mapping WHERE is_active_flag = TRUE`);
+      const total = totalQ.rows[0]?.cnt ?? 0;
+      results.push(check('H19', 'Product Attribute Mapping Fields', 'HIGH', true,
+        `All ${total} active mapping source fields verified against information_schema.`));
+    }
+  } else {
+    results.push(check('H19', 'Product Attribute Mapping Fields', 'HIGH', true,
+      'product_attribute_mapping or product_table_registry not present — skipped.'));
+  }
+
   return results;
 }
 

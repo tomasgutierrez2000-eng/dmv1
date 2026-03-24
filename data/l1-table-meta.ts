@@ -117,6 +117,10 @@ export const L1_TABLE_META: L1TableMeta[] = [
   // ── Product Tables Foundation (Migration 027) ──
   { name: 'product_subtype_dim', scd: 'SCD-0', category: 'Counterparty & Entity' },
   { name: 'customer_counterparty_map', scd: 'SCD-2', category: 'Counterparty & Entity' },
+
+  // ── Product Attribute Mapping (Migration 039) ──
+  { name: 'product_table_registry', scd: 'SCD-1', category: 'Data Quality & Infrastructure' },
+  { name: 'product_attribute_mapping', scd: 'SCD-1', category: 'Data Quality & Infrastructure' },
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

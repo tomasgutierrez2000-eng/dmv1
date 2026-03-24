@@ -82,7 +82,7 @@ export default function AgentDetail({ slug }: { slug: string }) {
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-xl font-bold text-slate-50 font-mono">{agent.name}</h1>
+            <h1 className="text-2xl font-bold text-slate-50 font-mono">{agent.name}</h1>
             <span className={`text-[10px] px-2 py-0.5 rounded font-medium uppercase tracking-wide ${catColor}`}>
               {agent.category}
             </span>

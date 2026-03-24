@@ -124,7 +124,7 @@ export default function ReasoningReplay({ agentSlug, runId }: { agentSlug: strin
         <div>
           <div className="flex items-center gap-3 mb-1">
             <StIcon className={`w-5 h-5 ${st.color}`} />
-            <h1 className="text-xl font-bold text-slate-50 font-mono">Run {run.run_id.slice(0, 8)}</h1>
+            <h1 className="text-2xl font-bold text-slate-50 font-mono">Run {run.run_id.slice(0, 8)}</h1>
           </div>
           <p className="text-xs text-slate-400">
             {new Date(run.created_at).toLocaleString()}

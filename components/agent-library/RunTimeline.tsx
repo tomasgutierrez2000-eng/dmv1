@@ -50,7 +50,7 @@ export default function RunTimeline({ agentSlug }: { agentSlug: string }) {
         <ArrowLeft className="w-3.5 h-3.5" /> Back to agent
       </Link>
 
-      <h1 className="text-xl font-bold text-slate-50 font-mono mb-6">Run History</h1>
+      <h1 className="text-2xl font-bold text-slate-50 font-mono mb-6">Run History</h1>
 
       {!connected && (
         <div className="flex items-center gap-2 text-slate-500 text-sm mb-6">

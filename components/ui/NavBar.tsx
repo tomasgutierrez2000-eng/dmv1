@@ -168,20 +168,14 @@ export default function NavBar() {
           ]}
         />
 
-        {/* Agent Library dropdown */}
-        <NavDropdown
-          label="Agents"
-          icon={Bot}
-          bg="bg-emerald-600"
-          hoverBg="bg-emerald-500"
-          accentColor="text-emerald-400"
-          isActive={isActive('/agents')}
-          items={[
-            { href: '/agents', icon: Bot, label: 'Agent Catalog' },
-            { href: '/agents/artifacts', icon: Package, label: 'Artifact Explorer' },
-            { href: '/agents/metrics', icon: BarChart3, label: 'Performance' },
-          ]}
-        />
+        {/* Agent Library */}
+        <Link
+          href="/agents"
+          className={`bg-emerald-600 hover:bg-emerald-500 text-white rounded-md text-[11px] font-medium transition-colors flex items-center gap-1.5 py-1.5 px-2.5 whitespace-nowrap ${isActive('/agents') ? 'ring-1 ring-white/30' : ''}`}
+        >
+          <Bot className="w-3.5 h-3.5" />
+          <span>Agents</span>
+        </Link>
 
         {/* Ask AI */}
         <Link

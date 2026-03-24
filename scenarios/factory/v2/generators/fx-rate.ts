@@ -77,7 +77,7 @@ export function generateFxRateRows(
       if (baseRate === undefined) continue; // unknown currency, skip
 
       const drift = DRIFT_FACTORS[ccy] ?? 0;
-      const rate = round(baseRate * (1.0 + drift * weeksFromBase), 10);
+      const rate = Math.max(round(baseRate * (1.0 + drift * weeksFromBase), 10), 0.000001);
 
       const fxId = registry.allocate('fx_rate', 1)[0];
       rows.push({

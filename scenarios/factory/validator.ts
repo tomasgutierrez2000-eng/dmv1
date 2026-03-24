@@ -880,6 +880,7 @@ function guessPKFields(table: string, sampleRow: Record<string, unknown>): strin
     counterparty_financial_snapshot: ['counterparty_id', 'as_of_date'],
     ecl_provision_snapshot: ['facility_id', 'as_of_date'],
     limit_contribution_snapshot: ['limit_rule_id', 'facility_id', 'as_of_date'],
+    fx_rate: ['from_currency_code', 'to_currency_code', 'as_of_date'],
   };
 
   if (compositePKs[table]) {

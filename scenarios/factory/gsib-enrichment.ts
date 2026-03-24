@@ -327,10 +327,11 @@ export function enrichFacilities(
     const facilityCommit = Math.round(totalCommit * slot.fraction);
     const typeLabel = TYPE_LABELS[slot.facilityType] ?? slot.facilityType;
 
-    // Industry code mapping for facility_master
+    // Industry code mapping for facility_master — keyed by NAICS 2-digit code
+    // (counterparty.industry_id is now a NAICS code after the audit fix, not internal 1-10)
     const industryCodes: Record<number, string> = {
-      1: 'FIN', 2: 'TMT', 3: 'HC', 4: 'ENR', 5: 'IND',
-      6: 'CS', 7: 'RET', 8: 'UTL', 9: 'MAT', 10: 'RE',
+      51: 'TMT', 62: 'HC', 52: 'FIN', 21: 'ENR', 31: 'IND',
+      42: 'CS', 44: 'RET', 22: 'UTL', 23: 'MAT', 53: 'RE',
     };
 
     return {

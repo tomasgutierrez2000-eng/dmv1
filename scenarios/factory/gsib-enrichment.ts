@@ -19,30 +19,7 @@ import {
   type StoryArc,
 } from '../../scripts/shared/mvp-config';
 import type { CounterpartyProfile } from './scenario-config';
-
-/* ────────────────── PRNG (deterministic) ────────────────── */
-
-function mulberry32(seed: number): () => number {
-  let s = seed | 0;
-  return () => {
-    s = (s + 0x6D2B79F5) | 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function hashStr(s: string): number {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) {
-    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
-  }
-  return h;
-}
-
-function pick<T>(rng: () => number, arr: T[]): T {
-  return arr[Math.floor(rng() * arr.length)];
-}
+import { mulberry32, hashStr, pick } from './v2/prng';
 
 /* ────────────────── Industry Mapping ────────────────── */
 
@@ -142,8 +119,12 @@ export interface EnrichedCounterparty {
 export function enrichCounterparty(
   profile: CounterpartyProfile,
   counterpartyId: number,
+  scenarioSeed?: string,
 ): EnrichedCounterparty {
-  const rng = mulberry32(hashStr(`cp.${counterpartyId}.${profile.legal_name}`));
+  const seedKey = scenarioSeed
+    ? `cp.${scenarioSeed}.${counterpartyId}`
+    : `cp.${counterpartyId}.${profile.legal_name}`; // legacy fallback
+  const rng = mulberry32(hashStr(seedKey));
   const tier = RATING_TIER_MAP[profile.rating_tier];
   const industryMap = INDUSTRY_GSIB_MAP[profile.industry_id] ?? INDUSTRY_GSIB_MAP[1];
   if (!INDUSTRY_GSIB_MAP[profile.industry_id]) {
@@ -291,8 +272,12 @@ export function enrichFacilities(
   facilityIds: number[],
   sizeProfile: SizeProfile,
   ratingTier: RatingTier,
+  scenarioSeed?: string,
 ): EnrichedFacility[] {
-  const rng = mulberry32(hashStr(`fac.${counterparty.counterparty_id}.${agreementId}`));
+  const seedKey = scenarioSeed
+    ? `fac.${scenarioSeed}.${counterparty.counterparty_id}.${agreementId}`
+    : `fac.${counterparty.counterparty_id}.${agreementId}`; // legacy fallback
+  const rng = mulberry32(hashStr(seedKey));
   const tier = RATING_TIER_MAP[ratingTier];
   const countryMap = COUNTRY_MAP[counterparty.country_code] ?? COUNTRY_MAP['US'];
   const count = facilityIds.length;
@@ -400,8 +385,12 @@ export function enrichAgreement(
   agreementId: number,
   counterparty: EnrichedCounterparty,
   sizeProfile: SizeProfile,
+  scenarioSeed?: string,
 ): EnrichedAgreement {
-  const rng = mulberry32(hashStr(`agr.${agreementId}.${counterparty.counterparty_id}`));
+  const seedKey = scenarioSeed
+    ? `agr.${scenarioSeed}.${agreementId}`
+    : `agr.${agreementId}.${counterparty.counterparty_id}`; // legacy fallback
+  const rng = mulberry32(hashStr(seedKey));
   const countryMap = COUNTRY_MAP[counterparty.country_code] ?? COUNTRY_MAP['US'];
 
   const originYear = 2020 + Math.floor(rng() * 5);

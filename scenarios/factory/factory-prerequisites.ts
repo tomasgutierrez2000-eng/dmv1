@@ -47,16 +47,16 @@ const FACTORY_CURRENCIES: PrerequisiteRow[] = [
 /* ────────────────── Metric Threshold ────────────────── */
 
 const FACTORY_THRESHOLDS: PrerequisiteRow[] = [
-  { threshold_id: 1, metric_definition_id: 1, threshold_type: 'WARNING', threshold_value: 1.25, effective_from_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'DSCR', metric_name: 'Debt Service Coverage Ratio', metric_category: 'CREDIT' },
-  { threshold_id: 2, metric_definition_id: 1, threshold_type: 'BREACH', threshold_value: 1.00, effective_from_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'DSCR', metric_name: 'Debt Service Coverage Ratio', metric_category: 'CREDIT' },
-  { threshold_id: 3, metric_definition_id: 2, threshold_type: 'WARNING', threshold_value: 0.75, effective_from_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'LTV', metric_name: 'Loan-to-Value Ratio', metric_category: 'CREDIT' },
-  { threshold_id: 4, metric_definition_id: 2, threshold_type: 'BREACH', threshold_value: 0.90, effective_from_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'LTV', metric_name: 'Loan-to-Value Ratio', metric_category: 'CREDIT' },
-  { threshold_id: 5, metric_definition_id: 3, threshold_type: 'WARNING', threshold_value: 1.50, effective_from_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'ICR', metric_name: 'Interest Coverage Ratio', metric_category: 'CREDIT' },
-  { threshold_id: 6, metric_definition_id: 3, threshold_type: 'BREACH', threshold_value: 1.00, effective_from_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'ICR', metric_name: 'Interest Coverage Ratio', metric_category: 'CREDIT' },
-  { threshold_id: 7, metric_definition_id: 4, threshold_type: 'WARNING', threshold_value: 4.00, effective_from_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'LEVERAGE', metric_name: 'Total Leverage Ratio', metric_category: 'CREDIT' },
-  { threshold_id: 8, metric_definition_id: 4, threshold_type: 'BREACH', threshold_value: 6.00, effective_from_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'LEVERAGE', metric_name: 'Total Leverage Ratio', metric_category: 'CREDIT' },
-  { threshold_id: 9, metric_definition_id: 5, threshold_type: 'WARNING', threshold_value: 1.20, effective_from_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'CURRENT_RATIO', metric_name: 'Current Ratio', metric_category: 'LIQUIDITY' },
-  { threshold_id: 10, metric_definition_id: 5, threshold_type: 'BREACH', threshold_value: 1.00, effective_from_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'CURRENT_RATIO', metric_name: 'Current Ratio', metric_category: 'LIQUIDITY' },
+  { threshold_id: 1, metric_definition_id: 1, threshold_type: 'WARNING', threshold_value: 1.25, effective_start_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'DSCR', metric_name: 'Debt Service Coverage Ratio', metric_category: 'CREDIT' },
+  { threshold_id: 2, metric_definition_id: 1, threshold_type: 'BREACH', threshold_value: 1.00, effective_start_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'DSCR', metric_name: 'Debt Service Coverage Ratio', metric_category: 'CREDIT' },
+  { threshold_id: 3, metric_definition_id: 2, threshold_type: 'WARNING', threshold_value: 0.75, effective_start_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'LTV', metric_name: 'Loan-to-Value Ratio', metric_category: 'CREDIT' },
+  { threshold_id: 4, metric_definition_id: 2, threshold_type: 'BREACH', threshold_value: 0.90, effective_start_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'LTV', metric_name: 'Loan-to-Value Ratio', metric_category: 'CREDIT' },
+  { threshold_id: 5, metric_definition_id: 3, threshold_type: 'WARNING', threshold_value: 1.50, effective_start_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'ICR', metric_name: 'Interest Coverage Ratio', metric_category: 'CREDIT' },
+  { threshold_id: 6, metric_definition_id: 3, threshold_type: 'BREACH', threshold_value: 1.00, effective_start_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'ICR', metric_name: 'Interest Coverage Ratio', metric_category: 'CREDIT' },
+  { threshold_id: 7, metric_definition_id: 4, threshold_type: 'WARNING', threshold_value: 4.00, effective_start_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'LEVERAGE', metric_name: 'Total Leverage Ratio', metric_category: 'CREDIT' },
+  { threshold_id: 8, metric_definition_id: 4, threshold_type: 'BREACH', threshold_value: 6.00, effective_start_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'LEVERAGE', metric_name: 'Total Leverage Ratio', metric_category: 'CREDIT' },
+  { threshold_id: 9, metric_definition_id: 5, threshold_type: 'WARNING', threshold_value: 1.20, effective_start_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'CURRENT_RATIO', metric_name: 'Current Ratio', metric_category: 'LIQUIDITY' },
+  { threshold_id: 10, metric_definition_id: 5, threshold_type: 'BREACH', threshold_value: 1.00, effective_start_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'CURRENT_RATIO', metric_name: 'Current Ratio', metric_category: 'LIQUIDITY' },
 ];
 
 /* ────────────────── Source System Registry ────────────────── */

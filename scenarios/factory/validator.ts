@@ -279,7 +279,7 @@ export function validateScenario(
   }
 
   // Risk flags: single PK (risk_flag_id)
-  const flagPKs = new Set<number>();
+  const flagPKs = new Set<string>();
   for (const flag of (l2Data.risk_flag ?? [])) {
     if (flagPKs.has(flag.risk_flag_id)) {
       errors.push(`Duplicate risk_flag PK: ${flag.risk_flag_id}`);
@@ -288,7 +288,7 @@ export function validateScenario(
   }
 
   // Credit events: single PK (credit_event_id)
-  const evtPKs = new Set<number>();
+  const evtPKs = new Set<string>();
   for (const evt of (l2Data.credit_event ?? [])) {
     if (evtPKs.has(evt.credit_event_id)) {
       errors.push(`Duplicate credit_event PK: ${evt.credit_event_id}`);
@@ -327,7 +327,7 @@ export function validateScenario(
   }
 
   // Position: single PK (position_id)
-  const posPKs = new Set<number>();
+  const posPKs = new Set<string>();
   for (const pos of (l2Data.position ?? [])) {
     if (posPKs.has(pos.position_id)) {
       errors.push(`Duplicate position PK: ${pos.position_id}`);

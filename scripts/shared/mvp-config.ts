@@ -67,7 +67,8 @@ export type StoryArc =
   | 'DETERIORATING'
   | 'RECOVERING'
   | 'STRESSED_SECTOR'
-  | 'NEW_RELATIONSHIP';
+  | 'NEW_RELATIONSHIP'
+  | 'DISTRESSED';
 
 /** Rating tier types */
 export type RatingTier =
@@ -133,6 +134,7 @@ export const STORY_PD_MULTIPLIERS: Record<StoryArc, number[]> = {
   RECOVERING:       [1.80, 1.50, 1.20, 0.95, 0.80],
   STRESSED_SECTOR:  [1.00, 1.40, 2.00, 1.60, 1.30],
   NEW_RELATIONSHIP: [1.00, 1.00, 1.00, 0.98, 0.95],
+  DISTRESSED:       [1.00, 2.50, 5.00, 8.00, 12.00],
 };
 
 /** Story arc → utilization ratio path across 5 cycles (fraction of committed) */
@@ -144,6 +146,7 @@ export const STORY_UTILIZATION: Record<StoryArc, number[]> = {
   RECOVERING:       [0.75, 0.70, 0.60, 0.50, 0.45],
   STRESSED_SECTOR:  [0.50, 0.60, 0.78, 0.70, 0.62],
   NEW_RELATIONSHIP: [0.30, 0.35, 0.38, 0.42, 0.45],
+  DISTRESSED:       [0.60, 0.78, 0.92, 0.95, 0.88],
 };
 
 /** Story arc → spread multiplier path across 5 cycles */
@@ -155,6 +158,7 @@ export const STORY_SPREAD_MULTIPLIERS: Record<StoryArc, number[]> = {
   RECOVERING:       [1.30, 1.20, 1.10, 1.02, 0.98],
   STRESSED_SECTOR:  [1.00, 1.15, 1.35, 1.25, 1.15],
   NEW_RELATIONSHIP: [1.00, 1.00, 0.98, 0.97, 0.95],
+  DISTRESSED:       [1.00, 1.30, 1.80, 2.20, 2.50],
 };
 
 /** Story arc → credit status across 5 cycles */
@@ -166,6 +170,7 @@ export const STORY_CREDIT_STATUS: Record<StoryArc, string[]> = {
   RECOVERING:       ['WATCH', 'WATCH', 'PERFORMING', 'PERFORMING', 'PERFORMING'],
   STRESSED_SECTOR:  ['PERFORMING', 'WATCH', 'SPECIAL_MENTION', 'WATCH', 'PERFORMING'],
   NEW_RELATIONSHIP: ['PERFORMING', 'PERFORMING', 'PERFORMING', 'PERFORMING', 'PERFORMING'],
+  DISTRESSED:       ['PERFORMING', 'SUBSTANDARD', 'DEFAULT', 'DEFAULT', 'DEFAULT'],
 };
 
 /** Story arc → days past due across 5 cycles */
@@ -177,4 +182,5 @@ export const STORY_DPD: Record<StoryArc, number[]> = {
   RECOVERING:       [30, 18, 8, 0, 0],
   STRESSED_SECTOR:  [0, 10, 25, 12, 5],
   NEW_RELATIONSHIP: [0, 0, 0, 0, 0],
+  DISTRESSED:       [0, 60, 95, 120, 150],
 };

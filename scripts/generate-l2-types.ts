@@ -17,9 +17,11 @@ const OUTPUT_PATH = path.join(ROOT, 'scenarios/factory/l2-types.ts');
 
 /* ── DD type → TypeScript type mapping ── */
 
-function tsType(ddType: string, isFlag: boolean): string {
+function tsType(ddType: string, isFlag: boolean, fieldName: string): string {
   const upper = ddType.toUpperCase();
   if (upper === 'BOOLEAN' || isFlag) return 'string'; // flags use 'Y'/'N'
+  // ID fields are strings throughout the factory pipeline (IDRegistry returns string[])
+  if (fieldName.endsWith('_id') && (upper === 'BIGINT' || upper === 'INTEGER' || upper === 'BIGSERIAL')) return 'string';
   if (upper === 'BIGINT' || upper === 'INTEGER' || upper === 'BIGSERIAL') return 'number';
   if (upper.startsWith('NUMERIC') || upper.startsWith('DECIMAL') || upper === 'REAL' || upper === 'DOUBLE PRECISION') return 'number';
   if (upper === 'DATE') return 'string';
@@ -162,7 +164,7 @@ function main() {
     for (const field of table.fields) {
       const isPk = field.pk_fk?.is_pk === true;
       const isFlag = field.name.endsWith('_flag');
-      const ts = tsType(field.data_type, isFlag);
+      const ts = tsType(field.data_type, isFlag, field.name);
       // PK fields are always required, everything else is nullable
       const nullable = isPk ? '' : ' | null';
       // Quote field names that aren't valid JS identifiers (e.g. start with digit)

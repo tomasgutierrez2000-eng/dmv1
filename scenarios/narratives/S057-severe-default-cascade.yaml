@@ -1,0 +1,89 @@
+# S57: Severe Default Cascade
+#
+# Story: Multiple counterparties across diverse entity types experience
+# severe credit deterioration leading to actual defaults. DPD exceeds
+# 90+ days, facilities enter default status with full loss recognition.
+#
+# Dashboard signal: CRO sees defaults, 90+ DPD concentrations,
+# diverse entity type exposure across sovereigns, funds, and insurance.
+
+scenario_id: "S57"
+name: "Severe Default Cascade"
+type: EVENT_CASCADE
+narrative: "Multi-sector default wave; counterparties across diverse entity types deteriorate to default"
+
+counterparties:
+  - legal_name: "Sovereign Energy Corp (State-Owned)"
+    country: US
+    industry_id: 6
+    rating_tier: HY_MID
+    story_arc: DISTRESSED
+    size: LARGE
+  - legal_name: "Pacific Infrastructure Fund LP"
+    country: US
+    industry_id: 9
+    rating_tier: HY_HIGH
+    story_arc: DISTRESSED
+    size: MID
+  - legal_name: "National Insurance Holdings"
+    country: GB
+    industry_id: 2
+    rating_tier: HY_MID
+    story_arc: DISTRESSED
+    size: LARGE
+  - legal_name: "Atlas Private Equity Partners"
+    country: US
+    industry_id: 7
+    rating_tier: HY_LOW
+    story_arc: DISTRESSED
+    size: MID
+  - legal_name: "Nordic Financial Services AB"
+    country: GB
+    industry_id: 5
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: MID
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: DEFAULT
+      date: "2025-01-15"
+      description: "Multi-sector default wave triggers cross-default clauses"
+      severity: CRITICAL
+    - type: DOWNGRADE
+      date: "2024-12-01"
+      description: "Severe multi-notch downgrades across sectors"
+      severity: HIGH
+  risk_flags:
+    - code: DEFAULT_WATCH
+      severity: CRITICAL
+      description: "Multiple counterparties approaching or at default"
+    - code: SECTOR_CONCENTRATION
+      severity: HIGH
+      description: "Default contagion across sectors"
+    - code: LOSS_RECOGNITION
+      severity: HIGH
+      description: "Significant expected loss provisions required"
+
+l2_tables:
+  counterparty_rating_observation:
+    generate: true
+    ratings_before:
+      sp: "BB"
+      moodys: "Ba2"
+    ratings_after:
+      sp: "CCC"
+      moodys: "Caa1"
+
+verification:
+  min_rows: 15
+  key_assertion: "4+ counterparties reach DPD 90+ and default status with diverse entity types"

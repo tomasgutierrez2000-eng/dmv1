@@ -111,6 +111,8 @@ Examples:
 /orchestrate --mode REVIEW --domain capital --scope all
 /orchestrate --mode MONITOR
 /orchestrate --mode DRY_RUN --metric "CET1 Ratio" --domain capital
+/orchestrate --mode DATA_GEN_ENHANCED "oil crash hits 8 energy borrowers"
+/orchestrate --mode REMEDIATE
 ```
 
 ### 2C. Mode Detection Rules
@@ -124,6 +126,8 @@ Examples:
 | "drift", "monitor", "health check" | MONITOR |
 | "dry run", "plan only", "what would happen" | DRY_RUN |
 | "generate data", "populate", "backfill", "factory", "seed data", "add scenario" | DATA_FACTORY |
+| "generate enhanced scenario", "curator generate", "AI scenario", "narrative scenario", "LLM scenario" | DATA_GEN_ENHANCED |
+| "fix database warnings", "remediate", "heal the data", "fix data quality", "diagnose database" | REMEDIATE |
 | No clear signal | Ask user to choose mode |
 
 ### 2D. Risk Stripe Detection
@@ -199,6 +203,31 @@ Phase 3: REPORT       → Findings summary
 Phase 1: DRIFT_CHECK  → Schema Drift Monitor (if available)
 Phase 2: AUDIT_REPORT → Audit Report Generator (if available)
 Phase 3: REPORT       → Health summary
+```
+
+**DATA_GEN_ENHANCED** — LLM-powered scenario generation with full quality pipeline:
+```
+Phase 1:  PARSE_INPUT    → Parse narrative or metric requirement from user input
+Phase 2:  CURATOR_GEN    → Invoke curator-gen or curator-metric (Python subprocess)
+Phase 3:  VALIDATE_YAML  → Validate emitted YAML (parseScenarioYaml dry-run)
+Phase 4:  RUN_FACTORY    → Run TS factory (scenario-runner.ts --scenario SXX)
+Phase 5:  EXPORT_JSON    → Export V2 output to JSON (--export-json)
+Phase 6:  CURATOR_AUDIT  → Invoke curator-audit (coherence review, hard gate score >= 80)
+Phase 7:  AUDIT_REVIEW   → If score < 80, retry with error context (max 2 retries)
+Phase 8:  LOAD_DATA      → If audit passed → emit SQL / write to DB
+Phase 9:  DIAGNOSE       → Run DB Diagnostician on loaded data
+Phase 10: REMEDIATE      → If findings > 0: Run Remediation Engine + Fix Verifier
+Phase 11: REPORT         → Log full session to audit trail
+```
+
+**REMEDIATE** — Standalone database healing (diagnose → fix → verify):
+```
+Phase 1: DIAGNOSE       → Run DB Diagnostician (full database scan)
+Phase 2: PRESENT        → Present DiagnosisReport to user
+Phase 3: FIX            → Run Remediation Engine (user approves each fix)
+Phase 4: VERIFY         → Run Fix Verifier (confirm fixes, check regressions)
+Phase 5: ROLLBACK_CHECK → If regressions found → offer rollback
+Phase 6: REPORT         → Final report + audit trail
 ```
 
 **DRY_RUN** — Full pipeline planning without execution:

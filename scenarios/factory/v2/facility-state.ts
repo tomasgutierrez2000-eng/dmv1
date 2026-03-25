@@ -150,7 +150,11 @@ export function initializeFacilityState(
     : sampleCommittedAmount(rng, sizeProfile, counterparty.industry_id);
 
   // Initial utilization based on product type
-  const initialUtil = STORY_UTILIZATION[storyArc]?.[0] ?? 0.50;
+  const rawUtil = STORY_UTILIZATION[storyArc]?.[0] ?? 0.50;
+  // FUNDED revolvers must have a minimum initial draw (10% of committed)
+  // to avoid the inconsistency of lifecycle=FUNDED with drawn_amount=0
+  const minUtilForFunded = productConfig.bulletDraw ? 1.0 : 0.10;
+  const initialUtil = Math.max(rawUtil, minUtilForFunded);
   const drawn = productConfig.bulletDraw
     ? committed // Term loans: fully drawn at origination
     : round(committed * clamp(initialUtil, 0, 1), 2);

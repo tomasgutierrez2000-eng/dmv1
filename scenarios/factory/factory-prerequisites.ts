@@ -59,6 +59,12 @@ const FACTORY_THRESHOLDS: PrerequisiteRow[] = [
   { threshold_id: 10, metric_definition_id: 5, threshold_type: 'BREACH', threshold_value: 1.00, effective_start_date: '2024-01-01', is_active_flag: 'Y', metric_code: 'CURRENT_RATIO', metric_name: 'Current Ratio', metric_category: 'LIQUIDITY' },
 ];
 
+/* ────────────────── Source System Registry ────────────────── */
+
+const FACTORY_SOURCE_SYSTEMS: PrerequisiteRow[] = [
+  { source_system_id: 1400001, source_system_name: 'DATA_FACTORY_V2', data_domain: 'SYNTHETIC', ingestion_frequency: 'ON_DEMAND', system_owner: 'Data Factory', active_flag: 'Y' },
+];
+
 /* ────────────────── Public API ────────────────── */
 
 /**
@@ -66,6 +72,7 @@ const FACTORY_THRESHOLDS: PrerequisiteRow[] = [
  */
 export function getFactoryPrerequisites(): PrerequisiteTable[] {
   return [
+    { schema: 'l1', table: 'source_system_registry', conflictColumn: 'source_system_id', rows: FACTORY_SOURCE_SYSTEMS },
     { schema: 'l1', table: 'country_dim', conflictColumn: 'country_code', rows: FACTORY_COUNTRIES },
     { schema: 'l1', table: 'currency_dim', conflictColumn: 'currency_code', rows: FACTORY_CURRENCIES },
     { schema: 'l1', table: 'metric_threshold', conflictColumn: 'threshold_id', rows: FACTORY_THRESHOLDS },

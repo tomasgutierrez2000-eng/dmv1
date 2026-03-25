@@ -3,19 +3,12 @@
  * Reads: collateral_value, collateral_type, ltv_ratio
  */
 import type { FacilityStateMap, SqlRow } from '../types';
-import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
+import {
+  stateKey, FACTORY_SOURCE_SYSTEM_ID,
+  COLLATERAL_TYPE_ID_MAP, CRM_TYPE_CODE_MAP,
+} from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round, seededRng } from '../prng';
-
-/** Map collateral type to CRM type code (Basel credit risk mitigation). */
-const CRM_TYPE_MAP: Record<string, string> = {
-  RE: 'CRE',
-  RECEIVABLES: 'FIN_RECV',
-  FLEET: 'PHYS_COLL',
-  EQUIPMENT: 'PHYS_COLL',
-  CASH: 'CASH_COLL',
-  NONE: 'UNSECURED',
-};
 
 /** Map collateral type to mitigant group code. */
 const MITIGANT_GROUP_MAP: Record<string, string> = {
@@ -25,15 +18,6 @@ const MITIGANT_GROUP_MAP: Record<string, string> = {
   EQUIPMENT: 'PHYSICAL',
   CASH: 'CASH',
   NONE: 'NONE',
-};
-
-/** Map collateral type string to collateral_type_dim IDs (100001-100010). */
-const COLLATERAL_TYPE_ID_MAP: Record<string, number> = {
-  RE: 100001,
-  RECEIVABLES: 100002,
-  FLEET: 100003,
-  EQUIPMENT: 100004,
-  CASH: 100005,
 };
 
 export interface CollateralOutput {
@@ -69,7 +53,7 @@ export function generateCollateralRows(
         // Create the L2 collateral_asset_master row (FK parent for collateral_snapshot)
         autoCreatedAssets.push({
           collateral_asset_id: assetId,
-          collateral_type_id: COLLATERAL_TYPE_ID_MAP[state.collateral_type] ?? 100001,
+          collateral_type_id: COLLATERAL_TYPE_ID_MAP[state.collateral_type] ?? 1,
           counterparty_id: state.counterparty_id,
           country_code: state.country_code,
           currency_code: state.currency_code,
@@ -77,8 +61,8 @@ export function generateCollateralRows(
           effective_start_date: date,
           description: `Collateral asset — facility ${facId}`,
           collateral_status: 'ACTIVE',
-          is_current_flag: true,
-          is_regulatory_eligible_flag: true,
+          is_current_flag: 'Y',
+          is_regulatory_eligible_flag: 'Y',
           // original_cost required for RE assets — basis for origination NOI derivation
           original_cost: state.collateral_type === 'RE'
             ? round(state.collateral_value * 1.05, 2)  // original appraisal value
@@ -116,7 +100,7 @@ export function generateCollateralRows(
         haircut_pct: round(haircutPct, 6),
         eligible_collateral_amount: eligibleAmount,
         allocated_amount_usd: allocatedAmount,
-        crm_type_code: CRM_TYPE_MAP[state.collateral_type] ?? 'UNSECURED',
+        crm_type_code: CRM_TYPE_CODE_MAP[state.collateral_type] ?? 'COLLATERAL',
         mitigant_group_code: MITIGANT_GROUP_MAP[state.collateral_type] ?? 'NONE',
         mitigant_subtype: state.collateral_type,
         is_risk_shifting_flag: state.collateral_type === 'CASH' ? 'Y' : 'N',

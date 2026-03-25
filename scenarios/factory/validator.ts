@@ -856,8 +856,8 @@ export function validateV2Output(
     }
     if (invalidDpdCodes.size > 0) {
       errors.push(
-        `DPD bucket codes not in FFIEC standard: [${Array.from(invalidDpdCodes).join(', ')}]. ` +
-        `Valid codes: ${Array.from(VALID_DPD_CODES).join(', ')}. Old codes like '0-30', '31-60', '61-90' are no longer valid.`
+        `DPD bucket codes not in L1 dpd_bucket_dim: [${Array.from(invalidDpdCodes).join(', ')}]. ` +
+        `Valid L1 PK codes: ${Array.from(VALID_DPD_CODES).join(', ')}.`
       );
     }
   }

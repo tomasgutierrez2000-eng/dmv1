@@ -3,7 +3,7 @@
  * Reads: days_past_due, credit_status
  */
 import type { FacilityStateMap, SqlRow, CreditStatus } from '../types';
-import { stateKey, FACTORY_SOURCE_SYSTEM_ID, CREDIT_STATUS_CODE } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID, CREDIT_STATUS_CODE, mapDpdBucketCode } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round } from '../prng';
 
@@ -45,11 +45,11 @@ export function generateDelinquencyRows(
         credit_status_code: String(CREDIT_STATUS_CODE[state.credit_status as CreditStatus] ?? 1),
         days_past_due: dpd,
         days_past_due_max: dpd, // Same as current for generated data
-        delinquency_bucket_code: bucketCode,
-        dpd_bucket_code: bucketCode,
+        delinquency_bucket_code: mapDpdBucketCode(bucketCode),
+        dpd_bucket_code: mapDpdBucketCode(bucketCode),
         delinquency_status_code: dpd > 0 ? 'DELINQUENT' : 'CURRENT',
-        is_watch_list_flag: ['WATCH', 'SPECIAL_MENTION', 'SUBSTANDARD', 'DOUBTFUL'].includes(state.credit_status),
-        is_delinquent_payment_flag: dpd > 0,
+        is_watch_list_flag: ['WATCH', 'SPECIAL_MENTION', 'SUBSTANDARD', 'DOUBTFUL'].includes(state.credit_status) ? 'Y' : 'N',
+        is_delinquent_payment_flag: dpd > 0 ? 'Y' : 'N',
         overdue_interest_amt: overdueInterest,
         overdue_principal_amt: overduePrincipal,
         overdue_amt_0_30: dpd > 0 && dpd <= 30 ? overdueInterest : 0,

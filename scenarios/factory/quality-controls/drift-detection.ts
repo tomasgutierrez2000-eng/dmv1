@@ -26,8 +26,7 @@ export function runDriftDetection(
   const ssReport = registry.checkDrift('FACTORY_SOURCE_SYSTEM_ID', factorySSID, 'source_system_registry');
   if (!ssReport.isClean && ssReport.inMapNotInL1.length > 0) {
     warnings.push(
-      `FACTORY_SOURCE_SYSTEM_ID=${FACTORY_SOURCE_SYSTEM_ID} is not in L1 source_system_registry — ` +
-      `ensure it's registered before DB insert`
+      `FACTORY_SOURCE_SYSTEM_ID=${FACTORY_SOURCE_SYSTEM_ID} not in L1 seed SQL (OK — auto-inserted via factory prerequisites)`
     );
   }
 

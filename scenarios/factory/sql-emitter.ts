@@ -189,6 +189,11 @@ export function emitScenarioSql(tables: TableData[], opts: EmitOptions): string 
     '',
     'SET search_path TO l1, l2, public;',
     '',
+    '-- Ensure factory source system exists in L1 (FK prerequisite for all L2 INSERTs)',
+    `INSERT INTO l1.source_system_registry (source_system_id, source_system_name, data_domain, ingestion_frequency, system_owner, active_flag, created_ts, updated_ts)`,
+    `  VALUES (1400001, 'DATA_FACTORY_V2', 'SYNTHETIC', 'ON_DEMAND', 'Data Factory', 'Y', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+    `  ON CONFLICT (source_system_id) DO NOTHING;`,
+    '',
   ];
 
   // Build lookup for fast table access

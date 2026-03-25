@@ -32,7 +32,7 @@ export type CreditStatus =
   | 'DOUBTFUL'
   | 'DEFAULT';
 
-/** Map credit status to integer codes used in L2 tables. */
+/** Map credit status to integer codes used in L2 tables (matches l1.credit_status_dim PKs). */
 export const CREDIT_STATUS_CODE: Record<CreditStatus, number> = {
   PERFORMING: 1,
   WATCH: 3,
@@ -40,6 +40,57 @@ export const CREDIT_STATUS_CODE: Record<CreditStatus, number> = {
   SUBSTANDARD: 5,
   DOUBTFUL: 9,
   DEFAULT: 10,
+};
+
+// ─── DPD Bucket Mapping ──────────────────────────────────────────────────
+
+/**
+ * Map factory DPD bucket strings → l1.dpd_bucket_dim PK codes.
+ * L1 seed uses: '0-30', '31-60', '61-90', '90+' (original)
+ *               '1-29' (added by migration 024)
+ * Factory emits: 'CURRENT', '1-29', '30-59', '60-89', '90+'
+ */
+export const DPD_BUCKET_CODE_MAP: Record<string, string> = {
+  'CURRENT': '0-30',   // 0 DPD maps to the 0-30 bucket
+  '1-29': '1-29',      // Exact match with migration-024 bucket
+  '30-59': '31-60',    // Factory 30-59 → L1 31-60
+  '60-89': '61-90',    // Factory 60-89 → L1 61-90
+  '90+': '90+',        // Exact match
+};
+
+/** Convert factory DPD bucket string to L1 dim PK. */
+export function mapDpdBucketCode(factoryCode: string): string {
+  return DPD_BUCKET_CODE_MAP[factoryCode] ?? '0-30';
+}
+
+// ─── Collateral Type Mapping ──────────────────────────────────────────────
+
+/**
+ * Map collateral type strings → l1.collateral_type_dim IDs (1-10).
+ * L1 seed uses IDs 1-10, cycling through 10 collateral types.
+ */
+export const COLLATERAL_TYPE_ID_MAP: Record<string, number> = {
+  RE: 1,            // Real Estate → collateral_type 1
+  RECEIVABLES: 2,   // Trade Receivables → collateral_type 2
+  FLEET: 3,         // Fleet/Vehicles → collateral_type 3
+  EQUIPMENT: 4,     // Equipment → collateral_type 4
+  CASH: 5,          // Cash Deposit → collateral_type 5
+};
+
+// ─── CRM Type Mapping ──────────────────────────────────────────────────
+
+/**
+ * Map collateral type strings → l1.crm_type_dim PK codes.
+ * L1 crm_type_dim PKs: COLLATERAL, GUARANTEE, NETTING, CREDIT_DERIV,
+ *   MORTGAGE, PLEDGE, ASSIGNMENT, LIEN, SURETY, INSURANCE
+ */
+export const CRM_TYPE_CODE_MAP: Record<string, string> = {
+  RE: 'MORTGAGE',         // Real estate → mortgage
+  RECEIVABLES: 'ASSIGNMENT', // Receivables → assignment
+  FLEET: 'PLEDGE',        // Fleet → asset pledge
+  EQUIPMENT: 'PLEDGE',    // Equipment → asset pledge
+  CASH: 'COLLATERAL',     // Cash → financial collateral
+  NONE: 'COLLATERAL',     // Default
 };
 
 // ─── Lifecycle ──────────────────────────────────────────────────────────

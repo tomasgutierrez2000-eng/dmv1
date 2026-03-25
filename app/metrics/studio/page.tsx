@@ -34,19 +34,29 @@ function ZoomIndicator() {
   );
 }
 
-function ClearButton() {
+function CanvasActions() {
   const clearCanvas = useStudioStore(s => s.clearCanvas);
+  const autoLayout = useStudioStore(s => s.autoLayout);
   const nodeCount = useStudioStore(s => s.nodes.length);
 
   if (nodeCount === 0) return null;
 
   return (
-    <button
-      onClick={clearCanvas}
-      className="absolute top-3 left-[232px] z-10 px-2 py-0.5 text-[10px] rounded border border-slate-700 text-slate-500 hover:text-red-400 hover:border-red-500/30 bg-slate-800/50"
-    >
-      Clear Canvas
-    </button>
+    <div className="absolute top-3 left-[232px] z-10 flex items-center gap-1">
+      <button
+        onClick={autoLayout}
+        className="px-2 py-0.5 text-[10px] rounded border border-slate-700 text-slate-500 hover:text-[#D04A02] hover:border-[#D04A02]/30 bg-slate-800/50"
+        title="Arrange nodes in end-to-end flow layout"
+      >
+        Auto Layout
+      </button>
+      <button
+        onClick={clearCanvas}
+        className="px-2 py-0.5 text-[10px] rounded border border-slate-700 text-slate-500 hover:text-red-400 hover:border-red-500/30 bg-slate-800/50"
+      >
+        Clear Canvas
+      </button>
+    </div>
   );
 }
 
@@ -77,7 +87,7 @@ export default function MetricStudioPage() {
           <div className="flex-1 relative">
             <MetricStudioCanvas />
             <ZoomIndicator />
-            <ClearButton />
+            <CanvasActions />
           </div>
           <DataInspector />
         </div>

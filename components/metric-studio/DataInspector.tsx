@@ -106,17 +106,68 @@ function DataTab({
   // Show selected node info
   if (nodeData?.type === 'table') {
     const td = nodeData as { tableName: string; layer: string; selectedFields: string[]; rowCount?: number; sampleRows?: Record<string, unknown>[] };
+    const layerColor = td.layer === 'l1' ? 'text-teal-400' : td.layer === 'l3' ? 'text-rose-400' : 'text-violet-400';
     return (
       <div>
         <div className="mb-3">
           <div className="text-[10px] text-slate-500 uppercase tracking-wider">Selected Node</div>
           <div className="text-sm text-slate-200 font-medium mt-0.5 font-mono">{td.tableName}</div>
-          <div className="text-[10px] text-violet-400 mt-0.5">
-            {td.layer.toUpperCase()} &middot; {td.selectedFields?.length ?? 0} fields
+          <div className={`text-[10px] ${layerColor} mt-0.5`}>
+            {td.layer.toUpperCase()}{td.layer === 'l1' ? ' REF' : ''} &middot; {td.selectedFields?.length ?? 0} fields
           </div>
         </div>
         {td.sampleRows && td.sampleRows.length > 0 && (
           <SampleTable rows={td.sampleRows} />
+        )}
+      </div>
+    );
+  }
+
+  // Show L3 destination node info
+  if (nodeData?.type === 'destination') {
+    const dd = nodeData as { tableName: string; targetColumn?: string; fields: Array<{ name: string; dataType?: string }>; category?: string; isGhost?: boolean };
+    if (dd.isGhost) {
+      return (
+        <div>
+          <div className="mb-3">
+            <div className="text-[10px] text-slate-500 uppercase tracking-wider">L3 Destination</div>
+            <div className="text-sm text-slate-400 font-medium mt-0.5 italic">Unknown destination</div>
+            <div className="text-[10px] text-slate-500 mt-1">
+              L3 destination not mapped for this metric domain.
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div>
+        <div className="mb-3">
+          <div className="text-[10px] text-slate-500 uppercase tracking-wider">L3 Destination</div>
+          <div className="text-sm text-slate-200 font-medium mt-0.5 font-mono">{dd.tableName}</div>
+          <div className="text-[10px] text-rose-400 mt-0.5">
+            L3 &middot; {dd.category ?? 'Derived'} &middot; {dd.fields.length} fields
+          </div>
+        </div>
+        {dd.targetColumn && (
+          <div className="mb-3">
+            <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Target Column</div>
+            <div className="text-xs text-[#D04A02] font-mono bg-[#D04A02]/5 border border-[#D04A02]/20 rounded px-2 py-1">
+              → {dd.targetColumn}
+            </div>
+          </div>
+        )}
+        {dd.fields.length > 0 && (
+          <div>
+            <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Schema</div>
+            <div className="space-y-px">
+              {dd.fields.map(f => (
+                <div key={f.name} className={`text-[10px] font-mono px-1.5 py-0.5 rounded flex items-center justify-between ${f.name === dd.targetColumn ? 'text-[#D04A02] bg-[#D04A02]/5' : 'text-slate-500'}`}>
+                  <span className="truncate">{f.name}</span>
+                  {f.dataType && <span className="text-slate-600 text-[8px] ml-2 shrink-0">{f.dataType}</span>}
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     );

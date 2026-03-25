@@ -25,6 +25,16 @@ function DataFlowEdgeInner({
 
   const rowCount = data?.rowCount as number | undefined;
   const label = data?.label as string | undefined;
+  const flowType = data?.flowType as string | undefined;
+
+  // Layer-aware stroke colors
+  const FLOW_COLORS: Record<string, string> = {
+    'dim-lookup': '#14b8a6', // teal-500
+    'source': '#8b5cf6',     // violet-500
+    'output': '#f43f5e',     // rose-500
+  };
+  const baseColor = flowType ? (FLOW_COLORS[flowType] ?? '#334155') : '#334155';
+  const isDashed = flowType === 'dim-lookup';
 
   return (
     <>
@@ -32,8 +42,9 @@ function DataFlowEdgeInner({
         id={id}
         path={edgePath}
         style={{
-          stroke: selected ? '#D04A02' : '#334155',
+          stroke: selected ? '#D04A02' : baseColor,
           strokeWidth: selected ? 2 : 1.5,
+          strokeDasharray: isDashed ? '6 3' : undefined,
           transition: 'stroke 0.2s, stroke-width 0.2s',
         }}
       />

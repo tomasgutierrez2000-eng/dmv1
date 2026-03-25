@@ -57,6 +57,7 @@ interface StudioState {
   removeNode: (nodeId: string) => void;
   executeFormula: () => Promise<void>;
   loadMetricTemplate: (metricId: string) => Promise<void>;
+  autoLayout: () => void;
   setSelectedNode: (nodeId: string | null) => void;
   setZoomLevel: (level: ZoomLevel) => void;
   setExecutionMode: (mode: ExecutionMode) => void;
@@ -308,9 +309,92 @@ export const useStudioStore = create<StudioState>((set, get) => ({
         executionResult: null,
         debugStepIndex: 0,
       });
+
+      // Auto-layout after template load for end-to-end flow visualization
+      get().autoLayout();
     } catch (err) {
       console.error('Failed to load template:', err);
     }
+  },
+
+  autoLayout: () => {
+    const { nodes, edges, schema } = get();
+    if (nodes.length === 0) return;
+
+    // Classify nodes by type
+    const l1Nodes: StudioNode[] = [];
+    const l2Nodes: StudioNode[] = [];
+    const transformNodes: StudioNode[] = [];
+    const outputNodes: StudioNode[] = [];
+    const destNodes: StudioNode[] = [];
+
+    for (const n of nodes) {
+      if (n.data.type === 'destination') destNodes.push(n);
+      else if (n.data.type === 'output') outputNodes.push(n);
+      else if (n.data.type === 'transform') transformNodes.push(n);
+      else if (n.data.type === 'table') {
+        const td = n.data as TableNodeData;
+        if (td.layer === 'l1') l1Nodes.push(n);
+        else l2Nodes.push(n);
+      }
+    }
+
+    // Main horizontal flow columns
+    const COL_GAP = 300;
+    const ROW_GAP = 120;
+    const L1_Y_OFFSET = -140; // L1 nodes float above their L2 target
+
+    // Position L2 nodes in column 0
+    const positioned = new Map<string, { x: number; y: number }>();
+    l2Nodes.forEach((n, i) => positioned.set(n.id, { x: 0, y: i * ROW_GAP }));
+
+    // Position transform nodes in column 1
+    transformNodes.forEach((n, i) => positioned.set(n.id, { x: COL_GAP, y: i * ROW_GAP }));
+
+    // Position output nodes in column 2
+    outputNodes.forEach((n, i) => positioned.set(n.id, { x: COL_GAP * 2, y: i * ROW_GAP }));
+
+    // Position destination nodes in column 3
+    destNodes.forEach((n, i) => positioned.set(n.id, { x: COL_GAP * 3, y: i * ROW_GAP }));
+
+    // Position L1 nodes above the L2 node they join to (via FK from schema)
+    const fkRels = schema?.relationships ?? [];
+    for (const l1Node of l1Nodes) {
+      const l1TableName = (l1Node.data as TableNodeData).tableName;
+      let matchedL2Pos: { x: number; y: number } | null = null;
+
+      // Find which L2 node this L1 joins to via FK
+      for (const l2Node of l2Nodes) {
+        const l2TableName = (l2Node.data as TableNodeData).tableName;
+        const hasFK = fkRels.some(r =>
+          (r.fromTable === l2TableName && r.toTable === l1TableName) ||
+          (r.fromTable === l1TableName && r.toTable === l2TableName)
+        );
+        if (hasFK) {
+          matchedL2Pos = positioned.get(l2Node.id) ?? null;
+          break;
+        }
+      }
+
+      if (matchedL2Pos) {
+        positioned.set(l1Node.id, { x: matchedL2Pos.x, y: matchedL2Pos.y + L1_Y_OFFSET });
+      } else {
+        // No FK match — position above leftmost L2
+        const firstL2Pos = l2Nodes.length > 0 ? positioned.get(l2Nodes[0].id) : null;
+        positioned.set(l1Node.id, {
+          x: (firstL2Pos?.x ?? 0) + l1Nodes.indexOf(l1Node) * 180,
+          y: (firstL2Pos?.y ?? 0) + L1_Y_OFFSET,
+        });
+      }
+    }
+
+    // Apply positions
+    const laid = nodes.map(n => {
+      const pos = positioned.get(n.id);
+      return pos ? { ...n, position: pos } : n;
+    });
+
+    set({ nodes: laid });
   },
 
   setSelectedNode: (nodeId) => set({ selectedNodeId: nodeId }),

@@ -13,9 +13,10 @@ const LAYER_STYLES: Record<string, { badge: string; border: string; dot: string 
 function TableNodeInner({ data, selected }: NodeProps & { data: TableNodeData }) {
   const style = LAYER_STYLES[data.layer] ?? LAYER_STYLES.l2;
   const zoom: ZoomLevel = data.zoomLevel ?? 'analyst';
+  const isL1 = data.layer === 'l1';
 
   return (
-    <div className={`rounded-lg border ${style.border} bg-[#151520] min-w-[160px] max-w-[260px] transition-shadow ${selected ? 'ring-1 ring-[#D04A02] shadow-lg shadow-[#D04A02]/10' : ''}`}>
+    <div className={`rounded-lg border ${isL1 ? 'border-dashed' : ''} ${style.border} bg-[#151520] ${isL1 ? 'min-w-[140px] max-w-[200px]' : 'min-w-[160px] max-w-[260px]'} transition-shadow ${selected ? 'ring-1 ring-[#D04A02] shadow-lg shadow-[#D04A02]/10' : ''}`}>
       <Handle type="target" position={Position.Left} className="!w-2 !h-2 !bg-slate-600 !border-slate-500" />
 
       {/* Header — always visible */}
@@ -23,6 +24,9 @@ function TableNodeInner({ data, selected }: NodeProps & { data: TableNodeData })
         <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${style.badge}`}>
           {data.layer.toUpperCase()}
         </span>
+        {isL1 && (
+          <span className="text-[8px] uppercase tracking-wider text-teal-400/60">REF</span>
+        )}
         <span className="text-xs text-slate-300 font-medium truncate font-mono">
           {data.tableName}
         </span>

@@ -38,6 +38,8 @@ export default function AgentCard({ agent }: { agent: AgentDefinition }) {
     ? agent.description.slice(0, 120).replace(/\s+\S*$/, '') + '...'
     : agent.description;
 
+  const phaseCount = new Set(agent.capabilities.map(c => c.phase)).size;
+
   return (
     <Link
       href={`/agents/${encodeURIComponent(agent.slug)}`}
@@ -76,15 +78,22 @@ export default function AgentCard({ agent }: { agent: AgentDefinition }) {
       </div>
 
       {agent.capabilities.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1">
-          {agent.capabilities.slice(0, 3).map(cap => (
-            <span key={cap} className="text-[10px] bg-slate-700/50 text-slate-400 px-1.5 py-0.5 rounded">
-              {cap.length > 25 ? cap.slice(0, 25) + '...' : cap}
+        <div className="mt-2">
+          <div className="flex items-center gap-1.5 mb-1">
+            <span className="text-[10px] text-emerald-400/80 font-medium">
+              {agent.capabilities.length} {agent.capabilities.length === 1 ? 'capability' : 'capabilities'}
             </span>
-          ))}
-          {agent.capabilities.length > 3 && (
-            <span className="text-[10px] text-slate-500">+{agent.capabilities.length - 3}</span>
-          )}
+            {phaseCount > 1 && (
+              <span className="text-[10px] text-slate-600">across {phaseCount} phases</span>
+            )}
+          </div>
+          <div className="space-y-0.5">
+            {agent.capabilities.slice(0, 2).map((cap, i) => (
+              <p key={i} className="text-[10px] text-slate-500 line-clamp-1 font-mono">
+                {cap.title}
+              </p>
+            ))}
+          </div>
         </div>
       )}
     </Link>

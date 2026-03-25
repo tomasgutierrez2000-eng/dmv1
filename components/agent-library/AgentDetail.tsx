@@ -7,6 +7,7 @@ import {
   CheckCircle, Clock, AlertTriangle, Play, FileCode, Database,
 } from 'lucide-react';
 import type { AgentDefinition, AgentRun, AgentCategory } from '@/lib/agent-library/types';
+import CapabilityList from './CapabilityList';
 
 const CATEGORY_ICONS: Record<AgentCategory, typeof Bot> = {
   expert: Bot, builder: Wrench, reviewer: Shield, workflow: Workflow, session: Calendar,
@@ -115,21 +116,13 @@ export default function AgentDetail({ slug }: { slug: string }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Capabilities */}
         <div className="lg:col-span-2">
-          <h2 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wide">Capabilities</h2>
-          <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
-            {agent.capabilities.length === 0 ? (
-              <p className="text-xs text-slate-500">No capabilities parsed</p>
-            ) : (
-              <div className="space-y-2">
-                {agent.capabilities.map((cap, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm text-slate-300">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
-                    {cap}
-                  </div>
-                ))}
-              </div>
+          <h2 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wide">
+            Capabilities
+            {agent.capabilities.length > 0 && (
+              <span className="text-slate-600 font-normal ml-2">({agent.capabilities.length})</span>
             )}
-          </div>
+          </h2>
+          <CapabilityList capabilities={agent.capabilities} />
 
           {/* Dependencies */}
           {agent.dependencies.length > 0 && (

@@ -434,3 +434,145 @@ export function seasonalMultiplier(industryId: number, month: number): number {
       return 1.00;
   }
 }
+
+// ─── Gaussian Copula for Cross-Field Correlation ─────────────────────────
+
+/**
+ * Correlation matrix for GSIB risk fields: [PD, LGD, utilization, spread_bps].
+ * Based on empirical GSIB portfolio correlations.
+ * Regime-dependent: stressed markets increase PD↔LGD correlation (wrong-way risk).
+ */
+export type RiskCorrelationMatrix = number[][];
+
+export const BASELINE_CORRELATION: RiskCorrelationMatrix = [
+  // PD    LGD    util   spread
+  [1.00,  0.30,  0.40,  0.60],   // PD
+  [0.30,  1.00,  0.10,  0.20],   // LGD
+  [0.40,  0.10,  1.00,  0.25],   // utilization
+  [0.60,  0.20,  0.25,  1.00],   // spread
+];
+
+/** Regime-dependent correlation shifts. */
+export function correlationForRegime(
+  regime: string,
+): RiskCorrelationMatrix {
+  // Deep copy baseline
+  const m = BASELINE_CORRELATION.map(row => [...row]);
+  switch (regime) {
+    case 'CUTTING_CYCLE':
+      m[0][1] = 0.35; m[1][0] = 0.35; // slightly elevated PD-LGD
+      break;
+    case 'RISING_RATES':
+      m[0][2] = 0.50; m[2][0] = 0.50; // borrowers draw more under rate stress
+      m[0][3] = 0.65; m[3][0] = 0.65;
+      break;
+    case 'STRESSED':
+    case 'ZERO_LOWER_BOUND':
+      // Systemic stress: all correlations elevated
+      for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+          if (i !== j) m[i][j] = Math.min(m[i][j] + 0.15, 0.95);
+        }
+      }
+      break;
+    // CURRENT_2024, RATE_PLATEAU: use baseline
+  }
+  return m;
+}
+
+/**
+ * Cholesky decomposition of a positive-definite matrix.
+ * Returns lower triangular matrix L such that L * L^T = M.
+ * Falls back to identity matrix if input is near-singular.
+ */
+export function choleskyDecomposition(matrix: number[][]): number[][] {
+  const n = matrix.length;
+  const L: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j <= i; j++) {
+      let sum = 0;
+      for (let k = 0; k < j; k++) {
+        sum += L[i][k] * L[j][k];
+      }
+      if (i === j) {
+        const diag = matrix[i][i] - sum;
+        if (diag <= 0) {
+          // Near-singular: fall back to identity (independent draws)
+          return Array.from({ length: n }, (_, idx) =>
+            Array.from({ length: n }, (_, jdx) => idx === jdx ? 1 : 0)
+          );
+        }
+        L[i][j] = Math.sqrt(diag);
+      } else {
+        L[i][j] = (matrix[i][j] - sum) / L[j][j];
+      }
+    }
+  }
+  return L;
+}
+
+/**
+ * Generate correlated uniform marginals using a Gaussian copula.
+ *
+ * Steps:
+ * 1. Generate n independent standard normal samples
+ * 2. Multiply by Cholesky factor to introduce correlation
+ * 3. Transform through standard normal CDF to get uniform [0,1] marginals
+ *
+ * The marginals can then be transformed through any inverse CDF
+ * (Beta for utilization, LogNormal for amounts, etc.)
+ */
+export function gaussianCopulaSample(
+  rng: () => number,
+  choleskyL: number[][],
+): number[] {
+  const n = choleskyL.length;
+
+  // Step 1: Independent standard normals
+  const z: number[] = [];
+  for (let i = 0; i < n; i++) {
+    z.push(normalSample(rng));
+  }
+
+  // Step 2: Correlated normals via L * z
+  const correlated: number[] = new Array(n).fill(0);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j <= i; j++) {
+      correlated[i] += choleskyL[i][j] * z[j];
+    }
+  }
+
+  // Step 3: Transform through standard normal CDF (Φ)
+  return correlated.map(x => normalCDF(x));
+}
+
+/** Standard normal CDF approximation (Abramowitz & Stegun). */
+function normalCDF(x: number): number {
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+  const p = 0.3275911;
+  const sign = x < 0 ? -1 : 1;
+  const absX = Math.abs(x);
+  const t = 1.0 / (1.0 + p * absX);
+  const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-absX * absX / 2);
+  return clamp(0.5 * (1.0 + sign * y), 0.001, 0.999);
+}
+
+/**
+ * Sample correlated risk fields for a facility using the Gaussian copula.
+ *
+ * Returns [pd_uniform, lgd_uniform, utilization_uniform, spread_uniform]
+ * as correlated uniform [0,1] values. The caller transforms each through
+ * the appropriate inverse CDF for the field.
+ *
+ * Usage:
+ *   const choleskyL = choleskyDecomposition(correlationForRegime('CURRENT_2024'));
+ *   const [pdU, lgdU, utilU, spreadU] = copulaSample(rng, choleskyL);
+ *   const pd = inverseBetaCDF(pdU, alpha, beta);
+ *   const utilization = inverseBetaCDF(utilU, 2, 3);
+ */
+export const copulaSample = gaussianCopulaSample;

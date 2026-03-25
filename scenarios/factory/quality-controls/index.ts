@@ -40,6 +40,7 @@ export { runPortfolioDistribution } from './distribution-health';
 export { runFinancialRealism } from './realism-bounds';
 export { runAntiSyntheticChecks } from './anti-synthetic-detection';
 export { runReconciliation } from './reconciliation';
+export { runDistributionRealismScore, computeRealismScore } from './distribution-realism-score';
 
 // Import for orchestrator
 import type { FullQualityControlResult } from './shared-types';
@@ -55,9 +56,10 @@ import { runPortfolioDistribution } from './distribution-health';
 import { runFinancialRealism } from './realism-bounds';
 import { runAntiSyntheticChecks } from './anti-synthetic-detection';
 import { runReconciliation } from './reconciliation';
+import { runDistributionRealismScore } from './distribution-realism-score';
 
 /**
- * Run all 11 quality control groups for a scenario.
+ * Run all 13 quality control groups for a scenario.
  */
 export function runAllQualityControls(
   output: V2GeneratorOutput,
@@ -76,8 +78,9 @@ export function runAllQualityControls(
   const group9 = runFinancialRealism(output, chain);
   const group10 = runAntiSyntheticChecks(output);
   const group11 = runReconciliation(output, chain);
+  const group13 = runDistributionRealismScore(output);
 
-  const combined = merge(group1, group2, group3, group4, group5, group6, group7, group8, group9, group10, group11);
+  const combined = merge(group1, group2, group3, group4, group5, group6, group7, group8, group9, group10, group11, group13);
 
   return {
     ...combined,
@@ -92,5 +95,6 @@ export function runAllQualityControls(
     group9_realism: group9,
     group10_antiSynthetic: group10,
     group11_reconciliation: group11,
+    group13_realismScore: group13,
   };
 }

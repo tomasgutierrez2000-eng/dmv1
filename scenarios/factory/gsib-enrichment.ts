@@ -36,16 +36,16 @@ const INDUSTRY_GSIB_MAP: Record<number, {
    *  as industry_id — they don't exist in the dim table and silently break industry rollups. */
   naicsCode: number;
 }> = {
-  1:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 51 },  // TMT → Information
-  2:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 62 },  // Healthcare → Health Care
-  3:  { baselAssetClass: 'BANK',      fr2590Type: 'FI',   callReportType: 'DEPOSITORY',    y14Type: 'BANK',            regType: 'BANK',      entityTypeCode: 'BANK', naicsCode: 52 },  // Financials → Finance
-  4:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 21 },  // Energy → Mining/Oil&Gas
-  5:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 31 },  // Industrials → Manufacturing
-  6:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 42 },  // Consumer Staples → Wholesale
-  7:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 44 },  // Retail → Retail Trade
-  8:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 22 },  // Utilities → Utilities
-  9:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 23 },  // Materials → Construction
-  10: { baselAssetClass: 'CRE',       fr2590Type: 'CRE',  callReportType: 'CRE_NONFARM',   y14Type: 'CRE',             regType: 'CRE',       entityTypeCode: 'RE',   naicsCode: 53 },  // Real Estate → Real Estate
+  1:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 51 },  // TMT → Information (Corporate)
+  2:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'INS',  naicsCode: 62 },  // Healthcare → Insurance
+  3:  { baselAssetClass: 'BANK',      fr2590Type: 'FI',   callReportType: 'DEPOSITORY',    y14Type: 'BANK',            regType: 'BANK',      entityTypeCode: 'BANK', naicsCode: 52 },  // Financials → Bank
+  4:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'CORP', naicsCode: 21 },  // Energy → Corporate
+  5:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'FI',   naicsCode: 31 },  // Industrials → Financial Institution (non-bank)
+  6:  { baselAssetClass: 'SOVEREIGN', fr2590Type: 'GOV',  callReportType: 'SOVEREIGN',     y14Type: 'SOVEREIGN',       regType: 'SOVEREIGN', entityTypeCode: 'SOV',  naicsCode: 92 },  // Gov/Public Admin → Sovereign
+  7:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'LARGE_CORPORATE', regType: 'CORPORATE', entityTypeCode: 'PE',   naicsCode: 44 },  // Retail → Private Equity
+  8:  { baselAssetClass: 'PSE',       fr2590Type: 'GOV',  callReportType: 'PSE',           y14Type: 'PSE',             regType: 'PSE',       entityTypeCode: 'PSE',  naicsCode: 22 },  // Utilities → Public Sector Entity
+  9:  { baselAssetClass: 'CORPORATE', fr2590Type: 'C&I',  callReportType: 'C&I_DOMESTIC',  y14Type: 'FUND',            regType: 'CORPORATE', entityTypeCode: 'FUND', naicsCode: 23 },  // Materials → Investment Fund
+  10: { baselAssetClass: 'CRE',       fr2590Type: 'CRE',  callReportType: 'CRE_NONFARM',   y14Type: 'CRE',             regType: 'CRE',       entityTypeCode: 'RE',   naicsCode: 53 },  // Real Estate → Real Estate SPV
 };
 
 /** Country → currency / region / call report suffix */

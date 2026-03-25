@@ -53,8 +53,8 @@ def emit_yaml(
             header_lines.append(f"# {line}")
     header = "\n".join(header_lines) + "\n"
 
-    # Serialize to dict, excluding None values
-    data = config.model_dump(exclude_none=True, by_alias=True)
+    # Serialize to dict, excluding None values. mode="json" converts enums to strings.
+    data = config.model_dump(exclude_none=True, by_alias=True, mode="json")
 
     # YAML formatting to match existing scenario files
     yaml_str = yaml.dump(

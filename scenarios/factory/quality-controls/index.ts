@@ -30,7 +30,7 @@ export { merge, sampleRows, findTable, extractNumericField, stdev } from './shar
 
 // Re-export individual group functions
 export { runFKDomainValidation } from './fk-domain-validation';
-export { runDriftDetection, runEnrichmentMapDrift } from './drift-detection';
+export { runDriftDetection, runEnrichmentMapDrift, runCCFDriftDetection } from './drift-detection';
 export { runArithmeticChecks } from './arithmetic-checks';
 export { runCrossFieldConsistency } from './cross-field-consistency';
 export { runStoryArcChecks } from './story-arc-fidelity';
@@ -46,7 +46,7 @@ export { runDistributionRealismScore, computeRealismScore } from './distribution
 import type { FullQualityControlResult } from './shared-types';
 import { merge } from './shared-types';
 import { runFKDomainValidation } from './fk-domain-validation';
-import { runDriftDetection } from './drift-detection';
+import { runDriftDetection, runCCFDriftDetection } from './drift-detection';
 import { runArithmeticChecks } from './arithmetic-checks';
 import { runCrossFieldConsistency } from './cross-field-consistency';
 import { runStoryArcChecks } from './story-arc-fidelity';
@@ -68,7 +68,9 @@ export function runAllQualityControls(
   registry: ReferenceDataRegistry,
 ): FullQualityControlResult {
   const group1 = runFKDomainValidation(output, registry);
-  const group2 = runDriftDetection(registry);
+  const group2base = runDriftDetection(registry);
+  const group2ccf = runCCFDriftDetection(registry);
+  const group2 = merge(group2base, group2ccf);
   const group3 = runArithmeticChecks(output);
   const group4 = runCrossFieldConsistency(output, registry);
   const group5 = runStoryArcChecks(output, chain, config);

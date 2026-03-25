@@ -44,6 +44,57 @@ export function runDriftDetection(
   return { errors, warnings };
 }
 
+/**
+ * M3: CCF Drift Detection
+ *
+ * Compares hardcoded CCF values per product type against l1.facility_type_dim.ccf_pct.
+ * ERROR if mismatch between expected regulatory CCF and what's in L1.
+ */
+export function runCCFDriftDetection(
+  registry: ReferenceDataRegistry,
+): QualityControlResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  // Expected CCF values per product type (Basel III / CRE 20.93)
+  const EXPECTED_CCF: Record<string, number> = {
+    REVOLVING_CREDIT: 75,
+    TERM_LOAN: 0,
+    LETTER_OF_CREDIT: 20,
+    BRIDGE_LOAN: 0,
+  };
+
+  const facilityTypeDim = registry.getTable('facility_type_dim');
+  if (!facilityTypeDim || facilityTypeDim.rows.length === 0) {
+    warnings.push('CCF drift: facility_type_dim not found in L1 registry — cannot validate CCF values');
+    return { errors, warnings };
+  }
+
+  for (const [productType, expectedCCF] of Object.entries(EXPECTED_CCF)) {
+    const dimRow = facilityTypeDim.rows.find(
+      (r: Record<string, unknown>) =>
+        (r.facility_type_code as string)?.toUpperCase() === productType ||
+        (r.facility_type_name as string)?.toUpperCase() === productType.replace(/_/g, ' ')
+    );
+    if (!dimRow) {
+      warnings.push(`CCF drift: product type '${productType}' not found in facility_type_dim`);
+      continue;
+    }
+    const actualCCF = dimRow.ccf_pct as number | undefined;
+    if (actualCCF === undefined || actualCCF === null) {
+      warnings.push(`CCF drift: facility_type_dim has no ccf_pct for '${productType}'`);
+      continue;
+    }
+    if (Math.abs(actualCCF - expectedCCF) > 0.01) {
+      errors.push(
+        `CCF drift: '${productType}' ccf_pct=${actualCCF}% in facility_type_dim but expected ${expectedCCF}% per Basel III`
+      );
+    }
+  }
+
+  return { errors, warnings };
+}
+
 export function runEnrichmentMapDrift(
   registry: ReferenceDataRegistry,
   maps: Array<{ name: string; keys: Set<string | number>; l1Table: string }>,

@@ -18,7 +18,7 @@
 import type { ReferenceDataRegistry } from '../reference-data-registry';
 import type { V2GeneratorOutput } from '../v2/generators';
 import type { QualityControlResult } from './shared-types';
-import { sampleRows } from './shared-types';
+import { findTable, sampleRows } from './shared-types';
 
 export function runCrossFieldConsistency(
   output: V2GeneratorOutput,
@@ -215,6 +215,90 @@ export function runCrossFieldConsistency(
         if (rw > 300 && canReport('rw_extreme')) {
           warnings.push(`${tbl}: extreme risk_weight_std_pct (${rw}%) — max Basel III SA is 250%`);
         }
+      }
+
+      // -- M8: PD ↔ Rating Tier ERROR Level --
+      // Upgrade to ERROR if PD is completely wrong tier
+      if ('pd_pct' in row && 'internal_risk_rating' in row) {
+        const pd = row.pd_pct as number;
+        const rating = row.internal_risk_rating as string;
+        const ratingNum = parseInt(rating, 10);
+        if (!isNaN(ratingNum)) {
+          // IG_HIGH (1-2) max PD 0.04%, IG (3) max PD 0.40%
+          if (ratingNum <= 2 && pd > 0.05 && canReport('pd_rating_error_ig_high')) {
+            errors.push(`${tbl}: rating ${rating} (IG_HIGH, max PD ~0.04%) but pd=${(pd*100).toFixed(2)}% — completely wrong tier`);
+          }
+          // Substandard (6-7) min PD 2%
+          if (ratingNum >= 8 && pd < 0.0005 && canReport('pd_rating_error_distressed')) {
+            errors.push(`${tbl}: rating ${rating} (distressed, min PD ~2%) but pd=${(pd*100).toFixed(4)}% — completely wrong tier`);
+          }
+        }
+      }
+
+      // -- M11: Spread-Rating Consistency --
+      // IG spread 50-300bps, HY spread 200-1000bps
+      if ('spread_bps' in row && 'internal_risk_rating' in row) {
+        const spread = row.spread_bps as number;
+        const rating = row.internal_risk_rating as string;
+        const ratingNum = parseInt(rating, 10);
+        if (!isNaN(ratingNum) && spread > 0) {
+          if (ratingNum <= 3 && spread > 300 && canReport('spread_ig_high')) {
+            warnings.push(`${tbl}: IG rating ${rating} but spread=${spread}bps — expected 50-300bps for investment grade`);
+          }
+          if (ratingNum >= 7 && spread < 200 && canReport('spread_hy_low')) {
+            warnings.push(`${tbl}: HY rating ${rating} but spread=${spread}bps — expected 200-1000bps for high yield`);
+          }
+        }
+      }
+
+      // -- M13: ECL Stage Ordering --
+      // ecl_12m ≤ ecl_lifetime (12-month ECL can never exceed lifetime ECL)
+      if ('ecl_12m' in row && 'ecl_lifetime' in row) {
+        const ecl12 = row.ecl_12m as number;
+        const eclLt = row.ecl_lifetime as number;
+        if (typeof ecl12 === 'number' && typeof eclLt === 'number' && ecl12 > eclLt + 0.01) {
+          if (canReport('ecl_stage_ordering')) {
+            errors.push(
+              `${tbl}: ecl_12m (${ecl12.toFixed(2)}) > ecl_lifetime (${eclLt.toFixed(2)}) — ` +
+              `12-month ECL cannot exceed lifetime ECL`
+            );
+          }
+        }
+      }
+    }
+  }
+
+  // -- M5: EBT Hierarchy Validation --
+  // Verify facility_master.lob_segment_id appears in enterprise_business_taxonomy
+  const facilityMaster = findTable(output, 'facility_master');
+  if (facilityMaster) {
+    // Try to get EBT data from registry or output
+    const ebtTable = findTable(output, 'enterprise_business_taxonomy');
+    const ebtIds = new Set<unknown>();
+    if (ebtTable) {
+      for (const row of ebtTable.rows) {
+        if (row.is_current_flag === 'Y' || row.is_current_flag === undefined) {
+          ebtIds.add(row.managed_segment_id);
+        }
+      }
+    }
+
+    if (ebtIds.size > 0) {
+      let orphanCount = 0;
+      for (const row of facilityMaster.rows) {
+        const lobId = row.lob_segment_id;
+        if (lobId !== null && lobId !== undefined && !ebtIds.has(lobId)) {
+          orphanCount++;
+          if (orphanCount <= 3) {
+            warnings.push(
+              `EBT hierarchy: facility ${row.facility_id} has lob_segment_id=${lobId} ` +
+              `not found in enterprise_business_taxonomy (active nodes)`
+            );
+          }
+        }
+      }
+      if (orphanCount > 3) {
+        warnings.push(`EBT hierarchy: ${orphanCount} total facilities with orphaned lob_segment_id values`);
       }
     }
   }

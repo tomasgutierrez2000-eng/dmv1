@@ -113,5 +113,31 @@ export function runCrossTableCorrelation(
     }
   }
 
+  // -- M9: Collateral-Facility Coverage --
+  // If FacilityState has collateral_value > 0, there should be a collateral_snapshot row
+  const collateralTable = findTable(output, 'collateral_snapshot');
+  const riskTable = findTable(output, 'facility_risk_snapshot');
+  if (riskTable) {
+    const collateralFacIds = collateralTable
+      ? new Set(collateralTable.rows.map(r => r.facility_id))
+      : new Set<unknown>();
+
+    let missingCollateral = 0;
+    for (const row of riskTable.rows) {
+      const cv = row.collateral_value as number | undefined;
+      if (cv !== undefined && cv !== null && cv > 0) {
+        if (!collateralFacIds.has(row.facility_id)) {
+          missingCollateral++;
+        }
+      }
+    }
+    if (missingCollateral > 0) {
+      warnings.push(
+        `Cross-table: ${missingCollateral} facilities have collateral_value > 0 ` +
+        `in risk_snapshot but no collateral_snapshot row`
+      );
+    }
+  }
+
   return { errors, warnings };
 }

@@ -172,5 +172,42 @@ export function runFinancialRealism(
     }
   }
 
+  // -- M4: Tenure Bounds by Product Type --
+  // Check maturity_date - origination_date falls within expected range per product type
+  const TENURE_BOUNDS: Record<string, { minYears: number; maxYears: number }> = {
+    REVOLVING_CREDIT: { minYears: 1, maxYears: 7 },
+    TERM_LOAN: { minYears: 3, maxYears: 7 },
+    BRIDGE_LOAN: { minYears: 1, maxYears: 3 },
+    LETTER_OF_CREDIT: { minYears: 0, maxYears: 2 },
+  };
+
+  for (const td of output.tables) {
+    if (td.table !== 'facility_master') continue;
+    for (const row of sampleRows(td.rows, 300)) {
+      const matDate = row.maturity_date as string | undefined;
+      const origDate = row.origination_date as string | undefined;
+      const facType = row.facility_type as string | undefined;
+      if (!matDate || !origDate || !facType) continue;
+
+      const matMs = new Date(matDate).getTime();
+      const origMs = new Date(origDate).getTime();
+      if (isNaN(matMs) || isNaN(origMs)) continue;
+
+      const tenureYears = (matMs - origMs) / (365.25 * 24 * 60 * 60 * 1000);
+      const typeKey = facType.toUpperCase().replace(/\s+/g, '_');
+      const bounds = TENURE_BOUNDS[typeKey];
+      if (!bounds) continue;
+
+      if (tenureYears < bounds.minYears || tenureYears > bounds.maxYears) {
+        if (canReport('tenure_bounds')) {
+          warnings.push(
+            `Tenure bounds: facility ${row.facility_id} (${facType}) has tenure ` +
+            `${tenureYears.toFixed(1)}yr — expected ${bounds.minYears}-${bounds.maxYears}yr`
+          );
+        }
+      }
+    }
+  }
+
   return { errors, warnings };
 }

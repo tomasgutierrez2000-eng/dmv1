@@ -135,6 +135,48 @@ export function runAntiSyntheticChecks(
     }
   }
 
+  // -- M2: Numeric Realism Validation --
+  // For each _amt, _pct, _bps column with ≥10 rows: check stdev > 0, min ≠ max, CV > 0.05
+  const numericSuffixes = ['_amt', '_pct', '_bps'];
+  const fieldStats = new Map<string, number[]>(); // "table.field" -> values
+
+  for (const td of output.tables) {
+    for (const row of td.rows) {
+      for (const [key, val] of Object.entries(row)) {
+        if (typeof val !== 'number' || val === null || val === undefined) continue;
+        if (!numericSuffixes.some(s => key.endsWith(s))) continue;
+        const fqn = `${td.schema}.${td.table}.${key}`;
+        let arr = fieldStats.get(fqn);
+        if (!arr) { arr = []; fieldStats.set(fqn, arr); }
+        arr.push(val);
+      }
+    }
+  }
+
+  for (const [fqn, values] of fieldStats) {
+    if (values.length < 10) continue;
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    if (min === max) {
+      warnings.push(`Numeric realism: ${fqn} has all identical values (${min}) across ${values.length} rows — degenerate distribution`);
+      continue;
+    }
+    const mean = values.reduce((s, v) => s + v, 0) / values.length;
+    const variance = values.reduce((s, v) => s + (v - mean) ** 2, 0) / (values.length - 1);
+    const sd = Math.sqrt(variance);
+    if (sd === 0) {
+      warnings.push(`Numeric realism: ${fqn} has zero standard deviation across ${values.length} rows`);
+      continue;
+    }
+    const cv = Math.abs(mean) > 0 ? sd / Math.abs(mean) : 0;
+    if (cv < 0.05 && cv > 0) {
+      warnings.push(
+        `Numeric realism: ${fqn} has very low coefficient of variation (${cv.toFixed(4)}) ` +
+        `across ${values.length} rows — may indicate synthetic uniformity`
+      );
+    }
+  }
+
   // -- Benford's Law first-digit distribution --
   // Expected: P(d) = log10(1 + 1/d) for d = 1..9
   // Applied to committed_amount, drawn_amount, outstanding_balance_amt

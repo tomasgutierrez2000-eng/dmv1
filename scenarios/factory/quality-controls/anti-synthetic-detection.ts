@@ -135,5 +135,68 @@ export function runAntiSyntheticChecks(
     }
   }
 
+  // -- Benford's Law first-digit distribution --
+  // Expected: P(d) = log10(1 + 1/d) for d = 1..9
+  // Applied to committed_amount, drawn_amount, outstanding_balance_amt
+  // Chi-squared goodness-of-fit test; warn if p < 0.01
+  const benfordFields = ['committed_amount', 'drawn_amount', 'outstanding_balance_amt'];
+  const benfordExpected = [
+    0.30103, 0.17609, 0.12494, 0.09691, 0.07918,
+    0.06695, 0.05799, 0.05115, 0.04576,
+  ]; // P(d) for d=1..9
+
+  for (const field of benfordFields) {
+    // Collect all positive values for this field across all tables
+    const values: number[] = [];
+    for (const td of output.tables) {
+      for (const row of td.rows) {
+        if (field in row) {
+          const val = row[field] as number;
+          if (typeof val === 'number' && val > 0) {
+            values.push(val);
+          }
+        }
+      }
+    }
+
+    // Need at least 50 values for a meaningful test
+    if (values.length < 50) continue;
+
+    // Count first digits
+    const digitCounts = new Array(10).fill(0); // index 0 unused
+    for (const v of values) {
+      // Extract first digit: take abs, convert to string, grab first non-zero digit
+      const s = Math.abs(v).toExponential();
+      const firstChar = s[0];
+      const d = parseInt(firstChar, 10);
+      if (d >= 1 && d <= 9) {
+        digitCounts[d]++;
+      }
+    }
+
+    const n = values.length;
+
+    // Chi-squared statistic
+    let chiSq = 0;
+    for (let d = 1; d <= 9; d++) {
+      const observed = digitCounts[d];
+      const expected = benfordExpected[d - 1] * n;
+      if (expected > 0) {
+        chiSq += ((observed - expected) ** 2) / expected;
+      }
+    }
+
+    // Chi-squared critical value for df=8, alpha=0.01 is 20.090
+    // (df = 9 categories - 1 = 8)
+    const CHI_SQ_CRITICAL_001 = 20.090;
+    if (chiSq > CHI_SQ_CRITICAL_001) {
+      warnings.push(
+        `Anti-synthetic (Benford): ${field} first-digit distribution fails chi-squared test ` +
+        `(chi2=${chiSq.toFixed(2)}, critical=${CHI_SQ_CRITICAL_001}, n=${n}) — ` +
+        `digits [${digitCounts.slice(1).join(',')}] vs expected Benford distribution`
+      );
+    }
+  }
+
   return { errors, warnings };
 }

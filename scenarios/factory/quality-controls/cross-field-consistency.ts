@@ -66,20 +66,53 @@ export function runCrossFieldConsistency(
         }
       }
 
-      // -- IFRS 9 Stage Consistency --
+      // -- M1: IFRS 9 Stage Consistency --
+      // Stage 1: DPD < 30 AND credit_status NOT DEFAULT
+      // Stage 2: 30 <= DPD < 90 OR significant PD increase
+      // Stage 3: DPD >= 90 OR credit_status = DEFAULT
       if ('ifrs9_stage' in row && 'days_past_due' in row) {
         const stage = row.ifrs9_stage as number;
         const dpd = row.days_past_due as number;
         const statusCode = row.credit_status_code as number | undefined;
+        const statusInfo = statusCode !== undefined ? registry.getCreditStatusInfo(statusCode) : undefined;
+        const isDefault = statusInfo?.default_flag === true;
 
-        if (stage === 3 && dpd < 30) {
-          const statusInfo = statusCode !== undefined ? registry.getCreditStatusInfo(statusCode) : undefined;
-          if (!statusInfo?.default_flag && canReport('stage3_low_dpd')) {
-            warnings.push(`${tbl}: ifrs9_stage=3 but dpd=${dpd} and not DEFAULT`);
-          }
+        // Stage 3 should have DPD >= 90 OR default status
+        if (stage === 3 && dpd < 30 && !isDefault && canReport('stage3_low_dpd')) {
+          warnings.push(`${tbl}: ifrs9_stage=3 but dpd=${dpd} and not DEFAULT — expected DPD>=90 or DEFAULT`);
         }
+
+        // Stage 1 must have DPD < 30 and NOT default
         if (stage === 1 && dpd >= 90 && canReport('stage1_high_dpd')) {
           warnings.push(`${tbl}: ifrs9_stage=1 but dpd=${dpd} — should be Stage 2/3`);
+        }
+        if (stage === 1 && isDefault && canReport('stage1_default')) {
+          warnings.push(`${tbl}: ifrs9_stage=1 but credit_status is DEFAULT — should be Stage 3`);
+        }
+
+        // Stage 2 should have 30 <= DPD < 90 (or PD increase, which we can't check here)
+        // But Stage 2 with DPD >= 90 and no PD-increase justification is suspicious
+        if (stage === 2 && dpd >= 90 && canReport('stage2_high_dpd')) {
+          warnings.push(`${tbl}: ifrs9_stage=2 but dpd=${dpd} — should be Stage 3 (DPD>=90)`);
+        }
+
+        // Stage 2 with default status is inconsistent — defaults are always Stage 3
+        if (stage === 2 && isDefault && canReport('stage2_default')) {
+          warnings.push(`${tbl}: ifrs9_stage=2 but credit_status is DEFAULT — should be Stage 3`);
+        }
+      }
+
+      // -- M1b: ECL Stage Code Consistency (ecl_staging_snapshot) --
+      // ecl_stage_code should align with ifrs9_stage when both present
+      if ('ecl_stage_code' in row && 'ifrs9_stage' in row) {
+        const eclStage = row.ecl_stage_code as string | null;
+        const ifrs9 = row.ifrs9_stage as number;
+        if (eclStage !== null) {
+          // ecl_stage_code is typically "STAGE_1", "STAGE_2", "STAGE_3"
+          const eclNum = parseInt(eclStage.replace(/\D/g, ''), 10);
+          if (!isNaN(eclNum) && eclNum !== ifrs9 && canReport('ecl_ifrs9_mismatch')) {
+            warnings.push(`${tbl}: ecl_stage_code='${eclStage}' but ifrs9_stage=${ifrs9} — stages should align`);
+          }
         }
       }
 

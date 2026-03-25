@@ -424,8 +424,56 @@ WHERE fm.is_current_flag = true
 
 ### Fix: EBT Non-Leaf Assignment
 ```sql
--- Reassign to nearest leaf descendant
--- Manual review required — log finding and escalate
+-- Map each non-leaf node to its first leaf descendant
+WITH non_leaf AS (
+  SELECT DISTINCT parent_segment_id FROM l1.enterprise_business_taxonomy WHERE parent_segment_id IS NOT NULL
+),
+leaf_mapping AS (
+  SELECT nl.parent_segment_id AS non_leaf_id,
+    (SELECT MIN(ebt2.managed_segment_id) FROM l1.enterprise_business_taxonomy ebt2
+     WHERE ebt2.parent_segment_id = nl.parent_segment_id
+     AND ebt2.managed_segment_id NOT IN (SELECT parent_segment_id FROM non_leaf)
+     AND ebt2.is_current_flag = 'Y') AS leaf_id
+  FROM non_leaf nl
+)
+UPDATE l2.facility_master fm SET lob_segment_id = lm.leaf_id
+FROM leaf_mapping lm WHERE fm.lob_segment_id = lm.non_leaf_id AND lm.leaf_id IS NOT NULL;
+-- NOTE: Some non-leaf nodes have children that are ALSO non-leaf. If on_non_leaf > 0 after first pass,
+-- re-run the mapping — it may take 2-3 iterations to reach true leaves.
+```
+
+### Fix: Facility Type All Same Value
+```sql
+-- Distribute across active facility types by GSIB portfolio mix
+-- CRITICAL: Verify dim table IDs first: SELECT facility_type_id, facility_type_name FROM l1.facility_type_dim WHERE is_active_flag = true;
+UPDATE l2.facility_master SET facility_type_id = CASE
+  WHEN facility_id % 100 < 35 THEN 1   -- Term Loan (35%)
+  WHEN facility_id % 100 < 60 THEN 4   -- Revolving Credit (25%)
+  WHEN facility_id % 100 < 70 THEN 11  -- SBLC (10%)
+  WHEN facility_id % 100 < 78 THEN 9   -- Trade Finance (8%)
+  WHEN facility_id % 100 < 85 THEN 2   -- Term Loan B (7%)
+  WHEN facility_id % 100 < 90 THEN 5   -- Commercial LC (5%)
+  WHEN facility_id % 100 < 94 THEN 10  -- ABL (4%)
+  WHEN facility_id % 100 < 97 THEN 3   -- Bridge Loan (3%)
+  WHEN facility_id % 100 < 99 THEN 6   -- Financial Guarantee (2%)
+  ELSE 8                                 -- Uncommitted (1%)
+END;
+```
+
+### Fix: Legal Entity ID All NULL
+```sql
+-- Distribute across legal entities by counterparty geography
+UPDATE l2.facility_master fm SET legal_entity_id = CASE
+  WHEN c.country_code = 'US' THEN (CASE WHEN fm.facility_id % 3 = 0 THEN 1 WHEN fm.facility_id % 3 = 1 THEN 2 ELSE 3 END)
+  WHEN c.country_code IN ('GB', 'DE', 'FR', 'CH') THEN 8   -- Europe entity
+  WHEN c.country_code IN ('JP', 'AU', 'IN', 'KR') THEN 9   -- Asia Pacific entity
+  WHEN c.country_code = 'CA' THEN 10
+  WHEN c.country_code = 'SG' THEN 11
+  WHEN c.country_code = 'HK' THEN 12
+  ELSE 7  -- International
+END
+FROM l2.counterparty c WHERE c.counterparty_id = fm.counterparty_id;
+-- CRITICAL: Verify legal_entity IDs exist first: SELECT legal_entity_id FROM l2.legal_entity;
 ```
 
 ### Fix: Maturity Before Origination
@@ -463,3 +511,30 @@ Return standard DQ output JSON per template:
 ```
 
 Finding IDs use prefix `DQ-FM-NNN` (e.g., `DQ-FM-001`).
+
+---
+
+## 7. Regression Checks (Lessons Learned — 2026-03-25)
+
+These issues were found in the first comprehensive DQ review and MUST be checked every run:
+
+### 7A. Facility Type Diversity (CRITICAL regression)
+```sql
+SELECT COUNT(DISTINCT facility_type_id) AS distinct_types FROM l2.facility_master;
+-- Must be >= 5. If = 1, all facilities share one type (the "Unknown" bug)
+```
+
+### 7B. Legal Entity Populated (CRITICAL regression)
+```sql
+SELECT SUM(CASE WHEN legal_entity_id IS NULL THEN 1 ELSE 0 END) AS null_le FROM l2.facility_master;
+-- Must be 0. If = total rows, capital metrics cascade-fail
+```
+
+### 7C. EBT Leaf Recursion Warning
+When fixing non-leaf EBT assignments, the first pass maps parent→child, but some children are themselves parents.
+Always verify with a second pass count:
+```sql
+-- After fix, re-check. If still > 0, run the fix again.
+SELECT SUM(CASE WHEN ebt.managed_segment_id IN (SELECT DISTINCT parent_segment_id FROM l1.enterprise_business_taxonomy WHERE parent_segment_id IS NOT NULL) THEN 1 ELSE 0 END) AS on_non_leaf
+FROM l2.facility_master fm JOIN l1.enterprise_business_taxonomy ebt ON fm.lob_segment_id = ebt.managed_segment_id;
+```

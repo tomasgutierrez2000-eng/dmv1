@@ -331,3 +331,16 @@ Health score formula: `max(0, 100 - (critical * 15 + high * 8 + medium * 3 + low
 6. **LTV derivation is advisory** — flag outliers but do not auto-fix collateral values (requires appraisal review)
 7. **Collateral type diversity is advisory** — portfolio composition may legitimately skew to one type
 8. **If running in orchestrator mode**, return JSON payload only (no interactive prompts)
+
+---
+
+## 7. Regression Cases (Lessons Learned — 2026-03-25)
+
+| Issue | Details | Fix |
+|-------|---------|-----|
+| `haircut_pct = 0` for ALL rows | Basel III requires supervisory haircuts (5-50% by type). Zero haircuts overstate eligible collateral | Set by `collateral_asset_type`: REAL_ESTATE=25%, EQUIPMENT=30%, RECEIVABLES=15%, SECURITIES=20%, CASH=0-8% |
+| `eligible_collateral_amount` not recalculated after haircut fix | Must update `eligible_collateral_amount = valuation_amount * (1 - haircut_pct)` | Always update both columns together |
+| Only 12% of facilities covered | 45 assets for 362 facilities | Add `collateral_asset_master` entries + snapshots for ~30% more facilities with realistic LTV ratios |
+| Single `crm_type_code` = 'CASH_COLL' | No collateral type diversity | Add RE_MORTGAGE, PHYS_COLL, REC_COLL, FIN_COLL for new assets |
+| Column name: `valuation_amount` not `collateral_value_amt` | Agent queries must use actual DD column names | Always verify via `information_schema.columns` |
+| `noi_current_amt` 100% NULL | CRE income field completely unpopulated | LOW severity — only relevant for CRE-specific collateral analysis |

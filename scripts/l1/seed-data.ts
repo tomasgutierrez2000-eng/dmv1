@@ -2675,6 +2675,21 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       }
       if (columnName === 'facility_name') return FACILITY_NAMES[idx];
       if (columnName === 'facility_type') return FACILITY_TYPES[idx];
+      // DQ FIX: facility_type_id must map to l1.facility_type_dim PK — distribute across active types
+      // GSIB mix: 35% Term Loan(1), 25% Revolver(4), 10% SBLC(11), 8% Trade Finance(9), 7% TLB(2), 5% LC(5), 4% ABL(10), 3% Bridge(3), 2% Guarantee(6), 1% Uncommitted(8)
+      if (columnName === 'facility_type_id') {
+        const pct = rowIndex % 100;
+        if (pct < 35) return 1;       // Term Loan
+        if (pct < 60) return 4;       // Revolving Credit
+        if (pct < 70) return 11;      // SBLC
+        if (pct < 78) return 9;       // Trade Finance
+        if (pct < 85) return 2;       // Term Loan B
+        if (pct < 90) return 5;       // Commercial LC
+        if (pct < 94) return 10;      // ABL
+        if (pct < 97) return 3;       // Bridge Loan
+        if (pct < 99) return 6;       // Financial Guarantee
+        return 8;                      // Uncommitted
+      }
       if (columnName === 'facility_status') return FACILITY_STATUSES[idx];
       if (columnName === 'committed_facility_amt') return COMMITTED_AMOUNTS[idx];
       if (columnName === 'currency_code') return CURRENCY_CODES[idx];
@@ -3657,6 +3672,10 @@ const CUSTOM_TABLE_SIZES: Record<string, number> = {
   'regulatory_capital_basis_dim': 28,
   'reporting_entity_dim': 22,
   'regulatory_mapping': 160,
+  // DQ FIX: FX rates must be exactly 1 row per (currency, date) — not scaled to requestedRows.
+  // 14 currencies × 1 to_currency (USD) = 14 unique pairs. With 3 dates = 42 rows.
+  // Using 14 ensures no duplicate (from_ccy, to_ccy, as_of_date) tuples.
+  'fx_rate': 14,
 };
 
 export function getTableRowCount(tableName: string, requestedRows: number, profile?: string): number {

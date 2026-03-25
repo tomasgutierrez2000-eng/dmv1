@@ -102,14 +102,15 @@ Run these 4 agents in parallel:
 
 **Gate:** If any CRITICAL findings with fix_mode enabled, apply fixes before proceeding. If CRITICAL findings without fix_mode, warn user and ask to continue or abort.
 
-### Phase 2: Data Value Dimension Checks (6 agents, parallel)
-Run these 6 agents in parallel:
+### Phase 2: Data Value Dimension Checks (7 agents, parallel)
+Run these 7 agents in parallel:
 5. `/data-quality/dimensions:dq-data-distribution`
 6. `/data-quality/dimensions:dq-temporal-coherence`
 7. `/data-quality/dimensions:dq-numeric-bounds`
 8. `/data-quality/dimensions:dq-boolean-consistency`
 9. `/data-quality/dimensions:dq-categorical-diversity`
 10. `/data-quality/dimensions:dq-cross-table-correlation`
+11. `/data-quality/dimensions:dq-dashboard-readiness` — **NEW (2026-03-25):** JOIN fan-out, rollup concentration, EBT leaf, FX coverage, NULL dimension keys, anti-synthetic uniformity
 
 ### Phase 3: Per-Table Deep Dives (15 agents, 3 batches of 5)
 
@@ -263,3 +264,54 @@ Full fix log: .claude/audit/dq-fixes/
 - `scenarios/factory/quality-controls/` — 11 QC modules (factory-generated data)
 - `scripts/validate-l1-data-quality.ts` — L1 reference data
 - `scenarios/factory/enhanced-validator.ts` — pre-flight validation
+
+---
+
+## 9. Regression Test Cases (Lessons Learned — 2026-03-25 DQ Run)
+
+These 12 issues were found in the first comprehensive L2 DQ review. Every future run MUST check for recurrence.
+
+| # | Finding | Table | Column | Severity | Regression SQL |
+|---|---------|-------|--------|----------|---------------|
+| 1 | ALL facilities mapped to single type ("Unknown", id=12) | facility_master | facility_type_id | CRITICAL | `SELECT COUNT(DISTINCT facility_type_id) AS types FROM l2.facility_master` → must be >= 5 |
+| 2 | `legal_entity_id` 100% NULL — capital metrics can't compute entity rollups | facility_master | legal_entity_id | CRITICAL | `SELECT SUM(CASE WHEN legal_entity_id IS NULL THEN 1 ELSE 0 END) FROM l2.facility_master` → must be 0 |
+| 3 | `rating_value = '0'` for 66.7% of CRO — invalid placeholder rating | counterparty_rating_observation | rating_value | CRITICAL | `SELECT SUM(CASE WHEN rating_value = '0' THEN 1 ELSE 0 END) FROM l2.counterparty_rating_observation` → must be 0 |
+| 4 | 29.5% of facilities assigned to non-leaf EBT nodes → rollup double-counting | facility_master | lob_segment_id | HIGH | See "EBT leaf check" query in CLAUDE.md → `on_non_leaf` must be 0 |
+| 5 | Collateral `haircut_pct = 0` for ALL rows — Basel III requires haircuts | collateral_snapshot | haircut_pct | HIGH | `SELECT SUM(CASE WHEN haircut_pct = 0 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) FROM l2.collateral_snapshot` → must be < 30% |
+| 6 | `facility_financial_snapshot` missing a month of data vs other snapshot tables | facility_financial_snapshot | as_of_date | HIGH | `SELECT COUNT(DISTINCT as_of_date) FROM l2.facility_financial_snapshot` → must match other snapshot tables |
+| 7 | `bank_share_pct` uniformly 1.0 — zero syndication diversity | facility_exposure_snapshot | bank_share_pct | MEDIUM | `SELECT COUNT(DISTINCT bank_share_pct) FROM l2.facility_exposure_snapshot` → must be >= 2 |
+| 8 | ALL amendment events are same type | amendment_event | amendment_type_code | MEDIUM | `SELECT COUNT(DISTINCT amendment_type_code) FROM l2.amendment_event` → must be >= 3 |
+| 9 | Counterparty hierarchy < 10% populated | counterparty_hierarchy | — | MEDIUM | `SELECT COUNT(DISTINCT counterparty_id) * 100.0 / (SELECT COUNT(*) FROM l2.counterparty) FROM l2.counterparty_hierarchy` → must be >= 50% |
+| 10 | Collateral covers < 15% of facilities | collateral_snapshot | facility_id | MEDIUM | `SELECT COUNT(DISTINCT facility_id) * 100.0 / (SELECT COUNT(*) FROM l2.facility_master) FROM l2.collateral_snapshot WHERE facility_id IS NOT NULL` → must be >= 20% |
+| 11 | Perfect snapshot uniformity (stddev=0) — anti-synthetic signal | facility_exposure_snapshot | — | LOW | `SELECT ROUND(STDDEV(cnt)::numeric,2) FROM (SELECT facility_id, COUNT(*) AS cnt FROM l2.facility_exposure_snapshot GROUP BY facility_id) t` → must be > 0 |
+| 12 | Zero negative interest income — unrealistic for variable-rate book | facility_profitability_snapshot | interest_income_amt | LOW | `SELECT SUM(CASE WHEN interest_income_amt < 0 THEN 1 ELSE 0 END) FROM l2.facility_profitability_snapshot` → must be > 0 |
+
+### Common Fix Patterns
+
+| Issue Type | Fix Pattern | Pitfall |
+|-----------|-------------|---------|
+| Single-value categorical | `UPDATE SET col = CASE WHEN id % N = 0 THEN ... END` | Must verify FK values exist in parent dim table BEFORE updating |
+| NULL FK column | `UPDATE fm SET col = CASE WHEN condition THEN ... END FROM join_table` | Distribute across available FK targets by geography/entity type, not random |
+| Missing snapshot month | `INSERT INTO ... SELECT ... FROM same_table WHERE as_of_date = [adjacent_date]` | Apply slight variance (0.9-1.1x) to numeric fields to avoid exact duplication |
+| Zero haircuts | `UPDATE SET haircut_pct = CASE WHEN type = X THEN Y END` | Also update `eligible_collateral_amount = valuation * (1 - haircut)` |
+| Non-leaf EBT | Map to first leaf child: `SELECT MIN(child_id) WHERE parent = non_leaf AND child NOT IN (SELECT parent ...)` | Some non-leaf nodes have children that are also non-leaf — must recurse to true leaves |
+| Lifecycle variation (anti-synthetic) | `DELETE FROM snapshot WHERE as_of_date = earliest AND facility_id % N = 0` | Check for FK cascade constraints (position → position_detail → loans_*) before deleting |
+| Placeholder ratings | Map via internal_risk_rating correlation using CTE + JOIN | Use `DISTINCT ON` to avoid multi-row joins when counterparty has multiple facilities |
+
+### Column Name Corrections (actual vs assumed)
+
+These column names differed from common assumptions during the DQ run:
+
+| Table | Assumed Name | Actual Name |
+|-------|-------------|-------------|
+| counterparty_rating_observation | `observation_date` | `as_of_date` |
+| counterparty_rating_observation | `rating_agency_code` | `rating_agency` |
+| facility_pricing_snapshot | `interest_rate_spread_bps` | `spread_bps` |
+| counterparty | `counterparty_status` | `counterparty_type` |
+| risk_flag | `risk_flag_type_code` | `flag_type` |
+| credit_event | `event_type_code` | `credit_event_type_code` |
+| collateral_snapshot | `collateral_value_amt` | `valuation_amount` |
+| facility_profitability_snapshot | `net_interest_income_amt` | `interest_income_amt` |
+| counterparty_hierarchy | `child_counterparty_id` | PK is `counterparty_id` (the child IS the PK) |
+
+**Lesson:** Always run `SELECT column_name FROM information_schema.columns WHERE table_schema='l2' AND table_name='xxx'` before writing queries with assumed column names. The data dictionary has the correct names but agent prompts may use outdated assumptions.

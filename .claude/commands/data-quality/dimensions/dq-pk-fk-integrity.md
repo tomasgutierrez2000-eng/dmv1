@@ -398,3 +398,31 @@ After any fix, run `npm run db:introspect` to update the data dictionary.
 8. **If running in orchestrator mode**, return JSON payload only
 9. **Never create FK constraints that don't exist in DDL** — only check existing ones
 10. **Cap orphan sample queries at LIMIT 10** — large tables can have millions of orphans
+
+---
+
+## 7. Logical Uniqueness Checks (Beyond PK Constraints)
+
+Some tables have logical uniqueness requirements that aren't enforced by database constraints but cause JOIN fan-out when violated.
+
+### 7A. FX Rate Uniqueness (CRITICAL — causes dashboard metric multiplication)
+```sql
+SELECT from_currency_code, to_currency_code, as_of_date, COUNT(*) AS dupes
+FROM l2.fx_rate GROUP BY 1, 2, 3 HAVING COUNT(*) > 1;
+```
+**Severity:** CRITICAL if any rows returned. Every duplicate FX rate row multiplies exposure by N in any query using `LEFT JOIN l2.fx_rate fx ON fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date`. In the 2026-03-25 DQ run, 246 duplicate FX rows inflated USD exposure totals by 3-11x per currency.
+**Fix:** `DELETE FROM l2.fx_rate WHERE fx_rate_id NOT IN (SELECT MIN(fx_rate_id) FROM l2.fx_rate GROUP BY from_currency_code, to_currency_code, as_of_date)`
+
+### 7B. Counterparty Rating Logical Uniqueness
+```sql
+SELECT counterparty_id, as_of_date, rating_agency, COUNT(*) AS dupes
+FROM l2.counterparty_rating_observation GROUP BY 1, 2, 3 HAVING COUNT(*) > 1;
+```
+**Severity:** HIGH — multiple ratings from same agency on same date for same counterparty is ambiguous.
+
+### 7C. Lender Allocation Over-Allocation
+```sql
+SELECT facility_id, SUM(bank_share_pct) AS total_share
+FROM l2.facility_lender_allocation GROUP BY facility_id HAVING SUM(bank_share_pct) > 1.01;
+```
+**Severity:** HIGH — over-allocated bank shares cause over-counted exposure in syndicated facility metrics.

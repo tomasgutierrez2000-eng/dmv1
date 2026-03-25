@@ -31,6 +31,14 @@ import { getCounterpartyRatingTier } from '../l1/mvp-counterparties';
 let FACILITY_COUNT = 10;
 const AS_OF = '2025-01-31';
 
+/**
+ * DQ FIX: Snapshot dates per cycle — each cycle gets a different as_of_date so that
+ * composite PK (facility_id, as_of_date) is unique across cycles. Without this,
+ * all 5 cycles produce the same PK tuple and 4/5 of story arc data is silently dropped.
+ */
+const SNAPSHOT_DATES = ['2025-01-31', '2024-12-31', '2024-11-30', '2024-10-31', '2024-09-30'];
+function snapshotDate(idx: number): string { return SNAPSHOT_DATES[cycle(idx)] ?? AS_OF; }
+
 /** Called by generate.ts to set the facility count for MVP profile. */
 export function setL2FacilityCount(count: number): void { FACILITY_COUNT = count; }
 
@@ -1038,7 +1046,7 @@ export function getL2SeedValue(
     // ═══════════════════════════════════════════════════════════════════
     case 'position':
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'facility_id') return fid(idx);
       if (columnName === 'instrument_id') return fid(idx);
       if (columnName === 'product_code') return posType(idx);
@@ -1075,7 +1083,7 @@ export function getL2SeedValue(
       const dt = detailTypes[(fid(idx) - 1 + cycle(idx)) % detailTypes.length];
       if (columnName === 'position_detail_id') return i;
       if (columnName === 'position_id') return (idx % N()) + 1;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'detail_type') return dt;
       if (columnName === 'amount') return dt === 'PRINCIPAL' ? drawn(idx) : dt === 'INTEREST' ? Math.round(drawn(idx) * allInRate(idx) / 100 / 12) : Math.round(committed(idx) * 0.001);
       if (columnName === 'maturity_date') return maturityDate(idx);
@@ -1116,7 +1124,7 @@ export function getL2SeedValue(
     // ═══════════════════════════════════════════════════════════════════
     case 'exposure_counterparty_attribution':
       if (columnName === 'attribution_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'exposure_type_id') return fid(idx);
       if (columnName === 'counterparty_id') return cid(idx);
       if (columnName === 'exposure_amount') return drawn(idx);
@@ -1138,7 +1146,7 @@ export function getL2SeedValue(
       const undrawn = Math.max(0, c - d);
       const val = valuation(idx);
       if (columnName === 'facility_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'exposure_type_id') return fid(idx);
       if (columnName === 'drawn_amount') return d;
       if (columnName === 'committed_amount') return c;
@@ -1151,8 +1159,18 @@ export function getL2SeedValue(
       if (columnName === 'facility_exposure_id') return i;
       if (columnName === 'fr2590_category_code') return pick(FR2590_CATS_BASE, fid(idx) - 1);
       if (columnName === 'gross_exposure_usd') return c;
-      if (columnName === 'legal_entity_id') return 1;
+      // DQ FIX: Distribute legal_entity across entities (was hardcoded to 1)
+      if (columnName === 'legal_entity_id') return (fid(idx) % 10) + 1;
       if (columnName === 'lob_segment_id') return fid(idx);
+      // DQ FIX: Vary bank_share_pct for syndication diversity (was missing → DECIMAL fallback)
+      // ~20% of facilities are syndicated (share < 1.0)
+      if (columnName === 'bank_share_pct') {
+        if (fid(idx) % 5 === 0) return 0.35;
+        if (fid(idx) % 5 === 1) return 0.50;
+        if (fid(idx) % 5 === 2) return 0.65;
+        if (fid(idx) % 5 === 3) return 0.80;
+        return 1.0;
+      }
       if (columnName === 'net_exposure_usd') return Math.max(0, d - val);
       if (columnName === 'product_node_id') return fid(idx);
       if (columnName === 'outstanding_balance_amt') return d;
@@ -1180,7 +1198,7 @@ export function getL2SeedValue(
     // ═══════════════════════════════════════════════════════════════════
     case 'netting_set_exposure_snapshot':
       if (columnName === 'netting_set_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'netted_exposure_amount') return nettedExp(idx);
       if (columnName === 'gross_exposure_amount') return grossExp(idx);
       if (columnName === 'currency_code') return 'USD';
@@ -1202,7 +1220,7 @@ export function getL2SeedValue(
       const eadVal = committed(idx);
       const rwPct = pdVal * lgdVal * 12.5; // simplified Basel RW proxy
       if (columnName === 'facility_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'counterparty_id') return cid(idx);
       if (columnName === 'pd_pct') return pdVal;
       if (columnName === 'lgd_pct') return lgdVal;
@@ -1225,7 +1243,7 @@ export function getL2SeedValue(
     case 'facility_lob_attribution':
       if (columnName === 'attribution_id') return i;
       if (columnName === 'facility_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'lob_segment_id') return fid(idx);
       if (columnName === 'attribution_pct') return 100;
       if (columnName === 'attributed_amount') return drawn(idx);
@@ -1243,7 +1261,7 @@ export function getL2SeedValue(
       const hc = haircut(idx);
       const eligible = Math.round(val * (1 - hc / 100));
       if (columnName === 'collateral_asset_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'valuation_amount') return val;
       if (columnName === 'haircut_pct') return hc;
       if (columnName === 'eligible_collateral_amount') return eligible;
@@ -1275,7 +1293,7 @@ export function getL2SeedValue(
       if (columnName === 'cash_flow_type') return cft;
       if (columnName === 'amount') return amt;
       if (columnName === 'currency_code') return 'USD';
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'contractual_amt') return Math.abs(amt);
       if (columnName === 'contractual_amt_usd') return Math.abs(amt);
       if (columnName === 'counterparty_id') return cid(idx);
@@ -1293,7 +1311,7 @@ export function getL2SeedValue(
     // ═══════════════════════════════════════════════════════════════════
     case 'facility_financial_snapshot':
       if (columnName === 'facility_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'total_debt_service_amt') return debtService(idx);
       if (columnName === 'revenue_amt') return revenue(idx);
       if (columnName === 'operating_expense_amt') return opex(idx);
@@ -1313,7 +1331,7 @@ export function getL2SeedValue(
       const d = dpd(idx);
       const isWatch = creditStatusId(idx) >= 2;
       if (columnName === 'facility_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'credit_status_code') return creditStatusId(idx);
       if (columnName === 'days_past_due') return d;
       if (columnName === 'is_watch_list_flag') return isWatch ? 'Y' : 'N';
@@ -1334,7 +1352,7 @@ export function getL2SeedValue(
     // ═══════════════════════════════════════════════════════════════════
     case 'facility_pricing_snapshot':
       if (columnName === 'facility_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'spread_bps') return spread(idx);
       if (columnName === 'rate_index_id') return fid(idx);
       if (columnName === 'all_in_rate_pct') return allInRate(idx);
@@ -1360,7 +1378,7 @@ export function getL2SeedValue(
     case 'facility_profitability_snapshot': {
       const d = drawn(idx);
       if (columnName === 'facility_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'nii_ytd') return niiYtd(idx);
       if (columnName === 'fee_income_ytd') return feeYtd(idx);
       if (columnName === 'ledger_account_id') return fid(idx);
@@ -1382,7 +1400,7 @@ export function getL2SeedValue(
       const paymentAmounts = [25000, 50000, 75000, 100000, 150000, 200000, 250000, 300000, 350000, 400000];
       if (columnName === 'payment_ledger_id') return i;
       if (columnName === 'facility_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'payment_due_date') return '2025-01-15';
       if (columnName === 'payment_received_date') return idx % 3 === 0 ? '2025-01-20' : '2025-01-14';
       if (columnName === 'payment_amount_due') return paymentAmounts[idx];
@@ -1399,7 +1417,7 @@ export function getL2SeedValue(
       const contrib = drawn(idx);
       if (columnName === 'limit_rule_id') return fid(idx);
       if (columnName === 'counterparty_id') return cid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'contribution_amount') return contrib;
       if (columnName === 'currency_code') return 'USD';
       if (columnName === 'contribution_amount_usd') return contrib;
@@ -1414,7 +1432,7 @@ export function getL2SeedValue(
     // ═══════════════════════════════════════════════════════════════════
     case 'limit_utilization_event':
       if (columnName === 'limit_rule_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'counterparty_id') return cid(idx);
       if (columnName === 'utilized_amount') return utilized(idx);
       if (columnName === 'available_amount') return limitAmt(idx) - utilized(idx);
@@ -1454,7 +1472,7 @@ export function getL2SeedValue(
       if (columnName === 'amendment_status') return amendStatus(idx);
       if (columnName === 'amendment_subtype') return amendSubtype(idx);
       if (columnName === 'amendment_type') return amendType(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'completed_date') return amendCompletedDate(idx);
       if (columnName === 'counterparty_id') return cid(idx);
       if (columnName === 'identified_date') return amendIdentifiedDate(idx);
@@ -1471,7 +1489,7 @@ export function getL2SeedValue(
       if (columnName === 'event_date') return eventDate(idx);
       if (columnName === 'event_ts') return '2025-01-15 10:00:00';
       if (columnName === 'default_definition_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'event_risk_rating') return ceRating(idx);
       if (columnName === 'event_status') return ceEventStatus(idx);
       if (columnName === 'event_summary') return ceSummary(idx);
@@ -1489,7 +1507,7 @@ export function getL2SeedValue(
       if (columnName === 'credit_event_id') return (idx % N()) + 1;
       if (columnName === 'facility_id') return fid(idx);
       if (columnName === 'exposure_at_default') return ead;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'estimated_loss_usd') return estLoss;
       if (columnName === 'impact_pct') return ead > 0 ? Math.round(estLoss / ead * 100 * 100) / 100 : 0;
       break;
@@ -1502,7 +1520,7 @@ export function getL2SeedValue(
       const ba = breachAmt(idx);
       if (columnName === 'breach_id') return i;
       if (columnName === 'scenario_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'limit_rule_id') return fid(idx);
       if (columnName === 'counterparty_id') return cid(idx);
       if (columnName === 'breach_amount') return ba;
@@ -1524,7 +1542,7 @@ export function getL2SeedValue(
       const totalExp = committed(idx) || 1;
       if (columnName === 'result_id') return i;
       if (columnName === 'scenario_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'portfolio_id') return fid(idx);
       if (columnName === 'loss_amount') return loss;
       if (columnName === 'pnl_impact') return -loss;
@@ -1547,7 +1565,7 @@ export function getL2SeedValue(
       const proposed = proposedAmt(idx);
       if (columnName === 'pipeline_id') return i;
       if (columnName === 'counterparty_id') return cid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'stage_code') return pipelineStage(idx);
       if (columnName === 'proposed_amount') return proposed;
       if (columnName === 'currency_code') return 'USD';
@@ -1575,7 +1593,7 @@ export function getL2SeedValue(
       const isInt = isInternal(idx);
       if (columnName === 'observation_id') return i;
       if (columnName === 'counterparty_id') return cid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'rating_grade_id') return fid(idx);
       if (columnName === 'rating_source_id') return fid(idx);
       if (columnName === 'is_internal_flag') return isInt ? 'Y' : 'N';
@@ -1606,7 +1624,7 @@ export function getL2SeedValue(
       if (columnName === 'observation_id') return i;
       if (columnName === 'counterparty_id') return cid(idx);
       if (columnName === 'facility_id') return fid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'metric_definition_id') return fid(idx);
       if (columnName === 'value') return metricVal(idx);
       if (columnName === 'context_id') return fid(idx);
@@ -1628,7 +1646,7 @@ export function getL2SeedValue(
     case 'exception_event': {
       const rd = raisedDate(idx);
       if (columnName === 'exception_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'exception_type') return exceptionType(idx);
       if (columnName === 'facility_id') return fid(idx);
       if (columnName === 'counterparty_id') return cid(idx);
@@ -1663,7 +1681,7 @@ export function getL2SeedValue(
       if (columnName === 'facility_id') return fid(idx);
       if (columnName === 'counterparty_id') return cid(idx);
       if (columnName === 'flag_type') return flagType(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'raised_ts') return raisedTs(idx);
       if (columnName === 'cleared_ts') return clearedTs(idx);
       if (columnName === 'created_ts') return raisedTs(idx);
@@ -1699,7 +1717,7 @@ export function getL2SeedValue(
 
       if (columnName === 'financial_snapshot_id') return i;
       if (columnName === 'counterparty_id') return cid(idx);
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'reporting_period') return ['Q4-2024', 'Q1-2025', 'Q2-2025', 'Q3-2025', 'Q4-2025'][cycle(idx)];
       if (columnName === 'currency_code') return 'USD';
       if (columnName === 'revenue_amt') return rev;
@@ -1726,7 +1744,7 @@ export function getL2SeedValue(
 
     case 'loans_indicative_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'interest_rate') return allInRate(idx) / 100;
       if (columnName === 'interest_rate_index') return 'SOFR';
       if (columnName === 'interest_rate_spread') return spread(idx) / 10000;
@@ -1744,7 +1762,7 @@ export function getL2SeedValue(
 
     case 'loans_accounting_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'accounting_intent') return 'HELD_FOR_INVESTMENT';
       if (columnName === 'bs_amount') return drawn(idx);
       if (columnName === 'carrying_value') return drawn(idx) * 0.98;
@@ -1766,7 +1784,7 @@ export function getL2SeedValue(
 
     case 'loans_classification_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'customer_id') return `CUST-${cid(idx)}`;
       if (columnName === 'facility_id') return fid(idx);
       if (columnName === 'counterparty_id') return cid(idx);
@@ -1781,7 +1799,7 @@ export function getL2SeedValue(
 
     case 'loans_risk_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'probability_of_default_pd') return pd(idx);
       if (columnName === 'loss_given_default_lgd') return lgd(idx);
       if (columnName === 'exposure_at_default_ead') return drawn(idx) + Math.max(0, committed(idx) - drawn(idx)) * 0.4;
@@ -1802,7 +1820,7 @@ export function getL2SeedValue(
     case 'derivatives_classification_snapshot':
     case 'derivatives_risk_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'currency_code') return 'USD';
       break;
     }
@@ -1810,7 +1828,7 @@ export function getL2SeedValue(
     // ── Off-BS Commitments ──
     case 'offbs_commitments_indicative_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'effective_date') return originationDate(idx);
       if (columnName === 'maturity_date') return maturityDate(idx);
       if (columnName === 'currency_code') return 'USD';
@@ -1820,7 +1838,7 @@ export function getL2SeedValue(
     }
     case 'offbs_commitments_accounting_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'committed_exposure_global') return committed(idx);
       if (columnName === 'funded_committed_exposure') return drawn(idx);
       if (columnName === 'unfunded_committed_exposure') return Math.max(0, committed(idx) - drawn(idx));
@@ -1831,7 +1849,7 @@ export function getL2SeedValue(
     }
     case 'offbs_commitments_classification_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'customer_id') return `CUST-${cid(idx)}`;
       if (columnName === 'product_code') return 'LETTER_OF_CREDIT';
       if (columnName === 'country_code') return 'US';
@@ -1841,7 +1859,7 @@ export function getL2SeedValue(
     }
     case 'offbs_commitments_risk_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'probability_of_default_pd') return pd(idx);
       if (columnName === 'loss_given_default_lgd') return lgd(idx);
       if (columnName === 'credit_conversion_factor') return 0.4;
@@ -1856,7 +1874,7 @@ export function getL2SeedValue(
     case 'sft_classification_snapshot':
     case 'sft_risk_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'currency_code') return 'USD';
       break;
     }
@@ -1867,7 +1885,7 @@ export function getL2SeedValue(
     case 'securities_classification_snapshot':
     case 'securities_risk_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'currency_code') return 'USD';
       break;
     }
@@ -1878,7 +1896,7 @@ export function getL2SeedValue(
     case 'deposits_classification_snapshot':
     case 'deposits_risk_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'currency_code') return 'USD';
       break;
     }
@@ -1889,7 +1907,7 @@ export function getL2SeedValue(
     case 'borrowings_classification_snapshot':
     case 'borrowings_risk_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'currency_code') return 'USD';
       break;
     }
@@ -1900,7 +1918,7 @@ export function getL2SeedValue(
     case 'debt_classification_snapshot':
     case 'debt_risk_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'currency_code') return 'USD';
       break;
     }
@@ -1911,7 +1929,7 @@ export function getL2SeedValue(
     case 'equities_classification_snapshot':
     case 'equities_risk_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'currency_code') return 'USD';
       break;
     }
@@ -1922,7 +1940,7 @@ export function getL2SeedValue(
     case 'stock_classification_snapshot':
     case 'stock_risk_snapshot': {
       if (columnName === 'position_id') return i;
-      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'as_of_date') return snapshotDate(idx);
       if (columnName === 'currency_code') return 'USD';
       break;
     }

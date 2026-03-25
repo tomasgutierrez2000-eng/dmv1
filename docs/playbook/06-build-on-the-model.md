@@ -791,7 +791,7 @@ The current data model contains:
 - **L1 — Reference Data (77 tables):** Dimensions, masters, lookups, hierarchies
 - **L2 — Atomic Data (102 tables):** Raw snapshots and events
 - **L3 — Derived Data (76 tables):** Calculated and aggregated data
-- **Total: all 253+ tables** across the three layers
+- **Total: all 255+ tables** across the three layers
 <!-- /AUTO:TABLE_COUNTS -->
 
 ## Appendix C: Current Metric Domains

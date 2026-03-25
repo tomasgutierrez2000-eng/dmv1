@@ -2,8 +2,8 @@
  * Generator: position + position_detail
  * Reads: drawn_amount, credit_status, days_past_due
  */
-import type { FacilityStateMap, SqlRow } from '../types';
-import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
+import type { FacilityStateMap, SqlRow, CreditStatus } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID, CREDIT_STATUS_CODE } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round, seededRng } from '../prng';
 
@@ -43,14 +43,14 @@ export function generatePositionRows(
         book_value_amt: round(state.drawn_amount + accruedInterest, 2),
         market_value_amt: round(state.drawn_amount * (1 - state.pd_annual), 2),
         notional_amount: round(state.committed_amount, 2),
-        credit_status_code: state.credit_status,
+        credit_status_code: CREDIT_STATUS_CODE[state.credit_status as CreditStatus] ?? 1,
         internal_risk_rating: state.internal_rating,
         external_risk_rating: state.external_rating_sp,
         pd_estimate: state.pd_annual.toFixed(6),
         lgd_estimate: state.lgd_current.toFixed(6),
         effective_date: state.origination_date,
         contractual_maturity_date: state.maturity_date,
-        is_trading_banking_book_flag: false,
+        is_trading_banking_book_flag: 'N',
         exposure_type_code: 'CREDIT',
         product_code: state.product_type,
         source_system_id: FACTORY_SOURCE_SYSTEM_ID,

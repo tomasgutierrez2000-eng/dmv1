@@ -26,9 +26,10 @@ export const VALID_NAICS_CODES = new Set([
 ]);
 
 /**
- * FFIEC-standard DPD bucket codes from l1.dpd_bucket_dim.
- * Old codes ('0-30', '31-60', '61-90') are no longer valid.
+ * Valid DPD bucket codes — L1 dpd_bucket_dim PK values.
+ * These are the codes as stored in PostgreSQL, not the factory's internal names.
+ * Factory internal → L1 PK mapping is done in v2/types.ts DPD_BUCKET_CODE_MAP.
  */
 export const VALID_DPD_CODES = new Set([
-  'CURRENT', '1-29', '30-59', '60-89', '90+',
+  '0-30', '1-29', '31-60', '61-90', '90+',
 ]);

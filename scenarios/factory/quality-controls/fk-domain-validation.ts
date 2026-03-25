@@ -23,15 +23,15 @@ export function runFKDomainValidation(
   }> = [
     { field: 'currency_code', l1Table: 'currency_dim', severity: 'warning' },
     { field: 'base_currency_code', l1Table: 'currency_dim', severity: 'warning' },
-    { field: 'credit_status_code', l1Table: 'credit_status_dim', severity: 'warning' },
-    { field: 'collateral_type_id', l1Table: 'collateral_type', severity: 'warning' },
-    { field: 'source_system_id', l1Table: 'source_system_registry', severity: 'warning' },
+    { field: 'credit_status_code', l1Table: 'credit_status_dim', severity: 'error' },
+    { field: 'collateral_type_id', l1Table: 'collateral_type', severity: 'error' },
+    { field: 'source_system_id', l1Table: 'source_system_registry', severity: 'error' },
     { field: 'portfolio_id', l1Table: 'portfolio_dim', severity: 'warning' },
     { field: 'rate_index_id', l1Table: 'interest_rate_index_dim', severity: 'warning' },
     { field: 'ledger_account_id', l1Table: 'ledger_account_dim', severity: 'warning' },
     { field: 'exposure_type_id', l1Table: 'exposure_type_dim', severity: 'warning' },
-    { field: 'delinquency_bucket_code', l1Table: 'dpd_bucket_dim', severity: 'warning' },
-    { field: 'dpd_bucket_code', l1Table: 'dpd_bucket_dim', severity: 'warning' },
+    { field: 'delinquency_bucket_code', l1Table: 'dpd_bucket_dim', severity: 'error' },
+    { field: 'dpd_bucket_code', l1Table: 'dpd_bucket_dim', severity: 'error' },
     { field: 'amendment_type_code', l1Table: 'amendment_type_dim', severity: 'warning' },
     { field: 'amendment_status_code', l1Table: 'amendment_status_dim', severity: 'warning' },
     { field: 'credit_event_type_code', l1Table: 'credit_event_type_dim', severity: 'warning' },
@@ -43,7 +43,7 @@ export function runFKDomainValidation(
     // (audit finding: 468 CPs with industry_id 1-10 not in industry_dim)
     { field: 'industry_id', l1Table: 'industry_dim', severity: 'error' },
     { field: 'region_code', l1Table: 'region_dim', severity: 'warning' },
-    { field: 'crm_type_code', l1Table: 'crm_type_dim', severity: 'warning' },
+    { field: 'crm_type_code', l1Table: 'crm_type_dim', severity: 'error' },
   ];
 
   for (const td of output.tables) {

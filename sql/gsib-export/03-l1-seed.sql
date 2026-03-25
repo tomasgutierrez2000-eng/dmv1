@@ -192,11 +192,12 @@ INSERT INTO l1.risk_rating_tier_dim (tier_code, tier_name, pd_min_pct, pd_max_pc
 INSERT INTO l1.risk_rating_tier_dim (tier_code, tier_name, pd_min_pct, pd_max_pct, display_order, active_flag) VALUES ('DOUBTFUL', 'Doubtful', 0.500000, 1.000000, 4, 'Y');
 INSERT INTO l1.risk_rating_tier_dim (tier_code, tier_name, pd_min_pct, pd_max_pct, display_order, active_flag) VALUES ('LOSS', 'Loss', 1.000000, 100.000000, 5, 'Y');
 
--- dpd_bucket_dim (4 rows)
-INSERT INTO l1.dpd_bucket_dim (dpd_bucket_code, bucket_name, dpd_min, dpd_max, display_order, active_flag) VALUES ('0-30', 'Current (0-30 DPD)', 0, 30, 1, 'Y');
-INSERT INTO l1.dpd_bucket_dim (dpd_bucket_code, bucket_name, dpd_min, dpd_max, display_order, active_flag) VALUES ('31-60', 'Early Delinquent (31-60 DPD)', 31, 60, 2, 'Y');
-INSERT INTO l1.dpd_bucket_dim (dpd_bucket_code, bucket_name, dpd_min, dpd_max, display_order, active_flag) VALUES ('61-90', 'Delinquent (61-90 DPD)', 61, 90, 3, 'Y');
-INSERT INTO l1.dpd_bucket_dim (dpd_bucket_code, bucket_name, dpd_min, dpd_max, display_order, active_flag) VALUES ('90+', 'Seriously Delinquent (90+ DPD)', 91, 99999, 4, 'Y');
+-- dpd_bucket_dim (5 rows — FFIEC aligned per migration 024)
+INSERT INTO l1.dpd_bucket_dim (dpd_bucket_code, bucket_name, dpd_min, dpd_max, display_order, active_flag) VALUES ('0-30', 'Current (0 DPD)', 0, 0, 1, 'Y');
+INSERT INTO l1.dpd_bucket_dim (dpd_bucket_code, bucket_name, dpd_min, dpd_max, display_order, active_flag) VALUES ('1-29', '1-29 Days Past Due', 1, 29, 2, 'Y');
+INSERT INTO l1.dpd_bucket_dim (dpd_bucket_code, bucket_name, dpd_min, dpd_max, display_order, active_flag) VALUES ('31-60', 'Early Delinquent (31-60 DPD)', 31, 60, 3, 'Y');
+INSERT INTO l1.dpd_bucket_dim (dpd_bucket_code, bucket_name, dpd_min, dpd_max, display_order, active_flag) VALUES ('61-90', 'Delinquent (61-90 DPD)', 61, 90, 4, 'Y');
+INSERT INTO l1.dpd_bucket_dim (dpd_bucket_code, bucket_name, dpd_min, dpd_max, display_order, active_flag) VALUES ('90+', 'Seriously Delinquent (90+ DPD)', 91, 99999, 5, 'Y');
 
 -- utilization_status_dim (4 rows)
 INSERT INTO l1.utilization_status_dim (utilization_status_code, status_name, utilization_min_pct, utilization_max_pct, display_order, active_flag) VALUES ('NO_BREACH', 'No Breach', 0.0000, 75.0000, 1, 'Y');
@@ -398,6 +399,7 @@ INSERT INTO l1.source_system_registry (source_system_id, source_system_name, dat
 INSERT INTO l1.source_system_registry (source_system_id, source_system_name, data_domain, ingestion_frequency, system_owner, active_flag, created_ts, updated_ts) VALUES (98, 'Position Ledger 98', 'TRADING', 'DAILY', 'Trading Tech', 'Y', '2024-06-15 12:00:00', '2024-06-15 12:00:00');
 INSERT INTO l1.source_system_registry (source_system_id, source_system_name, data_domain, ingestion_frequency, system_owner, active_flag, created_ts, updated_ts) VALUES (99, 'Position Ledger 99', 'TRADING', 'DAILY', 'Trading Tech', 'Y', '2024-06-15 12:00:00', '2024-06-15 12:00:00');
 INSERT INTO l1.source_system_registry (source_system_id, source_system_name, data_domain, ingestion_frequency, system_owner, active_flag, created_ts, updated_ts) VALUES (100, 'Position Ledger 100', 'TRADING', 'DAILY', 'Trading Tech', 'Y', '2024-06-15 12:00:00', '2024-06-15 12:00:00');
+INSERT INTO l1.source_system_registry (source_system_id, source_system_name, data_domain, ingestion_frequency, system_owner, active_flag, created_ts, updated_ts) VALUES (1400001, 'DATA_FACTORY_V2', 'SYNTHETIC', 'ON_DEMAND', 'Data Factory', 'Y', '2024-06-15 12:00:00', '2024-06-15 12:00:00');
 
 -- date_dim (10 rows)
 INSERT INTO l1.date_dim (date_id, calendar_date, calendar_year, calendar_quarter, calendar_month, day_of_month, day_of_week, day_name, fiscal_year, fiscal_quarter, fiscal_month, is_weekend_flag, is_month_end_flag, is_quarter_end_flag, is_year_end_flag, is_us_business_day_flag, is_us_bank_holiday_flag, date_day, date_month, date_quarter, date_year) VALUES (1, '2025-01-31', 2025, 'Q1', 1, 31, 6, 'Friday', 2025, 'FQ4', 10, FALSE, TRUE, TRUE, FALSE, TRUE, FALSE, 31, 1, 'Q1', 2025);

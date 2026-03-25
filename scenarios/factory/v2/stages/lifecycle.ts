@@ -32,7 +32,10 @@ export function applyLifecycle(
       break;
 
     case 'FUNDED':
-      if (PRODUCT_CONFIGS[input.product_type].amortizes && input.drawn_amount < input.original_committed) {
+      // Revolvers that fully repay transition back to COMMITMENT
+      if (input.drawn_amount <= 0 && !PRODUCT_CONFIGS[input.product_type].bulletDraw) {
+        lifecycle_stage = 'COMMITMENT';
+      } else if (PRODUCT_CONFIGS[input.product_type].amortizes && input.drawn_amount < input.original_committed) {
         lifecycle_stage = 'AMORTIZING';
       }
       if (remainingMonths <= 3 && remainingMonths > 0) {

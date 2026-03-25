@@ -29,7 +29,7 @@ export function generateRiskRows(
         internal_risk_rating: state.internal_rating,
         risk_weight_std_pct: round(state.risk_weight_pct, 6),
         risk_weight_erba_pct: round(state.risk_weight_pct * 0.95, 6),
-        is_defaulted_flag: state.credit_status === 'DEFAULT',
+        is_defaulted_flag: state.credit_status === 'DEFAULT' ? 'Y' : 'N',
         source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',

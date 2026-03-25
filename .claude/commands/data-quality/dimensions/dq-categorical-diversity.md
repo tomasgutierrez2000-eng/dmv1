@@ -349,3 +349,23 @@ WHERE {code_col} NOT IN (SELECT {pk_col} FROM l1.{dim_table})
 8. **Cross-reference with dq-data-distribution** — categorical single-value is a subset of zero-variance
 9. **Some single-value columns are legitimate** — e.g., `base_currency_code = 'USD'` for a US bank is correct
 10. **Match rate <95% is the threshold for CRITICAL** — based on CLAUDE.md "Dim chain completeness" guidance
+
+---
+
+## 7. Regression Cases (Lessons Learned — 2026-03-25)
+
+These specific categorical diversity failures were found and fixed in the first DQ run:
+
+| Table | Column | Issue | Fix Applied |
+|-------|--------|-------|-------------|
+| `facility_master` | `facility_type_id` | ALL 362 rows = 12 ("Unknown") — single inactive type | Distributed across 10 active types by GSIB portfolio mix using `facility_id % 100` |
+| `amendment_event` | `amendment_type_code` | ALL 390 rows = 'WAIVER' | Distributed across all 10 `amendment_type_dim` codes using `amendment_id % 10` |
+| `facility_exposure_snapshot` | `bank_share_pct` | ALL 1086 rows = 1.0 (100%) — zero syndication | Set 5 tiers (35%, 50%, 65%, 80%, 100%) using `facility_id % 5` |
+| `counterparty_rating_observation` | `rating_value` | 66.7% = '0' (invalid placeholder) | Mapped to rating_scale_dim grades (2-17) via internal_risk_rating correlation |
+| `collateral_snapshot` | `crm_type_code` | ALL rows = 'CASH_COLL' — single collateral type | Added RE_MORTGAGE, PHYS_COLL, REC_COLL, FIN_COLL for new assets |
+
+**Key lesson:** When fixing FK code values, ALWAYS query the dim table FIRST to get valid codes:
+```sql
+SELECT {pk_col}, {name_col} FROM l1.{dim_table} WHERE is_active_flag = true ORDER BY 1;
+```
+The first DQ run hit FK constraint violations when using assumed codes ('REPRICING') that didn't exist in `amendment_type_dim` (actual code was 'PRICING').

@@ -386,3 +386,22 @@ WHERE as_of_date IS NULL;
 8. **SCD-2 fixes must preserve audit trail** — never delete historical rows, only fix `is_current_flag`
 9. **Time series gaps may be legitimate** — quarterly data has 90-day gaps by design; weekly data has 7-day gaps
 10. **Cross-reference with data factory seed dates** — gaps may be intentional boundaries between seed and factory data
+
+---
+
+## 7. Regression Cases (Lessons Learned — 2026-03-25)
+
+### 7A. FFS Missing Month (HIGH)
+`facility_financial_snapshot` had only 2 dates (Dec, Jan) while all other snapshot tables had 3 (Nov, Dec, Jan). This caused DSCR calculations to return NULL for November and broke period-over-period financial analysis.
+
+**Regression check:**
+```sql
+WITH fes_dates AS (SELECT array_agg(DISTINCT as_of_date ORDER BY as_of_date) AS dates FROM l2.facility_exposure_snapshot),
+     ffs_dates AS (SELECT array_agg(DISTINCT as_of_date ORDER BY as_of_date) AS dates FROM l2.facility_financial_snapshot)
+SELECT CASE WHEN f.dates = ff.dates THEN 'ALIGNED' ELSE 'MISALIGNED: FES=' || f.dates::text || ' FFS=' || ff.dates::text END AS status
+FROM fes_dates f, ffs_dates ff;
+```
+**Fix:** Copy adjacent month with slight variance: `INSERT INTO ffs SELECT *, adjusted_date FROM ffs WHERE as_of_date = [adjacent_date]`
+
+### 7B. Snapshot Uniformity Signal
+All facilities had exactly 3 snapshots (stddev=0). Fixed by removing Nov snapshots for ~14% of facilities to simulate lifecycle variation.

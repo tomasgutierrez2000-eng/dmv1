@@ -339,3 +339,15 @@ Health score formula: `max(0, 100 - (critical * 15 + high * 8 + medium * 3 + low
 6. **Rating-PD correlation is advisory** — flag mismatches but do not auto-fix (requires business review)
 7. **Transition realism is advisory** — rapid multi-notch downgrades may be legitimate (credit events)
 8. **If running in orchestrator mode**, return JSON payload only (no interactive prompts)
+
+---
+
+## 7. Regression Cases (Lessons Learned — 2026-03-25)
+
+| Issue | Details | Fix |
+|-------|---------|-----|
+| `rating_value = '0'` for 66.7% of rows (966/1449) | Seed generator used '0' as placeholder for unrated counterparties. Value '0' doesn't exist in `rating_scale_dim` (valid grades: 1-21) | Map via `internal_risk_rating` correlation: CTE joining through `facility_master` → `facility_risk_snapshot` to get IRR per counterparty per date, then CASE to rating_scale_dim grade |
+| Column name: `as_of_date` not `observation_date` | Agent queries assumed `observation_date` but actual column is `as_of_date` | Always verify column names via `information_schema.columns` |
+| Column name: `rating_agency` not `rating_agency_code` | Similar DD-vs-assumption mismatch | Use DD as source of truth |
+| Multi-row JOIN ambiguity | When mapping ratings via `facility_risk_snapshot`, counterparties with multiple facilities produce multiple rows | Use `DISTINCT ON (counterparty_id, as_of_date)` or a CTE with deduplication |
+| Self-reference error in UPDATE ... FROM | PostgreSQL disallows referencing the target table alias in JOIN conditions of the FROM clause | Use CTE approach: `WITH mappings AS (...) UPDATE cro SET ... FROM mappings m WHERE cro.col = m.col` |

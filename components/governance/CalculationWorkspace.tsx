@@ -588,7 +588,7 @@ export default function CalculationWorkspace({
 
                     return (
                       <DrillDownRow
-                        key={`${activeLevel}:${String(row.dimension_key ?? idx)}`}
+                        key={`${activeLevel}:${String(row.dimension_key ?? idx)}:${idx}`}
                         level={activeLevel as DrillLevel}
                         row={row}
                         depth={0}

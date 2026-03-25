@@ -227,14 +227,16 @@ export default function InputDataInspector({
         {loading && <Loader2 className="w-3 h-3 text-gray-500 animate-spin ml-auto" />}
 
         {!loading && tableData.length > 0 && (
-          <button
-            type="button"
+          <span
+            role="button"
+            tabIndex={0}
             onClick={(e) => { e.stopPropagation(); handleRefresh(); }}
-            className="ml-auto p-1 rounded text-gray-600 hover:text-gray-400 transition-colors"
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); handleRefresh(); } }}
+            className="ml-auto p-1 rounded text-gray-600 hover:text-gray-400 transition-colors cursor-pointer"
             title="Refresh input data"
           >
             <RefreshCw className="w-3 h-3" />
-          </button>
+          </span>
         )}
       </button>
 

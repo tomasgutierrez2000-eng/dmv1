@@ -36,9 +36,18 @@ export async function GET(): Promise<NextResponse> {
     })),
   });
 
+  // L3 tables are lazy-loaded: include name + category but no fields (fetched on-demand)
+  const mapL3Table = (t: DataDictionaryTable) => ({
+    name: t.name,
+    layer: 'l3' as const,
+    category: t.category,
+    fields: [] as ReturnType<typeof mapTable>['fields'],
+  });
+
   const tables = [
     ...dd.L1.map(mapTable),
     ...dd.L2.map(mapTable),
+    ...dd.L3.map(mapL3Table),
   ];
 
   // Convert DD relationships to FKEdge format (bare table names)

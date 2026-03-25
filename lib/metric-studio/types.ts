@@ -114,9 +114,26 @@ export interface OutputNodeData {
   [key: string]: unknown;
 }
 
-export type StudioNodeData = TableNodeData | TransformNodeData | OutputNodeData;
+/** Data payload for DestinationNode (L3 table where metric results land). */
+export interface DestinationNodeData {
+  type: 'destination';
+  tableName: string;
+  layer: 'l3';
+  targetColumn?: string;
+  fields: Array<{ name: string; dataType?: string }>;
+  category?: string;
+  description?: string;
+  isGhost?: boolean;
+  zoomLevel: ZoomLevel;
+  [key: string]: unknown;
+}
+
+export type StudioNodeData = TableNodeData | TransformNodeData | OutputNodeData | DestinationNodeData;
 export type StudioNode = Node<StudioNodeData>;
-export type StudioEdge = Edge<{ rowCount?: number; label?: string }>;
+
+/** Edge flow types for layer-aware styling. */
+export type EdgeFlowType = 'dim-lookup' | 'source' | 'output';
+export type StudioEdge = Edge<{ rowCount?: number; label?: string; flowType?: EdgeFlowType }>;
 
 // ─── Execution ────────────────────────────────────────────────
 
@@ -153,20 +170,26 @@ export interface StudioExecuteResponse {
   steps?: SQLStep[];
 }
 
+/** Field info returned by the schema API. */
+export interface StudioSchemaField {
+  name: string;
+  dataType?: string;
+  description?: string;
+  isPk?: boolean;
+  fkTarget?: { layer: string; table: string; field: string };
+}
+
+/** Table info returned by the schema API. L3 tables have fields omitted (lazy-loaded). */
+export interface StudioSchemaTable {
+  name: string;
+  layer: 'l1' | 'l2' | 'l3';
+  category: string;
+  fields: StudioSchemaField[];
+}
+
 /** GET /api/metrics/studio/schema */
 export interface StudioSchemaResponse {
-  tables: Array<{
-    name: string;
-    layer: 'l1' | 'l2' | 'l3';
-    category: string;
-    fields: Array<{
-      name: string;
-      dataType?: string;
-      description?: string;
-      isPk?: boolean;
-      fkTarget?: { layer: string; table: string; field: string };
-    }>;
-  }>;
+  tables: StudioSchemaTable[];
   relationships: Array<FKEdge>;
 }
 
@@ -177,4 +200,5 @@ export interface StudioTemplateResponse {
   formulaSQL: string;
   nodes: StudioNode[];
   edges: StudioEdge[];
+  l3Destination?: { table: string; column?: string };
 }

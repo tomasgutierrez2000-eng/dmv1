@@ -13,6 +13,7 @@ const LAYER_DOT: Record<string, string> = {
 const LAYER_LABEL: Record<string, string> = {
   l1: 'L1 Reference Tables',
   l2: 'L2 Atomic Tables',
+  l3: 'L3 Derived Tables',
 };
 
 // Popular metric templates — IDs from YAML metric definitions
@@ -33,15 +34,19 @@ export function FieldPalette() {
   const [expandedTables, setExpandedTables] = useState<Set<string>>(new Set());
 
   const filteredTables = useMemo(() => {
-    if (!schema) return { l1: [], l2: [] };
+    if (!schema) return { l1: [], l2: [], l3: [] };
     const q = search.toLowerCase();
     const filter = (tables: typeof schema.tables) =>
       tables.filter(t =>
         !q || t.name.includes(q) || t.fields.some(f => f.name.includes(q))
       );
+    // L3 tables have no fields in schema (lazy-loaded), so filter by name only
+    const filterL3 = (tables: typeof schema.tables) =>
+      tables.filter(t => !q || t.name.includes(q));
     return {
       l1: filter(schema.tables.filter(t => t.layer === 'l1')),
       l2: filter(schema.tables.filter(t => t.layer === 'l2')),
+      l3: filterL3(schema.tables.filter(t => t.layer === 'l3')),
     };
   }, [schema, search]);
 
@@ -90,6 +95,7 @@ export function FieldPalette() {
 
       {/* Tables */}
       <div className="flex-1 overflow-y-auto p-2 space-y-3">
+        {/* L2 and L1 tables — draggable */}
         {(['l2', 'l1'] as const).map(layer => (
           <div key={layer}>
             <div className="flex items-center gap-1.5 mb-1.5 px-1">
@@ -133,6 +139,44 @@ export function FieldPalette() {
             ))}
           </div>
         ))}
+
+        {/* L3 tables — browse-only, NOT draggable */}
+        {filteredTables.l3.length > 0 && (
+          <div className="border-t border-slate-800 pt-2 mt-2">
+            <div className="flex items-center gap-1.5 mb-1.5 px-1">
+              <span className={`w-2 h-2 rounded-full ${LAYER_DOT.l3}`} />
+              <span className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
+                {LAYER_LABEL.l3}
+              </span>
+            </div>
+            {filteredTables.l3.map(table => (
+              <div key={table.name} className="mb-1">
+                <button
+                  onClick={() => toggleTable(table.name)}
+                  className="w-full text-left px-2 py-1 rounded text-xs text-slate-500 hover:bg-[#1a1a25] hover:text-slate-300 flex items-center gap-1"
+                >
+                  <span className="text-[10px] text-slate-600">
+                    {expandedTables.has(table.name) ? '▾' : '▸'}
+                  </span>
+                  <span className="truncate font-mono text-[11px]">{table.name}</span>
+                </button>
+                {expandedTables.has(table.name) && (
+                  <div className="ml-4 mt-0.5">
+                    {table.fields.length > 0 ? (
+                      table.fields.slice(0, 20).map(f => (
+                        <div key={f.name} className="text-[10px] text-slate-600 font-mono px-1.5 py-0.5 truncate">
+                          {f.name}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-[9px] text-slate-600 italic px-1.5 py-0.5">Output table — fields loaded on inspect</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Templates */}
         <div className="border-t border-slate-800 pt-2 mt-2">

@@ -19,6 +19,7 @@ import '@xyflow/react/dist/style.css';
 import { TableNode } from './nodes/TableNode';
 import { TransformNode } from './nodes/TransformNode';
 import { OutputNode } from './nodes/OutputNode';
+import { DestinationNode } from './nodes/DestinationNode';
 import { DataFlowEdge } from './edges/DataFlowEdge';
 import { useStudioStore } from '@/lib/metric-studio/canvas-state';
 import type { StudioDragPayload, StudioNode, StudioEdge, ZoomLevel } from '@/lib/metric-studio/types';
@@ -28,6 +29,7 @@ const nodeTypes = {
   tableNode: TableNode,
   transformNode: TransformNode,
   outputNode: OutputNode,
+  destinationNode: DestinationNode,
 };
 
 const edgeTypes = {
@@ -144,10 +146,11 @@ function MetricStudioCanvasInner() {
         <MiniMap
           className="!bg-slate-900 !border-slate-700"
           nodeColor={(n) => {
-            const layer = (n.data as { layer?: string })?.layer;
-            if (layer === 'l1') return '#14b8a6';
-            if (layer === 'l2') return '#8b5cf6';
-            if (layer === 'l3') return '#f43f5e';
+            const d = n.data as { layer?: string; type?: string };
+            if (d.type === 'destination') return '#f43f5e';
+            if (d.layer === 'l1') return '#14b8a6';
+            if (d.layer === 'l2') return '#8b5cf6';
+            if (d.layer === 'l3') return '#f43f5e';
             return '#D04A02';
           }}
           maskColor="rgba(0,0,0,0.7)"

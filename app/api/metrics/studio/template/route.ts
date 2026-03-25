@@ -4,13 +4,21 @@
  * Load a pre-built metric DAG as Studio nodes + edges.
  * Server-side proxy that uses generateLineage() and getCatalogueItem()
  * (both require fs access) and returns React Flow-compatible nodes/edges.
+ *
+ * Enhanced: includes L3 DestinationNode showing where the metric result lands,
+ * and edge flow types for layer-aware styling.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { jsonSuccess, jsonError } from '@/lib/api-response';
 import { generateLineage } from '@/lib/lineage-generator';
 import { getMergedMetrics } from '@/lib/metrics-store';
-import type { StudioNode, StudioEdge, TableNodeData, TransformNodeData, OutputNodeData } from '@/lib/metric-studio/types';
+import { readDataDictionary } from '@/lib/data-dictionary';
+import { resolveL3Destination } from '@/lib/metric-studio/l3-mapping';
+import type {
+  StudioNode, StudioEdge, TableNodeData, TransformNodeData,
+  OutputNodeData, DestinationNodeData, EdgeFlowType,
+} from '@/lib/metric-studio/types';
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
@@ -38,6 +46,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   // Convert LineageNode/Edge to React Flow Studio nodes/edges
+  let outputNodeId: string | null = null;
+
   const studioNodes: StudioNode[] = lineageNodes.map((n, i) => {
     const isOutput = n.layer === 'L3' && !lineageEdges.some(e => e.from === n.id);
     const isTransform = n.layer === 'transform';
@@ -45,6 +55,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     let data: TableNodeData | TransformNodeData | OutputNodeData;
 
     if (isOutput) {
+      outputNodeId = n.id;
       data = {
         type: 'output',
         metricName: metric.name,
@@ -75,18 +86,91 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return {
       id: n.id,
       type: isOutput ? 'outputNode' : isTransform ? 'transformNode' : 'tableNode',
-      position: { x: 0, y: i * 120 }, // Will be re-laid out by Dagre
+      position: { x: 0, y: i * 120 },
       data,
     };
   });
 
-  const studioEdges: StudioEdge[] = lineageEdges.map((e, i) => ({
-    id: `e-${i}`,
-    source: e.from,
-    target: e.to,
-    type: 'dataFlowEdge',
-    data: { label: e.label },
-  }));
+  // Determine edge flow types based on source/target node layers
+  const nodeLayerMap = new Map<string, string>();
+  for (const n of lineageNodes) {
+    nodeLayerMap.set(n.id, n.layer);
+  }
+
+  const studioEdges: StudioEdge[] = lineageEdges.map((e, i) => {
+    const sourceLayer = nodeLayerMap.get(e.from);
+    let flowType: EdgeFlowType | undefined;
+    if (sourceLayer === 'L1') flowType = 'dim-lookup';
+    else if (sourceLayer === 'L2') flowType = 'source';
+
+    return {
+      id: `e-${i}`,
+      source: e.from,
+      target: e.to,
+      type: 'dataFlowEdge',
+      data: { label: e.label, flowType },
+    };
+  });
+
+  // --- L3 Destination Node ---
+  let l3Destination: { table: string; column?: string } | undefined;
+
+  const l3TableName = resolveL3Destination(metricId);
+  const destNodeId = 'l3-destination';
+
+  if (l3TableName) {
+    // Look up L3 table fields from data dictionary
+    const dd = readDataDictionary();
+    const l3Table = dd?.L3?.find(t => t.name === l3TableName);
+
+    const destData: DestinationNodeData = {
+      type: 'destination',
+      tableName: l3TableName,
+      layer: 'l3',
+      targetColumn: 'metric_value',
+      fields: l3Table?.fields?.map(f => ({ name: f.name, dataType: f.data_type })) ?? [],
+      category: l3Table?.category,
+      isGhost: false,
+      zoomLevel: 'analyst',
+    };
+
+    studioNodes.push({
+      id: destNodeId,
+      type: 'destinationNode',
+      position: { x: 0, y: studioNodes.length * 120 },
+      data: destData,
+    });
+
+    l3Destination = { table: l3TableName, column: 'metric_value' };
+  } else {
+    // Ghost node — L3 destination unknown
+    const destData: DestinationNodeData = {
+      type: 'destination',
+      tableName: 'unknown',
+      layer: 'l3',
+      fields: [],
+      isGhost: true,
+      zoomLevel: 'analyst',
+    };
+
+    studioNodes.push({
+      id: destNodeId,
+      type: 'destinationNode',
+      position: { x: 0, y: studioNodes.length * 120 },
+      data: destData,
+    });
+  }
+
+  // Edge from output → destination
+  if (outputNodeId) {
+    studioEdges.push({
+      id: `e-dest`,
+      source: outputNodeId,
+      target: destNodeId,
+      type: 'dataFlowEdge',
+      data: { label: 'writes to', flowType: 'output' },
+    });
+  }
 
   return jsonSuccess({
     metricId: metric.id,
@@ -94,5 +178,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     formulaSQL: metric.formulaSQL ?? metric.formula ?? '',
     nodes: studioNodes,
     edges: studioEdges,
+    l3Destination,
   });
 }

@@ -15,12 +15,12 @@ const LAYER_LABEL: Record<string, string> = {
   l2: 'L2 Atomic Tables',
 };
 
-// A few popular metric templates
+// Popular metric templates — IDs from YAML metric definitions
 const TEMPLATES = [
-  { id: 'C001', name: 'Expected Loss Rate' },
-  { id: 'C003', name: 'DSCR' },
-  { id: 'C005', name: 'LTV' },
-  { id: 'C010', name: 'Utilization Rate' },
+  { id: 'EXP-015', name: 'Expected Loss Rate (%)' },
+  { id: 'EXP-014', name: 'DSCR' },
+  { id: 'RSK-009', name: 'Loan-to-Value (%)' },
+  { id: 'EXP-021', name: 'Utilization Status' },
 ];
 
 export function FieldPalette() {

@@ -110,7 +110,7 @@ export const useAgentLibraryStore = create<AgentLibraryState>((set, get) => ({
       filtered = filtered.filter(a =>
         a.name.toLowerCase().includes(q) ||
         a.description.toLowerCase().includes(q) ||
-        a.capabilities.some(c => c.toLowerCase().includes(q))
+        a.capabilities.some(c => c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q))
       );
     }
     return filtered;

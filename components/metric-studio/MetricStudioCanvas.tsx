@@ -21,6 +21,7 @@ import { TransformNode } from './nodes/TransformNode';
 import { OutputNode } from './nodes/OutputNode';
 import { DataFlowEdge } from './edges/DataFlowEdge';
 import { useStudioStore } from '@/lib/metric-studio/canvas-state';
+import { layoutNodes, hasOverlappingNodes } from '@/lib/metric-studio/layout-engine';
 import type { StudioDragPayload, StudioNode, StudioEdge, ZoomLevel } from '@/lib/metric-studio/types';
 
 // Defined OUTSIDE component to prevent re-render cascade (React Flow perf rule #1)
@@ -66,6 +67,19 @@ function MetricStudioCanvasInner() {
   useEffect(() => {
     setZoomLevel(zoomLevel);
   }, [zoomLevel, setZoomLevel]);
+
+  // Auto-layout when nodes change and overlap is detected
+  const prevNodeCount = React.useRef(nodes.length);
+  useEffect(() => {
+    if (nodes.length > 1 && nodes.length !== prevNodeCount.current) {
+      // Check for overlaps and apply layout if needed
+      if (hasOverlappingNodes(nodes)) {
+        const layouted = layoutNodes(nodes, edges, { direction: 'LR' });
+        useStudioStore.setState({ nodes: layouted as StudioNode[] });
+      }
+    }
+    prevNodeCount.current = nodes.length;
+  }, [nodes.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onNodesChange: OnNodesChange = useCallback((changes) => {
     useStudioStore.setState({

@@ -24,6 +24,8 @@ export interface FullQualityControlResult extends QualityControlResult {
   group9_realism: QualityControlResult;
   group10_antiSynthetic: QualityControlResult;
   group11_reconciliation: QualityControlResult;
+  group12_scdIntegrity: QualityControlResult;
+  group13_bridgeAllocation: QualityControlResult;
 }
 
 /* ────────────────── Helpers ────────────────── */

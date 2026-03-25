@@ -1,7 +1,7 @@
 /**
  * Quality Controls — holistic L1-driven data quality checks for Factory V2 output.
  *
- * 11 control groups covering every aspect of GSIB data quality:
+ * 13 control groups covering every aspect of GSIB data quality:
  *
  *   1. L1 FK Domain Validation — every FK value in L2 rows exists in L1
  *   2. Enrichment Map Drift Detection — hardcoded maps haven't gone stale
@@ -9,12 +9,14 @@
  *   4. Cross-Field Consistency — values are coherent with L1-driven rules
  *   5. Story Arc Fidelity — generated data tells the scenario's story
  *   6. Cross-Table Correlation — tables that should co-exist do
- *   7. Temporal Coherence — time series are well-formed and consistent
+ *   7. Temporal Coherence — time series well-formed, calendar frequency enforcement
  *   8. Portfolio Distribution — data isn't suspiciously uniform
  *   9. Financial Realism & GSIB Bounds — amounts/rates within regulatory limits
  *  10. Anti-Synthetic Pattern Detection — data looks real, not generated
  *  11. Reconciliation & Completeness — cross-table value matches, internal FKs,
  *      cash flow <-> balance reconciliation, limit aggregation, audit metadata
+ *  12. SCD-2 Integrity — single current row per entity, non-overlapping effective windows
+ *  13. Bridge Allocation Integrity — allocation percentages sum to 1.0, amounts don't exceed parents
  *
  * Each group returns { errors, warnings } consistent with validator.ts pattern.
  */
@@ -40,6 +42,8 @@ export { runPortfolioDistribution } from './distribution-health';
 export { runFinancialRealism } from './realism-bounds';
 export { runAntiSyntheticChecks } from './anti-synthetic-detection';
 export { runReconciliation } from './reconciliation';
+export { runSCDIntegrity } from './scd-integrity';
+export { runBridgeAllocationChecks } from './bridge-allocation';
 
 // Import for orchestrator
 import type { FullQualityControlResult } from './shared-types';
@@ -55,6 +59,8 @@ import { runPortfolioDistribution } from './distribution-health';
 import { runFinancialRealism } from './realism-bounds';
 import { runAntiSyntheticChecks } from './anti-synthetic-detection';
 import { runReconciliation } from './reconciliation';
+import { runSCDIntegrity } from './scd-integrity';
+import { runBridgeAllocationChecks } from './bridge-allocation';
 
 /**
  * Run all 11 quality control groups for a scenario.
@@ -76,8 +82,10 @@ export function runAllQualityControls(
   const group9 = runFinancialRealism(output, chain);
   const group10 = runAntiSyntheticChecks(output);
   const group11 = runReconciliation(output, chain);
+  const group12 = runSCDIntegrity(output);
+  const group13 = runBridgeAllocationChecks(output, chain);
 
-  const combined = merge(group1, group2, group3, group4, group5, group6, group7, group8, group9, group10, group11);
+  const combined = merge(group1, group2, group3, group4, group5, group6, group7, group8, group9, group10, group11, group12, group13);
 
   return {
     ...combined,
@@ -92,5 +100,7 @@ export function runAllQualityControls(
     group9_realism: group9,
     group10_antiSynthetic: group10,
     group11_reconciliation: group11,
+    group12_scdIntegrity: group12,
+    group13_bridgeAllocation: group13,
   };
 }

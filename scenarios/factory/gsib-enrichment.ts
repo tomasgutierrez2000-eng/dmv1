@@ -252,6 +252,8 @@ export interface EnrichedFacility {
   counterparty_id: string;
   facility_name: string;
   facility_type: string;
+  /** DQ FIX: FK to l1.facility_type_dim — MUST be populated to avoid "Unknown" type on dashboard */
+  facility_type_id: number;
   facility_status: string;
   committed_facility_amt: number;
   currency_code: string;
@@ -260,6 +262,8 @@ export interface EnrichedFacility {
   portfolio_id: number;
   industry_code: string;
   lob_segment_id: number;
+  /** DQ FIX: FK to l2.legal_entity — MUST be populated for capital metrics rollup */
+  legal_entity_id: number;
   product_node_id: number;
   rate_index_id: number;
   ledger_account_id: number;
@@ -351,6 +355,12 @@ export function enrichFacilities(
       counterparty_id: counterparty.counterparty_id,
       facility_name: `${shortName} — ${countryMap.currency} ${typeLabel} ${originYear + tenorYears}-${slot.tranche}`,
       facility_type: slot.facilityType,
+      // DQ FIX: Map facility_type string → facility_type_dim PK (prevents "Unknown" type=12)
+      facility_type_id: ({
+        REVOLVING_CREDIT: 4, TERM_LOAN: 1, TERM_LOAN_B: 2, BRIDGE_LOAN: 3,
+        LETTER_OF_CREDIT: 5, FINANCIAL_GUAR: 6, PERF_GUAR: 7, UNCOMMITTED: 8,
+        TRADE_FINANCE: 9, ABL: 10, SBLC: 11,
+      } as Record<string, number>)[slot.facilityType] ?? 1,
       facility_status: 'ACTIVE',
       committed_facility_amt: facilityCommit,
       currency_code: countryMap.currency,
@@ -358,7 +368,26 @@ export function enrichFacilities(
       maturity_date: maturityDate,
       portfolio_id: ratingTier.startsWith('IG') ? pick(rng, [810001, 810003, 810005, 810006]) : pick(rng, [810002, 810009, 810010]),
       industry_code: industryCodes[counterparty.industry_id] ?? 'IND',
-      lob_segment_id: pick(rng, [400001, 400002, 400003, 400004, 400005, 400006, 400007, 400008, 400009, 400010]),
+      // DQ FIX: Use LEAF node IDs across multiple segments (not 400001-400010 which are non-leaf parents)
+      // Maps entity_type to appropriate segment leaves for dashboard diversity
+      lob_segment_id: ({
+        RE: pick(rng, [400036, 400050, 400059, 400067, 400075]),     // CRE leaves
+        BANK: pick(rng, [400143, 400148, 400152, 400168]),           // Global Markets leaves
+        FI: pick(rng, [400143, 400148, 400152, 400168]),             // Global Markets leaves
+        SOV: pick(rng, [400222, 400228, 400231]),                     // Public Sector leaves
+        PSE: pick(rng, [400222, 400228, 400231]),                     // Public Sector leaves
+        FUND: pick(rng, [400130, 400134, 400138]),                    // Investment Banking leaves
+        PE: pick(rng, [400130, 400131, 400134]),                      // Investment Banking leaves
+        INS: pick(rng, [400189, 400190]),                             // Asset Management leaves
+      } as Record<string, number>)[counterparty.entity_type_code]
+        ?? pick(rng, [400003, 400004, 400009, 400019, 400020, 400022]), // Corporate Banking leaves
+      // DQ FIX: Assign legal_entity_id based on geography (prevents NULL blocking capital metrics)
+      legal_entity_id: ({
+        US: pick(rng, [1, 2, 3]),   // National Bank, Securities, Capital
+        GB: 8, DE: 8, FR: 8, CH: 8, // Europe
+        JP: 9, AU: 9, IN: 9, KR: 9, // Asia Pacific
+        CA: 10, SG: 11, HK: 12,
+      } as Record<string, number>)[counterparty.country_code] ?? 7, // International
       product_node_id: pick(rng, [410001, 410002, 410003, 410004, 410005, 410006, 410007, 410008, 410009, 410010]),
       rate_index_id: pick(rng, [500001, 500002, 500003, 500004, 500005]),
       ledger_account_id: pick(rng, [510001, 510002, 510003, 510004, 510005, 510006, 510007, 510008]),
@@ -458,12 +487,18 @@ export interface EnrichedAllocation {
  * @param allocationId  Pre-allocated ID from IDRegistry
  */
 export function enrichLenderAllocation(facility: EnrichedFacility, allocationId: string): EnrichedAllocation {
+  // DQ FIX: Vary bank_share_pct for syndication diversity — ~20% of facilities are syndicated
+  // Larger facilities (>500M) more likely to be syndicated
+  const isSyndicated = facility.committed_facility_amt > 500_000_000
+    || parseInt(facility.facility_id) % 5 === 0;
+  const syndicatedShare = [0.35, 0.50, 0.65, 0.80][parseInt(facility.facility_id) % 4];
+
   return {
     lender_allocation_id: allocationId,
     facility_id: facility.facility_id,
-    legal_entity_id: facility.ledger_account_id <= 5 ? facility.ledger_account_id : 1,
-    allocation_role: 'LEAD_ARRANGER',
-    bank_share_pct: 1.0,
+    legal_entity_id: facility.legal_entity_id,
+    allocation_role: isSyndicated ? 'LEAD_ARRANGER' : 'SOLE_LENDER',
+    bank_share_pct: isSyndicated ? syndicatedShare : 1.0,
     is_current_flag: 'Y',
     effective_start_date: facility.origination_date,
     effective_end_date: null,

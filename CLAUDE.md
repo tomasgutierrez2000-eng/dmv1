@@ -16,9 +16,9 @@ In QA mode, flag any code that doesn't match DESIGN.md.
 Banking data model visualization platform with metrics calculation engine. Next.js 14 App Router, TypeScript, Tailwind CSS, Zustand, Recharts. PostgreSQL + sql.js for calculations.
 
 ## Architecture: Three-Layer Data Model
-- **L1 — Reference Data (75 tables):** Dimensions, lookups, hierarchies, configuration. Rarely changes. Examples: `currency_dim`, `metric_threshold`, `enterprise_business_taxonomy`, `rating_scale_dim`
+- **L1 — Reference Data (77 tables):** Dimensions, lookups, hierarchies, configuration. Rarely changes. Examples: `currency_dim`, `metric_threshold`, `enterprise_business_taxonomy`, `rating_scale_dim`
 - **L2 — Atomic Data (102 tables):** Raw source-system snapshots, events, and master tables. Point-in-time observations, not computed. Examples: `counterparty`, `facility_master`, `credit_agreement_master`, `facility_exposure_snapshot`, `credit_event`, `position`
-- **L3 — Derived Data (83 tables):** Anything calculated, aggregated, or computed from L1+L2. Examples: `exposure_metric_cube`, `facility_financial_calc`, `stress_test_result`
+- **L3 — Derived Data (76 tables):** Anything calculated, aggregated, or computed from L1+L2. Examples: `exposure_metric_cube`, `facility_financial_calc`, `stress_test_result`
 
 Rollup hierarchy: **Facility → Counterparty → Desk (L3) → Portfolio (L2) → Business Segment (L1)**
 
@@ -47,7 +47,7 @@ lib/                    # Core business logic
   deep-dive/            # Seed metrics, lineage parser, cross-tier resolver
 data/                   # Data definitions
   l3-metrics.ts         # 110+ metric definitions (SOURCE OF TRUTH for L3 metrics)
-  l3-tables.ts          # 83 L3 table definitions
+  l3-tables.ts          # 76 L3 table definitions
   metric-library/       # catalogue.json, variants.json, parent-metrics.json, domains.json
 scripts/                # CLI data processing scripts
 ```
@@ -1055,6 +1055,81 @@ DATABASE_URL="$NEW_DB_URL" npx tsx scenarios/factory/seed-time-series.ts
 
 ### Factory ID Convention
 All entity IDs (`facility_id`, `counterparty_id`, `credit_agreement_id`, etc.) are **strings** in TypeScript throughout the factory pipeline. The IDRegistry allocates contiguous numeric ranges internally but returns `string[]` from `allocate()`. SQL emission converts back to unquoted integers via `formatSqlValue()`. PostgreSQL stores them as `BIGINT`.
+
+## L2 Data Quality Agent Suite
+
+53-agent DQ review system at `.claude/commands/data-quality/`. Invoke via `/data-quality:orchestrator` for full run or `/data-quality:orchestrator --table l2.facility_master` for single-table deep-dive.
+
+### Architecture
+```
+Phase 0: Baseline Profile (1 agent)
+Phase 1: Structural Dimensions (4 agents parallel — schema, PK/FK, types, nulls)
+Phase 2: Data Value Dimensions (6 agents parallel — distributions, temporal, bounds, booleans, categorical, cross-table)
+Phase 3: Per-Table Deep Dives (15 agents, 3 batches of 5)
+Phase 4: Narrative Validation (4 agents parallel — counterparty journey, facility lifecycle, credit events, rating-PD)
+Phase 5: Report Generation (1 agent)
+```
+
+### Known L2 Data Quality Patterns (from 2026-03-25 baseline audit)
+
+These 12 issues were found in the first comprehensive DQ review. The DQ agents now include regression checks for all of them.
+
+| # | Pattern | Root Cause | Impact | Fix Pattern |
+|---|---------|-----------|--------|-------------|
+| 1 | All facilities mapped to single type | Seed generator defaulted to "Unknown" (id=12) | CCF calculations, product-mix analysis broken | `UPDATE SET facility_type_id = CASE WHEN id % 100 < 35 THEN 1 ...` with GSIB mix |
+| 2 | `legal_entity_id` 100% NULL | Column added after seed data generated | Capital metrics cascade-fail | Map by counterparty geography → legal entity |
+| 3 | Placeholder `rating_value = '0'` | Seed generator used '0' for unrated | Rating migration and PD-grade metrics invalid | Correlate via `internal_risk_rating` → `rating_scale_dim` grades |
+| 4 | Facilities on non-leaf EBT nodes | Seed assigned to parent-level segments | Rollup double-counting | Recursive leaf mapping (may need 2-3 passes) |
+| 5 | Collateral haircuts all zero | Generator skipped Basel III haircut logic | Eligible collateral overstated | Set by `collateral_asset_type`: RE=25%, equipment=30%, receivables=15%, securities=20% |
+| 6 | Missing snapshot month | `facility_financial_snapshot` had 2 dates vs 3 | Cross-table JOIN returns 0 rows for that date | Copy adjacent month with slight variance |
+| 7 | Uniform `bank_share_pct` = 1.0 | No syndication data generated | Syndication metrics trivial | Set 5 tiers: 35%, 50%, 65%, 80%, 100% |
+| 8 | Single amendment type | All 'WAIVER', no diversity | Amendment analysis useless | Distribute across all 10 `amendment_type_dim` codes |
+| 9 | Sparse counterparty hierarchy | Only 8% coverage | Group-level analysis limited | Add parent/subsidiary by country grouping |
+| 10 | Low collateral coverage | Only 12% of facilities | Coverage metrics unreliable | Add collateral assets with realistic LTV ratios |
+| 11 | Perfect snapshot uniformity | stddev=0 (exactly 3 per facility) | Anti-synthetic signal for auditors | Remove Nov snapshots for ~14% of facilities |
+| 12 | Zero negative NII | Overly optimistic generator | Profitability distribution unrealistic | Flip ~10% to negative |
+
+### Column Name Gotchas (actual vs commonly assumed)
+
+| Table | Assumed Name | Actual Name |
+|-------|-------------|-------------|
+| counterparty_rating_observation | `observation_date` | `as_of_date` |
+| counterparty_rating_observation | `rating_agency_code` | `rating_agency` |
+| facility_pricing_snapshot | `interest_rate_spread_bps` | `spread_bps` |
+| risk_flag | `risk_flag_type_code` | `flag_type` |
+| credit_event | `event_type_code` | `credit_event_type_code` |
+| collateral_snapshot | `collateral_value_amt` | `valuation_amount` |
+| facility_profitability_snapshot | `net_interest_income_amt` | `interest_income_amt` |
+
+**Rule:** Always run `SELECT column_name FROM information_schema.columns WHERE table_schema='l2' AND table_name='xxx'` before writing queries against unfamiliar tables.
+
+### Generator Root Causes (Systemic Fixes Applied 2026-03-25)
+
+These root causes in the data generation pipeline produced the DQ issues above. All have been fixed in the source code.
+
+| Issue | Generator | Root Cause | Fix File |
+|-------|-----------|-----------|----------|
+| All facility_type_id = 12 | L1 seed | `facility_type_id` column not handled — DDL migration added it but generator had no case for it | `scripts/l1/seed-data.ts` — added GSIB mix distribution |
+| legal_entity_id NULL | Factory | `EnrichedFacility` interface didn't include the field | `scenarios/factory/gsib-enrichment.ts` — added geography-based mapping |
+| bank_share_pct = 1.0 | Factory | `enrichLenderAllocation()` hardcoded 1.0 | `scenarios/factory/gsib-enrichment.ts` — added syndication logic |
+| lob_segment_id non-leaf | Factory | `enrichFacilities()` picked from IDs 400001-400010 (all non-leaf parents) | `scenarios/factory/gsib-enrichment.ts` — mapped by entity_type to verified leaf IDs |
+| All same segment | Factory | All lob_segment_id picks were under Corporate Banking | `scenarios/factory/gsib-enrichment.ts` — entity_type → segment mapping across 6 segments |
+| FX duplicates | L1 seed | Generated one FX row per facility-currency instead of per unique (ccy, date) pair | Generator produces per-facility; DQ agent now detects and deduplicates |
+
+**Prevention rule for future generator work:** When adding a column to the PostgreSQL schema via DDL migration, ALWAYS also add a handler for that column in the relevant seed data generator (`scripts/l1/seed-data.ts` or `scripts/l2/seed-data.ts`). Missing handlers produce NULL or fall through to the type-based default which generates placeholder values.
+
+### DQ Agent Architecture (54 agents)
+
+```
+Phase 0: Baseline Profile (1 agent)
+Phase 1: Structural (4 agents) — schema, PK/FK + logical uniqueness, types, nulls
+Phase 2: Data Value (7 agents) — distributions, temporal, bounds, booleans, categorical, cross-table, **dashboard-readiness**
+Phase 3: Per-Table (15 agents, 3 batches)
+Phase 4: Narrative (4 agents)
+Phase 5: Report (1 agent)
+```
+
+The **dq-dashboard-readiness** agent (added 2026-03-25) specifically catches issues that break dashboards during aggregation: JOIN fan-out, rollup dimension concentration, EBT non-leaf, FX coverage gaps, NULL dimension keys, and Simpson's paradox risks.
 
 ## Agent Suite Architecture
 

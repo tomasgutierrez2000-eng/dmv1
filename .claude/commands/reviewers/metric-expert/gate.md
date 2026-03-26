@@ -358,7 +358,34 @@ When `--force` flag is used on a FAILed metric:
 
 ---
 
-## 6. Integration Points
+## 6. Lessons Learned (E2E Testing 2026-03-26)
+
+### Domain Validation Checks to Add
+
+When validating metric results, the gate should check these additional GSIB-specific patterns:
+
+| Check | What to verify | Example failure |
+|-------|---------------|-----------------|
+| **Rating tier diversity** | Results span multiple tiers/buckets, not a single value | RSK-001 returned 100% Investment Grade because all counterparties had pd_annual < 0.06%. Formula was correct but metric was untestable. |
+| **Ratio NULL rate** | NULLs from NULLIF denominator protection should be < 30% | CAP-001 had 12.8% NULLs from zero-RWA facilities — acceptable. >30% means seed data has too many zero-denominator rows. |
+| **Direction field correctness** | `direction` in YAML matches business semantics | CAP-001 had `direction: NEUTRAL` but capital adequacy is clearly `HIGHER_BETTER`. Gate should flag direction mismatches for ratio/percentage metrics. |
+| **Validation severity vs expected NULLs** | `NOT_NULL` with `severity: ERROR` should not exist on metrics where denominator can legitimately be zero | CAP-001 V01 was `ERROR` but expected 12.8% NULLs from zero-RWA. Should be `WARNING`. |
+| **FX conversion at aggregate levels** | CURRENCY metrics at counterparty+ must include `fx_rate` join | CAP-001 sums across currencies without conversion at aggregate levels — will produce incorrect ratios for multi-currency portfolios. |
+| **Owner field correctness** | `owner` matches the domain | CAP-001 had `owner: market-risk` but capital adequacy belongs to `capital` or `treasury`. |
+
+### Studio Execute Route Patterns
+
+When the gate tests formulas via the studio execute API (`/api/metrics/studio/execute`), be aware of:
+
+1. **Case-sensitive table key filter**: The `getDistinctAsOfDates` function in sql-runner historically filtered for uppercase `L2.`/`L1.` but the execute route sends lowercase. This was fixed 2026-03-26 but can recur if new code adds case-sensitive key comparisons.
+
+2. **`:as_of_date` parameter in PG mode**: The sql.js `:as_of_date` bind syntax doesn't work in PostgreSQL. The execute route now auto-resolves the latest date from the DB. If testing directly via psql, replace `:as_of_date` with `(SELECT MAX(as_of_date) FROM l2.facility_exposure_snapshot)`.
+
+3. **Scalar vs grouped results**: If the sql-runner returns 0 rows (e.g., due to empty WHERE match), the execute route returns a scalar result `{ dimension_key: 'scalar', metric_value: null }`. The gate should interpret this as "no data" rather than a formula error — investigate the `:as_of_date` binding and sample data coverage first.
+
+---
+
+## 7. Integration Points
 
 ### Upstream (who invokes this gate)
 - **User** via `/reviewers:metric-expert-gate {METRIC_ID}` (Mode A)

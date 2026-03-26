@@ -315,3 +315,25 @@ These column names differed from common assumptions during the DQ run:
 | counterparty_hierarchy | `child_counterparty_id` | PK is `counterparty_id` (the child IS the PK) |
 
 **Lesson:** Always run `SELECT column_name FROM information_schema.columns WHERE table_schema='l2' AND table_name='xxx'` before writing queries with assumed column names. The data dictionary has the correct names but agent prompts may use outdated assumptions.
+
+### Additional Regression Tests (2026-03-26 E2E Metric Validation)
+
+These issues were found during end-to-end testing of 5 GSIB metrics (EXP-001, CAP-001, PRC-001, RSK-001, REF-001):
+
+| # | Finding | Table | Severity | Regression SQL |
+|---|---------|-------|----------|---------------|
+| 13 | ALL counterparties have `pd_annual` < 0.06% — 100% Investment Grade, no tier diversity | counterparty | CRITICAL | `SELECT COUNT(DISTINCT CASE WHEN pd_annual > 0.4 THEN 1 WHEN pd_annual > 2.0 THEN 2 WHEN pd_annual > 10 THEN 3 END) AS tiers FROM l2.counterparty WHERE pd_annual IS NOT NULL` → must be >= 3 |
+| 14 | Low position diversity: 98.6% of facilities have exactly 1 position | position | MEDIUM | `SELECT ROUND(STDDEV(cnt)::numeric, 2) FROM (SELECT facility_id, COUNT(DISTINCT position_id) AS cnt FROM l2.position GROUP BY facility_id) t` → stddev must be > 0.5 |
+| 15 | Capital adequacy NOT_NULL validation at ERROR severity but 12.8% NULLs are expected | YAML validation | LOW | Check all YAML files: `NOT_NULL` + `severity: ERROR` on ratio metrics with NULLIF denominators → should be WARNING |
+
+### Metric-Specific GSIB Distribution Checks
+
+When running deep-dives on individual metrics, verify output distributions match these GSIB expectations:
+
+| Metric Type | Expected Distribution | Red Flag |
+|------------|----------------------|----------|
+| Risk Rating Tier | 60% IG, 25% Standard, 10% Sub, 4% Doubtful, 1% Loss | 100% single tier |
+| Capital Adequacy (%) | 80% in 8-20% range, <5% above 50% | >30% NULLs or >10% above 50% |
+| All-in Rate (%) | Spread across 1-25%, concentration in 5-10% | All values identical or >50% |
+| Collateral Value ($) | Log-normal distribution, 100K-10M range typical | All zero or all same value |
+| Position Count | 1-5 per facility, some with 10+ | All = 1 (no diversity) |

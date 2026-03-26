@@ -87,6 +87,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       WHERE fps.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM
@@ -107,6 +108,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       WHERE fps.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
@@ -128,6 +130,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
           AND ebt.is_current_flag = 'Y'
@@ -152,6 +155,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
           AND ebt_l3.is_current_flag = 'Y'
@@ -179,6 +183,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
           AND ebt_l3.is_current_flag = 'Y'

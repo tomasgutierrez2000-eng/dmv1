@@ -1148,8 +1148,8 @@
         },
         {
           "op": "*",
-          "field": "risk_weight_pct",
-          "label": "risk_weight_pct",
+          "field": "risk_weight_std_pct",
+          "label": "risk_weight_std_pct",
           "sample_value": 0,
           "source_table": "facility_risk_snapshot",
           "source_layer": "L2"
@@ -1173,8 +1173,8 @@
         "subtotal_fn": "none"
       },
       {
-        "field": "risk_weight_pct",
-        "header": "Risk Weight (%)",
+        "field": "risk_weight_std_pct",
+        "header": "Risk Weight Std (%)",
         "format": "percentage",
         "subtotal_fn": "none"
       },
@@ -1239,12 +1239,12 @@
           "join_on": "frs.facility_id = fprs.facility_id AND frs.as_of_date = fprs.as_of_date",
           "fields": [
             {
-              "name": "risk_weight_pct",
+              "name": "risk_weight_std_pct",
               "role": "MEASURE",
-              "description": "risk_weight_pct"
+              "description": "risk_weight_std_pct"
             }
           ],
-          "purpose": "Provides risk weight pct"
+          "purpose": "Provides risk weight std pct"
         },
         {
           "alias": "fm",
@@ -1283,7 +1283,7 @@
           "table_name": "enterprise_business_taxonomy",
           "layer": "L1",
           "join_type": "LEFT",
-          "join_on": "ebt.managed_segment_id = fm.lob_segment_id",
+          "join_on": "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'",
           "fields": [
             {
               "name": "managed_segment_id",
@@ -10099,7 +10099,7 @@
           "table_name": "enterprise_business_taxonomy",
           "layer": "L1",
           "join_type": "LEFT",
-          "join_on": "ebt.managed_segment_id = fm.lob_segment_id",
+          "join_on": "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'",
           "fields": [
             {
               "name": "managed_segment_id",

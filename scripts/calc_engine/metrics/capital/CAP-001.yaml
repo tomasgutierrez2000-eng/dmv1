@@ -43,7 +43,7 @@ source_tables:
   join_type: LEFT
   join_on: frs.facility_id = fprs.facility_id AND frs.as_of_date = fprs.as_of_date
   fields:
-  - name: risk_weight_pct
+  - name: risk_weight_std_pct
     role: MEASURE
 - schema: l2
   table: facility_master
@@ -63,7 +63,7 @@ source_tables:
   table: enterprise_business_taxonomy
   alias: ebt
   join_type: LEFT
-  join_on: ebt.managed_segment_id = fm.lob_segment_id
+  join_on: ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'
   fields:
   - name: managed_segment_id
     role: DIMENSION
@@ -78,7 +78,7 @@ levels:
       SELECT
         fprs.facility_id AS dimension_key,
         fprs.allocated_equity_amt
-          / NULLIF(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0, 0)
+          / NULLIF(fes.drawn_amount * COALESCE(frs.risk_weight_std_pct, 100.0) / 100.0, 0)
           * 100.0 AS metric_value
       FROM l2.facility_profitability_snapshot fprs
       INNER JOIN l2.facility_exposure_snapshot fes
@@ -90,6 +90,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       WHERE fprs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM
@@ -99,7 +100,7 @@ levels:
       SELECT
         fm.counterparty_id AS dimension_key,
         SUM(fprs.allocated_equity_amt)
-          / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0)
+          / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_std_pct, 100.0) / 100.0), 0)
           * 100.0 AS metric_value
       FROM l2.facility_profitability_snapshot fprs
       INNER JOIN l2.facility_exposure_snapshot fes
@@ -111,6 +112,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       WHERE fprs.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
@@ -121,7 +123,7 @@ levels:
       SELECT
         ebt.managed_segment_id AS dimension_key,
         SUM(fprs.allocated_equity_amt)
-          / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0)
+          / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_std_pct, 100.0) / 100.0), 0)
           * 100.0 AS metric_value
       FROM l2.facility_profitability_snapshot fprs
       INNER JOIN l2.facility_exposure_snapshot fes
@@ -133,6 +135,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
           AND ebt.is_current_flag = 'Y'
@@ -146,7 +149,7 @@ levels:
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
         SUM(fprs.allocated_equity_amt)
-          / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0)
+          / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_std_pct, 100.0) / 100.0), 0)
           * 100.0 AS metric_value
       FROM l2.facility_profitability_snapshot fprs
       INNER JOIN l2.facility_exposure_snapshot fes
@@ -158,6 +161,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
           AND ebt_l3.is_current_flag = 'Y'
@@ -174,7 +178,7 @@ levels:
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
         SUM(fprs.allocated_equity_amt)
-          / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0)
+          / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_std_pct, 100.0) / 100.0), 0)
           * 100.0 AS metric_value
       FROM l2.facility_profitability_snapshot fprs
       INNER JOIN l2.facility_exposure_snapshot fes
@@ -186,6 +190,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
           AND ebt_l3.is_current_flag = 'Y'

@@ -2,7 +2,7 @@ metric_id: EXP-038
 name: Utilization (%)
 version: 1.0.0
 owner: credit-risk
-status: DRAFT
+status: ACTIVE
 effective_date: '2026-01-01'
 supersedes: null
 domain: exposure
@@ -48,7 +48,7 @@ source_tables:
   table: enterprise_business_taxonomy
   alias: ebt
   join_type: LEFT
-  join_on: ebt.managed_segment_id = fm.lob_segment_id
+  join_on: ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'
   fields:
   - name: managed_segment_id
     role: DIMENSION
@@ -67,6 +67,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       WHERE fes.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM
@@ -85,11 +86,13 @@ levels:
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
         WHERE fes.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: CUSTOM
@@ -108,11 +111,13 @@ levels:
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
         WHERE fes.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
           AND ebt.is_current_flag = 'Y'
@@ -134,11 +139,13 @@ levels:
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
         WHERE fes.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
           AND ebt_l3.is_current_flag = 'Y'
@@ -163,11 +170,13 @@ levels:
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
         WHERE fes.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
           AND ebt_l3.is_current_flag = 'Y'

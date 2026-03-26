@@ -283,7 +283,10 @@ function loadSampleData(tableKeys: string[]): { data: SampleDataByTable; missing
 }
 
 export function getDistinctAsOfDates(tableKeys: string[]): string[] {
-  const { data } = loadSampleData(tableKeys.filter((k) => k.startsWith('L2.') || k.startsWith('L1.')));
+  const { data } = loadSampleData(tableKeys.filter((k) => {
+    const lower = k.toLowerCase();
+    return lower.startsWith('l2.') || lower.startsWith('l1.');
+  }));
   const dates = new Set<string>();
   for (const entry of Object.values(data)) {
     const colIdx = entry.columns.indexOf('as_of_date');

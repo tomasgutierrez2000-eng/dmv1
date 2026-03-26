@@ -2,7 +2,19 @@
 
 import React, { useState, useCallback } from 'react';
 import { useStudioStore } from '@/lib/metric-studio/canvas-state';
-import { CHILD_LEVEL, formatMetricValue, type DrillLevel } from '@/lib/governance/drill-down';
+import { CHILD_LEVEL, type DrillLevel } from '@/lib/governance/drill-down';
+
+// ---------- formatting ----------
+
+function formatStudioValue(val: number): string {
+  if (isNaN(val)) return 'N/A';
+  const abs = Math.abs(val);
+  if (abs === 0) return '0';
+  if (abs < 0.01) return val.toExponential(2);
+  if (abs < 1) return val.toFixed(4);
+  if (abs < 1000) return val.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  return val.toLocaleString(undefined, { maximumFractionDigits: 0 });
+}
 
 // ---------- types ----------
 
@@ -284,7 +296,7 @@ export function ResultsPanel({ visible }: { visible: boolean }) {
                         {row.dimension_label || ''}
                       </td>
                       <td className="px-2 py-1 text-right text-[#D04A02] border-b border-slate-800/20 font-medium">
-                        {typeof row.metric_value === 'number' ? formatMetricValue(row.metric_value) : String(row.metric_value ?? '\u2014')}
+                        {typeof row.metric_value === 'number' ? formatStudioValue(row.metric_value) : String(row.metric_value ?? '\u2014')}
                       </td>
                       <td className="px-2 py-1 text-right border-b border-slate-800/20">
                         <button className="text-[9px] text-slate-600 hover:text-[#D04A02] px-1.5 py-0.5 rounded border border-slate-800 hover:border-[#D04A02]/30">
@@ -311,7 +323,7 @@ export function ResultsPanel({ visible }: { visible: boolean }) {
                               {childRow.dimension_label || ''}
                             </td>
                             <td className="px-2 py-0.5 text-right text-slate-400 border-b border-slate-800/10 text-[9px]">
-                              {typeof childRow.metric_value === 'number' ? formatMetricValue(childRow.metric_value) : String(childRow.metric_value ?? '\u2014')}
+                              {typeof childRow.metric_value === 'number' ? formatStudioValue(childRow.metric_value) : String(childRow.metric_value ?? '\u2014')}
                             </td>
                             <td className="px-2 py-0.5 border-b border-slate-800/10"></td>
                           </tr>

@@ -90,7 +90,7 @@ async function executeSqlJs(
   // Extract rows from the result structure
   const rows: Record<string, unknown>[] = result.result.type === 'grouped'
     ? result.result.rows.map(r => ({ dimension_key: r.dimension_value, metric_value: r.metric_value }))
-    : [{ metric_value: result.result.value }];
+    : [{ dimension_key: 'scalar', metric_value: result.result.value }];
 
   const response: ExecutionSuccess = {
     ok: true,
@@ -128,7 +128,17 @@ async function executePG(
     await client.query('SET TRANSACTION READ ONLY');
     await client.query('SET search_path TO l1, l2, l3, public');
 
-    const result = await client.query(sql);
+    // Replace :as_of_date bind parameter with actual latest date from DB
+    let execSql = sql;
+    if (/:as_of_date\b/.test(execSql)) {
+      const dateResult = await client.query(
+        "SELECT MAX(as_of_date)::TEXT AS d FROM l2.facility_exposure_snapshot"
+      );
+      const latestDate = dateResult.rows?.[0]?.d ?? new Date().toISOString().slice(0, 10);
+      execSql = execSql.replace(/:as_of_date\b/g, `'${latestDate}'`);
+    }
+
+    const result = await client.query(execSql);
 
     const response: ExecutionSuccess = {
       ok: true,

@@ -330,6 +330,12 @@ against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
 | NULL propagation in outer expression | `SUM(x) * COALESCE(MAX(y), 100) / 100` returns NULL if SUM(x) is NULL | Wrap the entire expression in `COALESCE(..., 0)` — COALESCE on inner terms doesn't protect the outer multiplication chain |
 | 1:1 position-to-facility seed data | `COUNT(DISTINCT position_id)` returns 1 for all facilities | Seed l2.position with 1–5 positions per facility using varied instrument types. Uniform 1:1 makes COUNT metrics trivially constant |
 | Missing as_of_date coverage | `amendment_event` has data for Dec but not Jan snapshot | When adding time-series data for L2 event tables, ensure all 3 standard snapshot dates (Nov, Dec, Jan) have rows — formulas filter by `:as_of_date` and return 0 rows for uncovered dates |
+| Case-sensitive table key filter | `getDistinctAsOfDates` filters `k.startsWith('L2.')` but receives lowercase `l2.table` | Always use case-insensitive comparison for table keys — `k.toLowerCase().startsWith('l2.')`. Studio execute route sends lowercase, sql-runner's `loadSampleData` is case-insensitive but `getDistinctAsOfDates` was not |
+| Scalar result missing dimension_key | Execute route returns `{ metric_value: null }` without `dimension_key` for scalar results | Always include `dimension_key` in result rows — even scalar results need `dimension_key: 'scalar'` to prevent `String(undefined)` → `"undefined"` in UI |
+| PG mode :as_of_date bind param | PG executor receives SQL with `:as_of_date` (sql.js syntax) which PG doesn't understand | Replace `:as_of_date` with actual date by querying `MAX(as_of_date)` from source tables before executing against PG |
+| Uniform PD distribution | All 488 counterparties have `pd_annual` 0.0003–0.06% → 100% Investment Grade | Seed `pd_annual` must span all 5 rating tiers (IG 60%, Standard 25%, Substandard 10%, Doubtful 4%, Loss 1%) per GSIB calibration |
+| Wrong metric direction | CAP-001 `direction: NEUTRAL` but capital adequacy is `HIGHER_BETTER` | Verify `direction` field against business semantics — CAR, LCR, NSFR are `HIGHER_BETTER`; PD, LGD, delinquency are `LOWER_BETTER` |
+| NOT_NULL on ratio with legitimate NULLs | `severity: ERROR` on CAP-001 V01 but 12.8% NULLs are expected (zero-RWA facilities) | Use `severity: WARNING` for ratio metrics where denominator can legitimately be zero (undrawn commitments, 0% risk-weight sovereigns) |
 
 ### PostgreSQL Seed Data Quality Checklist (Phase 5C Extended)
 
@@ -347,6 +353,8 @@ After verifying formulas execute, always check that seed data produces **meaning
 | **Numeric range realism** | NUMERIC fields have values in GSIB-realistic ranges | `pd_pct = 100.5` makes PD metric return 100% instead of <5% |
 | **NULL sparsity** | Metric-critical fields have >10% non-null values | Column exists with correct type but 99.9% NULL → metric appears broken (e.g., 1/930 `risk_rating_change_steps`) |
 | **FK ID contiguity** | Remapped FK values all exist in parent table | Modulo remapping into non-contiguous PK ranges creates orphaned references in gaps |
+| **PD tier diversity** | `pd_annual` spans all 5 rating tiers (IG/Standard/Substandard/Doubtful/Loss) | All counterparties in IG tier → risk rating metrics return single value, migration metrics show 0% movement |
+| **Ratio denominator coverage** | Denominator fields (drawn_amount, committed_amount) are non-zero for >85% of rows | Zero denominators produce NULLs via NULLIF — acceptable at 10-15% but >30% indicates seed data gap |
 
 ### Legacy manual workflow (still works)
 1. Add CatalogueItem to `data/metric-library/catalogue.json` with `item_id`, `level_definitions`, `ingredient_fields`

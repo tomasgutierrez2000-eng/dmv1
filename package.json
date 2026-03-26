@@ -72,7 +72,12 @@
     "stripe:create": "tsx scripts/create-stripe-db.ts",
     "stripe:sync": "tsx scripts/sync-stripe-db.ts",
     "stripe:diff": "tsx scripts/diff-stripe-db.ts",
-    "test:stripe": "tsx scripts/test-stripe-db.ts"
+    "test:stripe": "tsx scripts/test-stripe-db.ts",
+    "curator:install": "cd scenarios/curator && pip install -e '.[dev]'",
+    "curator:gen": "cd scenarios/curator && python -m curator_factory.cli.generate_scenario",
+    "curator:audit": "cd scenarios/curator && python -m curator_factory.cli.audit_quality",
+    "curator:metric": "cd scenarios/curator && python -m curator_factory.cli.generate_metric_scenario",
+    "curator:variants": "cd scenarios/curator && python -m curator_factory.cli.generate_variants"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

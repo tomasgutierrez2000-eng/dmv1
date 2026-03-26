@@ -258,6 +258,106 @@ export function runReconciliation(output: V2GeneratorOutput, chain: L1Chain): Qu
     }
   }
 
+  // -- M6: Agreement-Facility Counterparty Alignment --
+  // credit_agreement_master.borrower_counterparty_id must match facility_master.counterparty_id
+  const facilityMaster = findTable(output, 'facility_master');
+  const agreementMaster = findTable(output, 'credit_agreement_master');
+  if (facilityMaster && agreementMaster) {
+    const agreementMap = new Map<unknown, unknown>(); // agreement_id -> borrower_counterparty_id
+    for (const row of agreementMaster.rows) {
+      agreementMap.set(row.credit_agreement_id, row.borrower_counterparty_id);
+    }
+    let misalignCount = 0;
+    for (const fRow of facilityMaster.rows) {
+      const agrCpId = agreementMap.get(fRow.credit_agreement_id);
+      if (agrCpId !== undefined && String(agrCpId) !== String(fRow.counterparty_id)) {
+        misalignCount++;
+        if (misalignCount <= 3) {
+          errors.push(
+            `CP alignment: facility ${fRow.facility_id} has counterparty_id=${fRow.counterparty_id} ` +
+            `but agreement ${fRow.credit_agreement_id} has borrower_counterparty_id=${agrCpId}`
+          );
+        }
+      }
+    }
+    if (misalignCount > 3) {
+      errors.push(`CP alignment: ${misalignCount} total facility-agreement counterparty misalignments`);
+    }
+  }
+
+  // -- M7: Syndication/CACP Integrity --
+  // For syndicated facilities (if CACP table exists), check ≥2 participants and sum ≈ 100%
+  const cacpTable = findTable(output, 'credit_agreement_counterparty_participation');
+  if (cacpTable && cacpTable.rows.length > 0) {
+    // Group by credit_agreement_id
+    const agrParticipants = new Map<unknown, { count: number; totalPct: number }>();
+    for (const row of cacpTable.rows) {
+      const agrId = row.credit_agreement_id;
+      let entry = agrParticipants.get(agrId);
+      if (!entry) { entry = { count: 0, totalPct: 0 }; agrParticipants.set(agrId, entry); }
+      entry.count++;
+      const pct = row.participation_pct as number ?? row.bank_share_pct as number ?? 0;
+      entry.totalPct += pct;
+    }
+    let singleParticipantCount = 0;
+    let pctMismatchCount = 0;
+    for (const [agrId, entry] of agrParticipants) {
+      if (entry.count < 2) {
+        singleParticipantCount++;
+        if (singleParticipantCount <= 2) {
+          warnings.push(`Syndication: agreement ${agrId} in CACP has only ${entry.count} participant — expected ≥2`);
+        }
+      }
+      if (entry.count >= 2 && Math.abs(entry.totalPct - 100) > 5) {
+        pctMismatchCount++;
+        if (pctMismatchCount <= 2) {
+          warnings.push(
+            `Syndication: agreement ${agrId} participation sums to ${entry.totalPct.toFixed(1)}% — expected ~100% (±5%)`
+          );
+        }
+      }
+    }
+  }
+
+  // -- M10: Cash Flow Direction --
+  // If drawn increased between periods, there should be an OUTFLOW cash flow
+  if (cashFlow && exposure && output.dates.length >= 2) {
+    const sortedDatesM10 = [...output.dates].sort();
+    const facilityIdsM10 = [...new Set(exposure.rows.map(r => r.facility_id))];
+    let missingOutflowCount = 0;
+
+    for (const facId of facilityIdsM10.slice(0, 30)) {
+      for (let d = 1; d < sortedDatesM10.length && missingOutflowCount < 5; d++) {
+        const prevDate = sortedDatesM10[d - 1];
+        const currDate = sortedDatesM10[d];
+        const prevExp = exposure.rows.find(r => r.facility_id === facId && r.as_of_date === prevDate);
+        const currExp = exposure.rows.find(r => r.facility_id === facId && r.as_of_date === currDate);
+        if (!prevExp || !currExp) continue;
+
+        const prevDrawn = (prevExp.outstanding_balance_amt ?? prevExp.drawn_amount) as number;
+        const currDrawn = (currExp.outstanding_balance_amt ?? currExp.drawn_amount) as number;
+        if (typeof prevDrawn !== 'number' || typeof currDrawn !== 'number') continue;
+
+        const delta = currDrawn - prevDrawn;
+        if (delta > 1000) {
+          // Drawn increased — expect an OUTFLOW cash flow
+          const hasCF = cashFlow.rows.some(
+            r => r.facility_id === facId && r.as_of_date === currDate && r.direction === 'OUTFLOW'
+          );
+          if (!hasCF) {
+            missingOutflowCount++;
+            if (missingOutflowCount <= 3) {
+              warnings.push(
+                `Cash flow direction: facility ${facId} drawn increased by ${delta.toFixed(0)} ` +
+                `(${prevDate} → ${currDate}) but no OUTFLOW cash flow found`
+              );
+            }
+          }
+        }
+      }
+    }
+  }
+
   // -- 11f: Audit metadata completeness --
   // Every output table should have source_system_id and record_source.
   const AUDIT_FIELDS = ['source_system_id', 'record_source'] as const;

@@ -257,15 +257,21 @@ function loadSampleData(tableKeys: string[]): { data: SampleDataByTable; missing
     return { data: {}, missingTables: tableKeys };
   }
 
-  const all = { ...(_cachedL1 ?? {}), ...(_cachedL2 ?? {}) };
+  const rawAll = { ...(_cachedL1 ?? {}), ...(_cachedL2 ?? {}) };
+  // Build case-insensitive lookup (sample data uses "L2.table" but SQL parser returns "l2.table")
+  const all = new Map<string, { columns: string[]; rows: unknown[][] }>();
+  for (const [k, v] of Object.entries(rawAll)) {
+    all.set(k.toLowerCase(), v);
+  }
   const missingTables: string[] = [];
   for (const key of tableKeys) {
-    let entry = all[key];
-    // Fall back: if L2.table not found, try L1.table (and vice versa)
+    const lowerKey = key.toLowerCase();
+    let entry = all.get(lowerKey);
+    // Fall back: if l2.table not found, try l1.table (and vice versa)
     if (!entry || !Array.isArray(entry.columns)) {
-      const tableName = key.replace(/^L[12]\./, '');
-      const altKey = key.startsWith('L2.') ? `L1.${tableName}` : `L2.${tableName}`;
-      entry = all[altKey];
+      const tableName = lowerKey.replace(/^l[123]\./, '');
+      const altKey = lowerKey.startsWith('l2.') ? `l1.${tableName}` : `l2.${tableName}`;
+      entry = all.get(altKey);
     }
     if (!entry || !Array.isArray(entry.columns) || !Array.isArray(entry.rows)) {
       missingTables.push(key);

@@ -63,6 +63,7 @@ interface StudioState {
   setDebugStep: (step: number) => void;
   clearCanvas: () => void;
   updateNodeZoomLevels: (level: ZoomLevel) => void;
+  highlightNodes: (nodeIds: string[]) => void;
 }
 
 let nextNodeId = 1;
@@ -339,6 +340,20 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       nodes: get().nodes.map(n => ({
         ...n,
         data: { ...n.data, zoomLevel: level },
+      })),
+    });
+  },
+
+  highlightNodes: (nodeIds) => {
+    const highlightSet = new Set(nodeIds);
+    const hasHighlights = nodeIds.length > 0;
+    set({
+      nodes: get().nodes.map(n => ({
+        ...n,
+        data: {
+          ...n.data,
+          isHighlighted: hasHighlights ? highlightSet.has(n.id) : undefined,
+        },
       })),
     });
   },

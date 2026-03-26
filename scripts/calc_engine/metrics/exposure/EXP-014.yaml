@@ -135,6 +135,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN (
         SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi
         FROM l2.collateral_snapshot cs
@@ -165,6 +166,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN (
         SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi
         FROM l2.collateral_snapshot cs
@@ -198,6 +200,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN (
         SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi
         FROM l2.collateral_snapshot cs
@@ -234,6 +237,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN (
         SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi
         FROM l2.collateral_snapshot cs
@@ -273,6 +277,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN (
         SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi
         FROM l2.collateral_snapshot cs

@@ -262,6 +262,23 @@ source .env && psql "$DATABASE_URL" -c "{facility formula_sql}"
 # Compare facility-level SUM vs counterparty-level output
 ```
 
+### Phase 5B: Metric Expert Gate (MANDATORY)
+
+After Phase 5 manual PG checks pass, invoke the Metric Expert gate for comprehensive validation:
+
+```
+/reviewers:metric-expert-gate {METRIC_ID}
+```
+
+This runs the full gate: SQL Executor (all 5 levels) → Domain Validator (GSIB ranges) → Cross-Metric Checker (mathematical identities). The gate writes test results to L3, validates, then cleans up.
+
+**Gate verdict determines next step:**
+- `PASS` or `PASS_WITH_WARNINGS` → proceed to Phase 6
+- `FAIL` → read debugger diagnosis, fix YAML, re-run from Phase 4 (calc:sync)
+- `FAIL` + `--force` → proceed with WARNING logged to audit trail
+
+**Do NOT skip Phase 5B.** No metric should reach `status: ACTIVE` without passing the gate. If DATABASE_URL is not set, log a WARNING and skip (the gate requires PG connectivity).
+
 ### Phase 6: Commit (only if user/orchestrator requests)
 Stage the YAML and regenerated catalogue files.
 
@@ -413,6 +430,20 @@ Common causes:
   - WHERE before JOIN → move all JOINs before WHERE
 ```
 
+### Formula validation lessons (from live PG testing 2026-03-25)
+
+These patterns were discovered by running 5 random formulas against PostgreSQL, inserting results into L3, then validating outputs against GSIB domain knowledge:
+
+1. **Column suffix variants:** When DD shows multiple variants of a column (e.g., `risk_weight_std_pct` vs `risk_weight_erba_pct`), the YAML must reference the exact column name. Generic names like `risk_weight_pct` don't exist. Always run `SELECT column_name FROM information_schema.columns WHERE table_name='...' AND column_name LIKE '%keyword%'` to verify.
+
+2. **Unbounded ratio metrics:** Percentage/ratio metrics (CAR, LTV, utilization) MUST use `LEAST(value, cap)` to prevent unrealistic outliers. Capital ratio >100% means near-zero RWA denominator, not genuine over-capitalization. Default cap: 100.0 for percentage metrics.
+
+3. **NULL propagation through expressions:** `COALESCE` on an inner term does NOT protect the outer expression. If `SUM(x) * COALESCE(y, default)` can have `SUM(x)` return NULL, the whole expression is NULL. Wrap the entire calculation: `COALESCE(entire_expression, 0)`.
+
+4. **Uniform seed data masks metric validity:** If `l2.position` has exactly 1 position per facility, `COUNT(DISTINCT position_id)` returns a constant 1 for every facility — the metric "works" but produces useless output. Always verify seed data has **variation** for COUNT/DISTINCT metrics.
+
+5. **Missing as_of_date coverage for event tables:** Event tables (amendment_event, credit_event) may only have data for some snapshot dates. Formulas filtering by `:as_of_date` return 0 rows for uncovered dates. Verify all 3 standard dates (Nov, Dec, Jan) have data.
+
 ---
 
 ## 10. Safety Rules
@@ -423,3 +454,5 @@ Common causes:
 4. **Always test formula_sql against PostgreSQL.** sql.js acceptance alone is insufficient.
 5. **Log everything.** Every YAML write, sync, and demo run must be audit-logged.
 6. **Respect the Decomp Expert's confidence level.** If confidence is LOW, flag for human review before writing YAML.
+7. **Always cap ratio/percentage metrics.** Use `LEAST(value, 100.0)` for percentages. Unbounded ratios with small denominators produce >100% values that are GSIB-unrealistic.
+8. **Verify column name exactly against DD.** Columns with multiple variants (std/erba, base/stressed) are a common source of silent formula failures.

@@ -101,6 +101,11 @@ Every failure from CLAUDE.md is a named check:
 | PD_RATING_ALIGN | PD 5% with AAA rating | HIGH |
 | CROSS_CP_CONSIST | Same CP different PD | HIGH |
 | TEMPORAL_MONOTONIC | Worsening reversed | HIGH |
+| COLUMN_SUFFIX_VARIANT | `risk_weight_pct` doesn't exist — PG has `risk_weight_std_pct` / `risk_weight_erba_pct` | HIGH |
+| UNBOUNDED_RATIO | CAR formula returns >100% for near-zero RWA denominators | MEDIUM |
+| NULL_OUTER_EXPRESSION | `COALESCE` on inner term doesn't protect outer `SUM(x) * y` when SUM is NULL | HIGH |
+| UNIFORM_COUNT_DATA | `l2.position` has exactly 1 row per facility — COUNT metrics return constant | MEDIUM |
+| EVENT_DATE_GAPS | `amendment_event` only has Dec data — Jan formula returns 0 rows | MEDIUM |
 
 ## 5. Safety Rules
 

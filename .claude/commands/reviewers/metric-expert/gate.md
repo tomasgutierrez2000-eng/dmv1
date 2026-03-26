@@ -68,7 +68,19 @@ basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "mai
 ```
 Used for worktree-aware batch IDs: `MXTEST_{METRIC_ID}_{WORKTREE}_{YYYYMMDD}`
 
-### Step 2d: Check for stale test batches
+### Step 2d: Load test registry
+
+Read the test registry to understand what's already been tested:
+```bash
+cat .claude/audit/metric-expert-registry.jsonl 2>/dev/null | wc -l
+```
+
+If the file exists, parse it to build a map of `metric_id → last_test_date, last_verdict`. Use this to:
+1. Report prior test history when running a single-metric gate (Step 3j)
+2. Identify never-tested metrics in sweep mode
+3. Detect metrics that previously FAILed and may need re-testing
+
+### Step 2e: Check for stale test batches
 ```bash
 source .env && psql "$DATABASE_URL" -c "
   SELECT load_batch_id, COUNT(*), MIN(created_ts) AS oldest
@@ -224,7 +236,41 @@ Write audit session to `.claude/audit/sessions/metric-expert-{METRIC_ID}-{timest
 }
 ```
 
-### Step 3j: Present results
+### Step 3j: Update test registry
+
+Append the result to the persistent test registry at `.claude/audit/metric-expert-registry.jsonl`. This is a JSONL file (one JSON object per line) that tracks every metric the gate has tested and when.
+
+```bash
+echo '{"metric_id":"{METRIC_ID}","verdict":"{VERDICT}","test_date":"{TEST_DATE}","tested_at":"{ISO_TIMESTAMP}","worktree":"{WORKTREE}","domain":"{DOMAIN}","levels_tested":5,"facility_rows":{N},"adversarial":{true|false},"forced":{true|false},"findings_count":{N}}' >> .claude/audit/metric-expert-registry.jsonl
+```
+
+**Before running the gate**, read the registry to report prior test history for this metric:
+```bash
+grep '"metric_id":"{METRIC_ID}"' .claude/audit/metric-expert-registry.jsonl 2>/dev/null | tail -5
+```
+
+If prior entries exist, display:
+```
+Prior test history for {METRIC_ID}:
+  2026-03-25 21:30 — PASS (worktree: condescending-swirles)
+  2026-03-24 14:15 — FAIL → fixed → PASS (worktree: quirky-ishizaka)
+```
+
+**In sweep mode**, after all metrics are tested, produce a coverage summary from the registry:
+```bash
+# Metrics tested in the last 7 days
+grep -c '"verdict"' .claude/audit/metric-expert-registry.jsonl 2>/dev/null
+# Metrics never tested (compare YAML list vs registry)
+```
+
+Display:
+```
+COVERAGE: 87/110 ACTIVE metrics tested in last 7 days
+NEVER TESTED: AMD-003, RSK-012, CAP-009, ... (23 metrics)
+LAST FULL SWEEP: 2026-03-25 (87 metrics)
+```
+
+### Step 3k: Present results
 
 Display a clear summary to the user:
 

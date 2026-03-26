@@ -325,6 +325,11 @@ against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
 | FK value range mismatch | `counterparty.industry_id = 1-10` but `industry_dim` uses NAICS codes 11+ | Verify FK values actually exist in parent dim PK range — values may be syntactically valid BIGINT but semantically wrong (no matching PK row) |
 | NULL weight column | `gross_exposure_usd` NULL for 347/2753 FES rows | Weighted avg returns NULL for entire segments when weight column has NULL gaps — verify weight columns have 100% coverage, not just formula correctness |
 | ROW_NUMBER for string rollup | `SUM(industry_name)` invalid at segment level | Use `ROW_NUMBER() OVER (PARTITION BY segment ORDER BY SUM(exposure) DESC)` to find dominant string value by exposure weight |
+| Wrong column suffix variant | `risk_weight_pct` doesn't exist — PG has `risk_weight_std_pct` and `risk_weight_erba_pct` | When a column has multiple variants (std vs erba, base vs stressed), always check DD for exact suffix. Use `information_schema.columns` to verify before writing formula_sql |
+| Unbounded ratio metric | `equity / RWA * 100` returns >100% for tiny denominators | Use `LEAST(ratio, 100.0)` to cap percentage metrics. Capital ratios >100% are unrealistic — indicates near-zero RWA denominator, not genuine over-capitalization |
+| NULL propagation in outer expression | `SUM(x) * COALESCE(MAX(y), 100) / 100` returns NULL if SUM(x) is NULL | Wrap the entire expression in `COALESCE(..., 0)` — COALESCE on inner terms doesn't protect the outer multiplication chain |
+| 1:1 position-to-facility seed data | `COUNT(DISTINCT position_id)` returns 1 for all facilities | Seed l2.position with 1–5 positions per facility using varied instrument types. Uniform 1:1 makes COUNT metrics trivially constant |
+| Missing as_of_date coverage | `amendment_event` has data for Dec but not Jan snapshot | When adding time-series data for L2 event tables, ensure all 3 standard snapshot dates (Nov, Dec, Jan) have rows — formulas filter by `:as_of_date` and return 0 rows for uncovered dates |
 
 ### PostgreSQL Seed Data Quality Checklist (Phase 5C Extended)
 
@@ -1133,7 +1138,7 @@ The **dq-dashboard-readiness** agent (added 2026-03-25) specifically catches iss
 
 ## Agent Suite Architecture
 
-19 agents across 4 layers coordinate metric decomposition, schema building, data generation, and validation.
+24 agents across 4 layers coordinate metric decomposition, schema building, data generation, and validation.
 
 ```
 LAYER 1 — EXPERTISE (10 agents)
@@ -1155,6 +1160,7 @@ LAYER 2 — BUILDING (4 agents)
 LAYER 3 — VALIDATION (4 agents)
 ┌─────────────────────────────────────────────────────────────┐
 │ risk-expert-reviewer (PRE/POST gates),                      │
+│ metric-expert-gate (PG formula validation + GSIB domain),   │
 │ sr-11-7-checker, drift-monitor, audit-reporter              │
 └─────────────────────────────────────────────────────────────┘
           ↓
@@ -1187,6 +1193,7 @@ LAYER 4 — ORCHESTRATION (1 agent)
 | Reviewer | sr-11-7-checker | `reviewers/sr-11-7-checker.md` | OCC SR 11-7 documentation compliance (12-item checklist) |
 | Reviewer | drift-monitor | `reviewers/drift-monitor.md` | Detect schema/metric drift from golden source |
 | Reviewer | audit-reporter | `reviewers/audit-reporter.md` | Generate compliance + audit reports |
+| Reviewer | metric-expert-gate | `reviewers/metric-expert/gate.md` | PostgreSQL formula validation gate — tests SQL at all 5 levels, GSIB domain validation, cross-metric identities, adversarial fuzzing |
 | Orchestrator | orchestrate | `orchestrate.md` | Coordinate all agents into end-to-end workflows |
 
 All files under `.claude/commands/`. Invoke via `/experts:decomp-credit-risk`, `/builders:db-schema-builder`, `/orchestrate`, etc.

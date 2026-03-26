@@ -730,6 +730,28 @@ To illustrate the full flow, here is a condensed example:
 
 ---
 
+## 10B. Formula Validation Lessons (from live PG testing 2026-03-25)
+
+When decomposing metrics, the expert MUST apply these validation rules to the proposed formula before outputting the decomposition:
+
+1. **Verify exact column names against DD.** Columns frequently have suffix variants (`risk_weight_std_pct` vs `risk_weight_erba_pct`). A generic reference like `risk_weight_pct` does not exist. Always check schema-manifest.yaml or query `information_schema.columns` for the exact name.
+
+2. **Cap ratio/percentage metrics.** Any formula that divides (e.g., `equity / RWA * 100`) can produce >100% when the denominator is near-zero. Include `LEAST(value, 100.0)` in the formula specification. Capital adequacy >100% is GSIB-unrealistic — it signals a tiny RWA denominator, not genuine over-capitalization.
+
+3. **Full-expression COALESCE.** `COALESCE` on an inner term does NOT protect outer multiplications. If the full expression is `SUM(x) * COALESCE(y, default) / 100`, and `SUM(x)` can be NULL, the result is NULL. Recommend wrapping: `COALESCE(entire_expression, 0)`.
+
+4. **Seed data diversity for COUNT metrics.** If the metric uses `COUNT(DISTINCT ...)`, verify that the source table has >1 row per grouping key. Uniform 1:1 data (e.g., one position per facility) makes the metric trivially constant and untestable.
+
+5. **Event table date coverage.** Event tables (`amendment_event`, `credit_event`) may not have data for all snapshot dates. When specifying `WHERE as_of_date = :as_of_date`, flag that the Data Factory must generate events for all 3 standard snapshots (Nov, Dec, Jan), not just one.
+
+6. **GSIB sanity ranges.** After specifying the formula, include expected output ranges in the decomposition:
+   - Capital ratios: 8–20% (well-capitalized), >20% suspicious
+   - All-in rates: 1–25% (IG to distressed)
+   - Collateral MV: varies by facility size, $10K–$100M typical
+   - Loan counts: 1–50 per facility, 10–500 per counterparty
+
+---
+
 ## 11. Integration Points
 
 ### Upstream (who invokes this expert)

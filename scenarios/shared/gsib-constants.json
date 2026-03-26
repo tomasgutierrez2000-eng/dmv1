@@ -1,0 +1,51 @@
+{
+  "pd_ranges": {
+    "IG_HIGH": [0.0001, 0.0004],
+    "IG_MID": [0.0004, 0.0015],
+    "IG_LOW": [0.0015, 0.0040],
+    "HY_HIGH": [0.0040, 0.0200],
+    "HY_MID": [0.0200, 0.0500],
+    "HY_LOW": [0.0500, 0.1500]
+  },
+  "commitment_ranges": {
+    "LARGE": [500000000, 5000000000],
+    "MID": [100000000, 500000000],
+    "SMALL": [20000000, 100000000]
+  },
+  "valid_countries": ["US", "GB", "DE", "FR", "JP", "CH", "CA", "AU", "NL", "SG", "HK", "KR", "BR", "IN", "AE", "MX"],
+  "valid_entity_type_codes": ["BANK", "CORP", "FI", "FUND", "INS", "MDB", "OTH", "PE", "PSE", "RE", "SOV", "SPE"],
+  "valid_dpd_codes": ["CURRENT", "1-29", "30-59", "60-89", "90+"],
+  "industry_map": {
+    "1": {"name": "TMT", "naics": 51, "entity_type": "CORP"},
+    "2": {"name": "Healthcare", "naics": 62, "entity_type": "CORP"},
+    "3": {"name": "Financials", "naics": 52, "entity_type": "BANK"},
+    "4": {"name": "Energy", "naics": 21, "entity_type": "CORP"},
+    "5": {"name": "Industrials", "naics": 31, "entity_type": "CORP"},
+    "6": {"name": "Consumer Staples", "naics": 42, "entity_type": "CORP"},
+    "7": {"name": "Retail", "naics": 44, "entity_type": "CORP"},
+    "8": {"name": "Utilities", "naics": 22, "entity_type": "CORP"},
+    "9": {"name": "Materials", "naics": 23, "entity_type": "CORP"},
+    "10": {"name": "Real Estate", "naics": 53, "entity_type": "RE"}
+  },
+  "country_map": {
+    "US": {"currency": "USD", "region": "AMER"},
+    "GB": {"currency": "GBP", "region": "EMEA"},
+    "DE": {"currency": "EUR", "region": "EMEA"},
+    "FR": {"currency": "EUR", "region": "EMEA"},
+    "JP": {"currency": "JPY", "region": "APAC"},
+    "CH": {"currency": "CHF", "region": "EMEA"},
+    "CA": {"currency": "CAD", "region": "AMER"},
+    "AU": {"currency": "AUD", "region": "APAC"},
+    "NL": {"currency": "EUR", "region": "EMEA"},
+    "SG": {"currency": "SGD", "region": "APAC"},
+    "HK": {"currency": "HKD", "region": "APAC"},
+    "KR": {"currency": "KRW", "region": "APAC"},
+    "BR": {"currency": "BRL", "region": "AMER"},
+    "IN": {"currency": "INR", "region": "APAC"},
+    "AE": {"currency": "AED", "region": "EMEA"},
+    "MX": {"currency": "MXN", "region": "AMER"}
+  },
+  "dscr_thresholds": {"healthy": 1.25, "watch": 1.0, "critical": 0.8},
+  "ltv_thresholds": {"healthy": 0.65, "elevated": 0.80, "critical": 0.90},
+  "utilization_bands": {"normal": [0.30, 0.70], "elevated": [0.70, 0.90], "critical": [0.90, 1.0]}
+}

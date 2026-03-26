@@ -1,7 +1,7 @@
 /**
  * Quality Controls — holistic L1-driven data quality checks for Factory V2 output.
  *
- * 13 control groups covering every aspect of GSIB data quality:
+ * 14 control groups covering every aspect of GSIB data quality:
  *
  *   1. L1 FK Domain Validation — every FK value in L2 rows exists in L1
  *   2. Enrichment Map Drift Detection — hardcoded maps haven't gone stale
@@ -17,6 +17,7 @@
  *      cash flow <-> balance reconciliation, limit aggregation, audit metadata
  *  12. SCD-2 Integrity — single current row per entity, non-overlapping effective windows
  *  13. Bridge Allocation Integrity — allocation percentages sum to 1.0, amounts don't exceed parents
+ *  14. Distribution Realism Score — Benford, correlation fidelity, distribution shape, concentration, temporal
  *
  * Each group returns { errors, warnings } consistent with validator.ts pattern.
  */
@@ -32,7 +33,7 @@ export { merge, sampleRows, findTable, extractNumericField, stdev } from './shar
 
 // Re-export individual group functions
 export { runFKDomainValidation } from './fk-domain-validation';
-export { runDriftDetection, runEnrichmentMapDrift } from './drift-detection';
+export { runDriftDetection, runEnrichmentMapDrift, runCCFDriftDetection } from './drift-detection';
 export { runArithmeticChecks } from './arithmetic-checks';
 export { runCrossFieldConsistency } from './cross-field-consistency';
 export { runStoryArcChecks } from './story-arc-fidelity';
@@ -44,12 +45,13 @@ export { runAntiSyntheticChecks } from './anti-synthetic-detection';
 export { runReconciliation } from './reconciliation';
 export { runSCDIntegrity } from './scd-integrity';
 export { runBridgeAllocationChecks } from './bridge-allocation';
+export { runDistributionRealismScore, computeRealismScore } from './distribution-realism-score';
 
 // Import for orchestrator
 import type { FullQualityControlResult } from './shared-types';
 import { merge } from './shared-types';
 import { runFKDomainValidation } from './fk-domain-validation';
-import { runDriftDetection } from './drift-detection';
+import { runDriftDetection, runCCFDriftDetection } from './drift-detection';
 import { runArithmeticChecks } from './arithmetic-checks';
 import { runCrossFieldConsistency } from './cross-field-consistency';
 import { runStoryArcChecks } from './story-arc-fidelity';
@@ -61,9 +63,10 @@ import { runAntiSyntheticChecks } from './anti-synthetic-detection';
 import { runReconciliation } from './reconciliation';
 import { runSCDIntegrity } from './scd-integrity';
 import { runBridgeAllocationChecks } from './bridge-allocation';
+import { runDistributionRealismScore } from './distribution-realism-score';
 
 /**
- * Run all 11 quality control groups for a scenario.
+ * Run all 14 quality control groups for a scenario.
  */
 export function runAllQualityControls(
   output: V2GeneratorOutput,
@@ -72,7 +75,9 @@ export function runAllQualityControls(
   registry: ReferenceDataRegistry,
 ): FullQualityControlResult {
   const group1 = runFKDomainValidation(output, registry);
-  const group2 = runDriftDetection(registry);
+  const group2base = runDriftDetection(registry);
+  const group2ccf = runCCFDriftDetection(registry);
+  const group2 = merge(group2base, group2ccf);
   const group3 = runArithmeticChecks(output);
   const group4 = runCrossFieldConsistency(output, registry);
   const group5 = runStoryArcChecks(output, chain, config);
@@ -84,8 +89,9 @@ export function runAllQualityControls(
   const group11 = runReconciliation(output, chain);
   const group12 = runSCDIntegrity(output);
   const group13 = runBridgeAllocationChecks(output, chain);
+  const group14 = runDistributionRealismScore(output);
 
-  const combined = merge(group1, group2, group3, group4, group5, group6, group7, group8, group9, group10, group11, group12, group13);
+  const combined = merge(group1, group2, group3, group4, group5, group6, group7, group8, group9, group10, group11, group12, group13, group14);
 
   return {
     ...combined,
@@ -102,5 +108,6 @@ export function runAllQualityControls(
     group11_reconciliation: group11,
     group12_scdIntegrity: group12,
     group13_bridgeAllocation: group13,
+    group14_realismScore: group14,
   };
 }

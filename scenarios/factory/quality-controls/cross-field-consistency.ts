@@ -18,7 +18,7 @@
 import type { ReferenceDataRegistry } from '../reference-data-registry';
 import type { V2GeneratorOutput } from '../v2/generators';
 import type { QualityControlResult } from './shared-types';
-import { sampleRows } from './shared-types';
+import { findTable, sampleRows } from './shared-types';
 
 export function runCrossFieldConsistency(
   output: V2GeneratorOutput,
@@ -66,20 +66,53 @@ export function runCrossFieldConsistency(
         }
       }
 
-      // -- IFRS 9 Stage Consistency --
+      // -- M1: IFRS 9 Stage Consistency --
+      // Stage 1: DPD < 30 AND credit_status NOT DEFAULT
+      // Stage 2: 30 <= DPD < 90 OR significant PD increase
+      // Stage 3: DPD >= 90 OR credit_status = DEFAULT
       if ('ifrs9_stage' in row && 'days_past_due' in row) {
         const stage = row.ifrs9_stage as number;
         const dpd = row.days_past_due as number;
         const statusCode = row.credit_status_code as number | undefined;
+        const statusInfo = statusCode !== undefined ? registry.getCreditStatusInfo(statusCode) : undefined;
+        const isDefault = statusInfo?.default_flag === true;
 
-        if (stage === 3 && dpd < 30) {
-          const statusInfo = statusCode !== undefined ? registry.getCreditStatusInfo(statusCode) : undefined;
-          if (!statusInfo?.default_flag && canReport('stage3_low_dpd')) {
-            warnings.push(`${tbl}: ifrs9_stage=3 but dpd=${dpd} and not DEFAULT`);
-          }
+        // Stage 3 should have DPD >= 90 OR default status
+        if (stage === 3 && dpd < 30 && !isDefault && canReport('stage3_low_dpd')) {
+          warnings.push(`${tbl}: ifrs9_stage=3 but dpd=${dpd} and not DEFAULT — expected DPD>=90 or DEFAULT`);
         }
+
+        // Stage 1 must have DPD < 30 and NOT default
         if (stage === 1 && dpd >= 90 && canReport('stage1_high_dpd')) {
           warnings.push(`${tbl}: ifrs9_stage=1 but dpd=${dpd} — should be Stage 2/3`);
+        }
+        if (stage === 1 && isDefault && canReport('stage1_default')) {
+          warnings.push(`${tbl}: ifrs9_stage=1 but credit_status is DEFAULT — should be Stage 3`);
+        }
+
+        // Stage 2 should have 30 <= DPD < 90 (or PD increase, which we can't check here)
+        // But Stage 2 with DPD >= 90 and no PD-increase justification is suspicious
+        if (stage === 2 && dpd >= 90 && canReport('stage2_high_dpd')) {
+          warnings.push(`${tbl}: ifrs9_stage=2 but dpd=${dpd} — should be Stage 3 (DPD>=90)`);
+        }
+
+        // Stage 2 with default status is inconsistent — defaults are always Stage 3
+        if (stage === 2 && isDefault && canReport('stage2_default')) {
+          warnings.push(`${tbl}: ifrs9_stage=2 but credit_status is DEFAULT — should be Stage 3`);
+        }
+      }
+
+      // -- M1b: ECL Stage Code Consistency (ecl_staging_snapshot) --
+      // ecl_stage_code should align with ifrs9_stage when both present
+      if ('ecl_stage_code' in row && 'ifrs9_stage' in row) {
+        const eclStage = row.ecl_stage_code as string | null;
+        const ifrs9 = row.ifrs9_stage as number;
+        if (eclStage !== null) {
+          // ecl_stage_code is typically "STAGE_1", "STAGE_2", "STAGE_3"
+          const eclNum = parseInt(eclStage.replace(/\D/g, ''), 10);
+          if (!isNaN(eclNum) && eclNum !== ifrs9 && canReport('ecl_ifrs9_mismatch')) {
+            warnings.push(`${tbl}: ecl_stage_code='${eclStage}' but ifrs9_stage=${ifrs9} — stages should align`);
+          }
         }
       }
 
@@ -182,6 +215,90 @@ export function runCrossFieldConsistency(
         if (rw > 300 && canReport('rw_extreme')) {
           warnings.push(`${tbl}: extreme risk_weight_std_pct (${rw}%) — max Basel III SA is 250%`);
         }
+      }
+
+      // -- M8: PD ↔ Rating Tier ERROR Level --
+      // Upgrade to ERROR if PD is completely wrong tier
+      if ('pd_pct' in row && 'internal_risk_rating' in row) {
+        const pd = row.pd_pct as number;
+        const rating = row.internal_risk_rating as string;
+        const ratingNum = parseInt(rating, 10);
+        if (!isNaN(ratingNum)) {
+          // IG_HIGH (1-2) max PD 0.04%, IG (3) max PD 0.40%
+          if (ratingNum <= 2 && pd > 0.05 && canReport('pd_rating_error_ig_high')) {
+            errors.push(`${tbl}: rating ${rating} (IG_HIGH, max PD ~0.04%) but pd=${(pd*100).toFixed(2)}% — completely wrong tier`);
+          }
+          // Substandard (6-7) min PD 2%
+          if (ratingNum >= 8 && pd < 0.0005 && canReport('pd_rating_error_distressed')) {
+            errors.push(`${tbl}: rating ${rating} (distressed, min PD ~2%) but pd=${(pd*100).toFixed(4)}% — completely wrong tier`);
+          }
+        }
+      }
+
+      // -- M11: Spread-Rating Consistency --
+      // IG spread 50-300bps, HY spread 200-1000bps
+      if ('spread_bps' in row && 'internal_risk_rating' in row) {
+        const spread = row.spread_bps as number;
+        const rating = row.internal_risk_rating as string;
+        const ratingNum = parseInt(rating, 10);
+        if (!isNaN(ratingNum) && spread > 0) {
+          if (ratingNum <= 3 && spread > 300 && canReport('spread_ig_high')) {
+            warnings.push(`${tbl}: IG rating ${rating} but spread=${spread}bps — expected 50-300bps for investment grade`);
+          }
+          if (ratingNum >= 7 && spread < 200 && canReport('spread_hy_low')) {
+            warnings.push(`${tbl}: HY rating ${rating} but spread=${spread}bps — expected 200-1000bps for high yield`);
+          }
+        }
+      }
+
+      // -- M13: ECL Stage Ordering --
+      // ecl_12m ≤ ecl_lifetime (12-month ECL can never exceed lifetime ECL)
+      if ('ecl_12m' in row && 'ecl_lifetime' in row) {
+        const ecl12 = row.ecl_12m as number;
+        const eclLt = row.ecl_lifetime as number;
+        if (typeof ecl12 === 'number' && typeof eclLt === 'number' && ecl12 > eclLt + 0.01) {
+          if (canReport('ecl_stage_ordering')) {
+            errors.push(
+              `${tbl}: ecl_12m (${ecl12.toFixed(2)}) > ecl_lifetime (${eclLt.toFixed(2)}) — ` +
+              `12-month ECL cannot exceed lifetime ECL`
+            );
+          }
+        }
+      }
+    }
+  }
+
+  // -- M5: EBT Hierarchy Validation --
+  // Verify facility_master.lob_segment_id appears in enterprise_business_taxonomy
+  const facilityMaster = findTable(output, 'facility_master');
+  if (facilityMaster) {
+    // Try to get EBT data from registry or output
+    const ebtTable = findTable(output, 'enterprise_business_taxonomy');
+    const ebtIds = new Set<unknown>();
+    if (ebtTable) {
+      for (const row of ebtTable.rows) {
+        if (row.is_current_flag === 'Y' || row.is_current_flag === undefined) {
+          ebtIds.add(row.managed_segment_id);
+        }
+      }
+    }
+
+    if (ebtIds.size > 0) {
+      let orphanCount = 0;
+      for (const row of facilityMaster.rows) {
+        const lobId = row.lob_segment_id;
+        if (lobId !== null && lobId !== undefined && !ebtIds.has(lobId)) {
+          orphanCount++;
+          if (orphanCount <= 3) {
+            warnings.push(
+              `EBT hierarchy: facility ${row.facility_id} has lob_segment_id=${lobId} ` +
+              `not found in enterprise_business_taxonomy (active nodes)`
+            );
+          }
+        }
+      }
+      if (orphanCount > 3) {
+        warnings.push(`EBT hierarchy: ${orphanCount} total facilities with orphaned lob_segment_id values`);
       }
     }
   }

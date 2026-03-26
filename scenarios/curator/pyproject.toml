@@ -1,0 +1,33 @@
+[project]
+name = "curator-factory"
+version = "0.1.0"
+description = "LLM-powered scenario generation and auditing for GSIB data factory"
+requires-python = ">=3.10"
+dependencies = [
+    "bespokelabs-curator>=0.2",
+    "pydantic>=2.0",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0",
+    "psycopg2-binary>=2.9",
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+]
+
+[project.scripts]
+curator-gen = "curator_factory.cli.generate_scenario:main"
+curator-audit = "curator_factory.cli.audit_quality:main"
+curator-metric = "curator_factory.cli.generate_metric_scenario:main"
+curator-variants = "curator_factory.cli.generate_variants:main"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["curator_factory*"]

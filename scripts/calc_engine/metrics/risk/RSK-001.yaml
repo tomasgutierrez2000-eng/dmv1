@@ -104,26 +104,26 @@ levels:
       INNER JOIN l2.counterparty c
         ON c.counterparty_id = fm.counterparty_id
       LEFT JOIN l1.risk_rating_tier_dim rrt
-        ON c.pd_annual >= rrt.pd_min_pct
-        AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
+        ON c.pd_annual * 100 >= rrt.pd_min_pct
+        AND (c.pd_annual * 100 < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
         AND rrt.is_active_flag = 'Y'
       WHERE fm.is_active_flag = 'Y'
         AND c.pd_annual IS NOT NULL
   counterparty:
     aggregation_type: CUSTOM
     formula_text: >
-      For each counterparty, look up pd_annual and range-match against
-      risk_rating_tier_dim where pd_annual >= pd_min_pct AND pd_annual <
-      pd_max_pct. Returns the tier ordinal (display_order). Counterparties
-      with NULL PD receive tier 0 (unrated).
+      For each counterparty, look up pd_annual (stored as decimal, e.g. 0.02 = 2%)
+      and range-match against risk_rating_tier_dim (percentage boundaries, e.g.
+      0.4 = 0.4%). Converts pd_annual * 100 for comparison. Returns the tier
+      ordinal (display_order). Counterparties with NULL PD receive tier 0 (unrated).
     formula_sql: |-
       SELECT
         c.counterparty_id AS dimension_key,
         COALESCE(rrt.display_order, 0) AS metric_value
       FROM l2.counterparty c
       LEFT JOIN l1.risk_rating_tier_dim rrt
-        ON c.pd_annual >= rrt.pd_min_pct
-        AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
+        ON c.pd_annual * 100 >= rrt.pd_min_pct
+        AND (c.pd_annual * 100 < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
         AND rrt.is_active_flag = 'Y'
       WHERE c.pd_annual IS NOT NULL
   desk:
@@ -141,8 +141,8 @@ levels:
         ON fm.counterparty_id = c.counterparty_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.risk_rating_tier_dim rrt
-        ON c.pd_annual >= rrt.pd_min_pct
-        AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
+        ON c.pd_annual * 100 >= rrt.pd_min_pct
+        AND (c.pd_annual * 100 < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
         AND rrt.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
@@ -163,8 +163,8 @@ levels:
         ON fm.counterparty_id = c.counterparty_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.risk_rating_tier_dim rrt
-        ON c.pd_annual >= rrt.pd_min_pct
-        AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
+        ON c.pd_annual * 100 >= rrt.pd_min_pct
+        AND (c.pd_annual * 100 < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
         AND rrt.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -188,8 +188,8 @@ levels:
         ON fm.counterparty_id = c.counterparty_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.risk_rating_tier_dim rrt
-        ON c.pd_annual >= rrt.pd_min_pct
-        AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
+        ON c.pd_annual * 100 >= rrt.pd_min_pct
+        AND (c.pd_annual * 100 < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
         AND rrt.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id

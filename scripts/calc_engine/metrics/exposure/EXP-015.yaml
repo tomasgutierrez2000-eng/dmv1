@@ -126,7 +126,7 @@ levels:
     formula_sql: |-
       SELECT
         frs.facility_id AS dimension_key,
-        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0 * fes.committed_amount)
+        SUM(frs.pd_pct * frs.lgd_pct * fes.committed_amount)
           / NULLIF(SUM(fes.committed_amount), 0) * 100.0
           AS metric_value
       FROM l2.facility_risk_snapshot frs
@@ -150,7 +150,7 @@ levels:
     formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+        SUM(frs.pd_pct * frs.lgd_pct
             * fes.committed_amount * COALESCE(fx.rate, 1))
           / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1)), 0) * 100.0
           AS metric_value
@@ -178,7 +178,7 @@ levels:
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+        SUM(frs.pd_pct * frs.lgd_pct
             * fes.committed_amount * COALESCE(fx.rate, 1))
           / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1)), 0) * 100.0
           AS metric_value
@@ -209,7 +209,7 @@ levels:
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+        SUM(frs.pd_pct * frs.lgd_pct
             * fes.committed_amount * COALESCE(fx.rate, 1))
           / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1)), 0) * 100.0
           AS metric_value
@@ -243,7 +243,7 @@ levels:
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+        SUM(frs.pd_pct * frs.lgd_pct
             * fes.committed_amount * COALESCE(fx.rate, 1))
           / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1)), 0) * 100.0
           AS metric_value

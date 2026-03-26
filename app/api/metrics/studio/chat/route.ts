@@ -71,7 +71,7 @@ const KNOWN_BUG_PATTERNS: Array<{ pattern: RegExp; message: string; severity: 'e
   { pattern: /WHERE[\s\S]*?LEFT\s+JOIN/i, message: 'WHERE clause appears before LEFT JOIN. All JOINs must come before the WHERE clause.', severity: 'error' },
   { pattern: /=\s*TRUE\b/i, message: 'Use = \'Y\' for boolean comparisons (works in both PostgreSQL and sql.js), not = TRUE.', severity: 'warning' },
   { pattern: /=\s*true\b/, message: 'Use = \'Y\' for boolean comparisons (works in both PostgreSQL and sql.js), not = true.', severity: 'warning' },
-  { pattern: /::FLOAT/i, message: 'PostgreSQL-specific cast ::FLOAT not supported in sql.js. Use * 1.0 for float math.', severity: 'error' },
+  { pattern: /::FLOAT/i, message: 'PostgreSQL-specific cast ::FLOAT not supported in sql.js Demo mode. Use * 1.0 for cross-engine compatibility.', severity: 'warning' },
   { pattern: /;\s*$/, message: 'Semicolons are not allowed in formula SQL.', severity: 'error' },
   { pattern: /SUM\s*\([^)]*_name[^)]*\)/i, message: 'SUM of text fields is invalid. Use COUNT(DISTINCT) or MIN() for string aggregation.', severity: 'error' },
   { pattern: /SUM\s*\([^)]*_id\b[^)]*\)/i, message: 'SUM of ID fields is meaningless. Use COUNT(DISTINCT id) instead.', severity: 'error' },

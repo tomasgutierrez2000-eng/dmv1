@@ -61,6 +61,7 @@ interface StudioState {
   setZoomLevel: (level: ZoomLevel) => void;
   setExecutionMode: (mode: ExecutionMode) => void;
   setDebugStep: (step: number) => void;
+  setFormulaSQL: (sql: string) => void;
   clearCanvas: () => void;
   updateNodeZoomLevels: (level: ZoomLevel) => void;
   highlightNodes: (nodeIds: string[]) => void;
@@ -250,27 +251,44 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   },
 
   executeFormula: async () => {
-    const { formulaSQL, formulaValid, executionMode } = get();
+    const { formulaSQL, formulaValid, executionMode, composedFields, schema } = get();
     if (!formulaSQL || !formulaValid) return;
 
     set({ isExecuting: true, executionResult: null });
 
     try {
-      const composed = composeSQL(
-        get().composedFields,
-        (get().schema?.relationships ?? []).map(r => ({
-          from_table: r.fromTable, from_field: r.fromColumn,
-          to_table: r.toTable, to_field: r.toColumn,
-          from_layer: r.fromLayer, to_layer: r.toLayer,
-        }))
-      );
+      // Use composed SQL from drag-drop fields if available, otherwise use AI-applied formulaSQL directly
+      let sqlToExecute = formulaSQL;
+      let sourceTables: string[] = [];
+
+      if (composedFields.length > 0) {
+        const composed = composeSQL(
+          composedFields,
+          (schema?.relationships ?? []).map(r => ({
+            from_table: r.fromTable, from_field: r.fromColumn,
+            to_table: r.toTable, to_field: r.toColumn,
+            from_layer: r.fromLayer, to_layer: r.toLayer,
+          }))
+        );
+        sqlToExecute = composed.sql;
+        sourceTables = composed.sourceTables;
+      } else {
+        // Extract tables from the AI-generated SQL
+        const tablePattern = /\b([Ll][123])\.([a-zA-Z_][a-zA-Z0-9_]*)/g;
+        let match: RegExpExecArray | null;
+        const tables = new Set<string>();
+        while ((match = tablePattern.exec(formulaSQL)) !== null) {
+          tables.add(`${match[1].toLowerCase()}.${match[2]}`);
+        }
+        sourceTables = Array.from(tables);
+      }
 
       const res = await fetch('/api/metrics/studio/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          formula_sql: composed.sql,
-          source_tables: composed.sourceTables,
+          formula_sql: sqlToExecute,
+          source_tables: sourceTables,
           execution_mode: executionMode,
         }),
       });
@@ -321,6 +339,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   },
   setExecutionMode: (mode) => set({ executionMode: mode }),
   setDebugStep: (step) => set({ debugStepIndex: Math.max(0, Math.min(step, get().debugStepCount - 1)) }),
+  setFormulaSQL: (sql) => set({ formulaSQL: sql, formulaValid: true, formulaError: null }),
   clearCanvas: () => set({
     nodes: [],
     edges: [],

@@ -156,9 +156,11 @@ export function buildSchemaPromptSection(context?: {
 
   // Add other commonly used tables (not already included)
   const commonL2 = ['facility_master', 'facility_exposure_snapshot', 'collateral_snapshot',
-    'facility_risk_snapshot', 'facility_financial_snapshot', 'credit_event'];
-  const commonL1 = ['counterparty', 'enterprise_business_taxonomy', 'enterprise_product_taxonomy',
-    'portfolio_dim', 'currency_dim', 'collateral_type'];
+    'facility_risk_snapshot', 'facility_financial_snapshot', 'credit_event',
+    'counterparty', 'counterparty_rating_observation', 'facility_delinquency_snapshot',
+    'facility_pricing_snapshot', 'credit_agreement_master', 'fx_rate'];
+  const commonL1 = ['enterprise_business_taxonomy', 'enterprise_product_taxonomy',
+    'portfolio_dim', 'currency_dim', 'facility_type_dim', 'rating_scale_dim'];
 
   sections.push('\nOTHER AVAILABLE TABLES:');
   for (const table of allTables) {
@@ -167,7 +169,14 @@ export function buildSchemaPromptSection(context?: {
     const isCommon = (table.layer === 'L2' && commonL2.includes(table.name)) ||
                      (table.layer === 'L1' && commonL1.includes(table.name));
     if (isCommon) {
-      sections.push(formatTableEntry(table));
+      // When no specific metric context, show all columns for common tables
+      // to prevent AI from hallucinating column names
+      if (relevantTableKeys.size === 0) {
+        const allCols = table.fields.map((f) => f.name);
+        sections.push(`- ${key} (${allCols.join(', ')})`);
+      } else {
+        sections.push(formatTableEntry(table));
+      }
     }
   }
 

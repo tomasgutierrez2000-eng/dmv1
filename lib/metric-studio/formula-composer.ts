@@ -279,8 +279,8 @@ export function validateSQL(sql: string): string | null {
       return `SQL contains forbidden keyword: ${kw}`;
     }
   }
-  if (!upper.startsWith('SELECT')) {
-    return 'SQL must start with SELECT';
+  if (!upper.startsWith('SELECT') && !upper.startsWith('WITH')) {
+    return 'SQL must start with SELECT or WITH';
   }
   if (sql.includes(';')) {
     return 'SQL must not contain semicolons';

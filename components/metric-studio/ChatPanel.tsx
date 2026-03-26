@@ -50,12 +50,26 @@ export function ChatPanel() {
   const setExecutionMode = useStudioStore((s) => s.setExecutionMode);
   const selectedNodeId = useStudioStore((s) => s.selectedNodeId);
 
+  const setFormulaSQL = useStudioStore((s) => s.setFormulaSQL);
+
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Pick up initial message from onboarding overlay (sessionStorage handoff)
+  useEffect(() => {
+    const initialMessage = sessionStorage.getItem('studio-initial-message');
+    if (initialMessage) {
+      sessionStorage.removeItem('studio-initial-message');
+      // Small delay to let components mount fully
+      const timer = setTimeout(() => sendMessage(initialMessage), 300);
+      return () => clearTimeout(timer);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount
 
   // Generate context-aware suggestion chips
   const getSuggestionChips = useCallback((): string[] => {
@@ -166,11 +180,18 @@ export function ChatPanel() {
     (chip: string) => {
       if (chip === 'Run this formula') {
         executeFormula();
+      } else if (chip === '__apply_formula__') {
+        // Find the most recent formula action and apply it to the canvas
+        const lastAssistantMsg = [...messages].reverse().find((m) => m.role === 'assistant');
+        const formulaAction = lastAssistantMsg?.actions?.find((a) => a.type === 'formula' && a.sql);
+        if (formulaAction?.sql) {
+          setFormulaSQL(formulaAction.sql);
+        }
       } else {
         sendMessage(chip);
       }
     },
-    [sendMessage, executeFormula]
+    [sendMessage, executeFormula, setFormulaSQL, messages]
   );
 
   return (

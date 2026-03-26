@@ -42,8 +42,6 @@ export function ResultsPanel({ visible }: { visible: boolean }) {
   const formulaSQL = useStudioStore((s) => s.formulaSQL);
   const highlightNodes = useStudioStore((s) => s.highlightNodes);
 
-  if (!visible) return null;
-
   const currentResult = executionResult as { ok: boolean; rows?: ResultRow[]; rowCount?: number; durationMs?: number; error?: string } | null;
 
   // Use execution result for facility level, levelResults for others
@@ -162,6 +160,8 @@ export function ResultsPanel({ visible }: { visible: boolean }) {
     a.click();
     URL.revokeObjectURL(url);
   }, [sortedRows, activeLevel]);
+
+  if (!visible) return null;
 
   return (
     <div className="border-t border-slate-800 bg-[#0f1017] flex flex-col" style={{ height: '40%', minHeight: '200px' }}>

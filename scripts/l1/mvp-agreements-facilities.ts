@@ -315,8 +315,23 @@ export function getMvpFacilityField(
   };
   const typeLabel = facilityTypeLabel[entry.facilityType] ?? entry.facilityType;
 
-  // LOB segment: distribute across the 249 EBT nodes deterministically
-  const lobSegmentId = (rowIndex % 249) + 1;
+  // DQ FIX: LOB segment must use LEAF node IDs only (non-leaf causes rollup double-counting)
+  // These are verified leaf nodes across 6 business segments from l1.enterprise_business_taxonomy
+  const EBT_LEAF_IDS = [
+    // Corporate Banking leaves
+    400003, 400004, 400009, 400010, 400019, 400020, 400022,
+    // CRE leaves
+    400036, 400050, 400059, 400067, 400075,
+    // Global Markets leaves
+    400143, 400148, 400152, 400168,
+    // Investment Banking leaves
+    400118, 400130, 400134, 400138,
+    // Public Sector leaves
+    400222, 400228, 400231,
+    // Asset Management leaves
+    400189, 400190,
+  ];
+  const lobSegmentId = EBT_LEAF_IDS[rowIndex % EBT_LEAF_IDS.length];
   // Product node: distribute across 10 product nodes
   const productNodeId = (rowIndex % 10) + 1;
   // Rate index: distribute across 10 rate indices
@@ -331,6 +346,17 @@ export function getMvpFacilityField(
     case 'facility_name':
       return `${shortName} — ${currency} ${typeLabel} ${maturityYear}-${entry.tranche}`;
     case 'facility_type': return entry.facilityType;
+    // DQ FIX: Map facility type string to facility_type_dim PK (prevents "Unknown" type=12)
+    case 'facility_type_id': {
+      const typeIdMap: Record<string, number> = {
+        REVOLVING_CREDIT: 4, TERM_LOAN: 1, TERM_LOAN_B: 2, BRIDGE_LOAN: 3,
+        LETTER_OF_CREDIT: 5, FINANCIAL_GUAR: 6, PERF_GUAR: 7, UNCOMMITTED: 8,
+        TRADE_FINANCE: 9, ABL: 10, SBLC: 11,
+      };
+      return typeIdMap[entry.facilityType] ?? 1;
+    }
+    // DQ FIX: legal_entity_id must be populated for capital metrics rollup
+    case 'legal_entity_id': return (rowIndex % 10) + 1;
     case 'facility_status': return rng() < 0.90 ? 'ACTIVE' : (rng() < 0.5 ? 'PENDING' : 'MATURED');
     case 'committed_facility_amt': return facilityCommit;
     case 'origination_date': return originDate;

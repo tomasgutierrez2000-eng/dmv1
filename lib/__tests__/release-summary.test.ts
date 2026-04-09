@@ -153,11 +153,12 @@ describe('field migration detection', () => {
 
 describe('rollup propagation detection', () => {
   it('detects same field added to multiple rollup tables', () => {
+    // Use table names from the summaryTables list in release-summary.ts
     const entries: ReleaseEntry[] = [
-      entry({ table: 'desk_summary', field: 'total_exposure_usd', changeType: 'Added' }),
-      entry({ table: 'portfolio_summary', field: 'total_exposure_usd', changeType: 'Added' }),
-      entry({ table: 'desk_summary', field: 'weighted_pd_pct', changeType: 'Added' }),
-      entry({ table: 'portfolio_summary', field: 'weighted_pd_pct', changeType: 'Added' }),
+      entry({ table: 'desk_derived', field: 'total_exposure_usd', changeType: 'Added' }),
+      entry({ table: 'portfolio_derived', field: 'total_exposure_usd', changeType: 'Added' }),
+      entry({ table: 'desk_derived', field: 'weighted_pd_pct', changeType: 'Added' }),
+      entry({ table: 'portfolio_derived', field: 'weighted_pd_pct', changeType: 'Added' }),
     ];
     const [summary] = generateSummaries(entries);
     const rollupBullet = summary.bullets.find(b => b.category === 'Rollup Propagation');

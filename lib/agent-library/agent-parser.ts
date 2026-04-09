@@ -6,6 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import type { AgentDefinition, AgentCategory, AgentStatus } from './types';
+import { extractCapabilities } from './capability-parser';
 
 const COMMANDS_DIR = path.join(process.cwd(), '.claude', 'commands');
 
@@ -41,21 +42,6 @@ function inferStatus(content: string, filename: string): AgentStatus {
   }
   // Default: if file has meaningful content (>200 chars of instructions), it's built
   return content.length > 200 ? 'built' : 'planned';
-}
-
-/** Extract capabilities from ## headers */
-function extractCapabilities(content: string): string[] {
-  const capabilities: string[] = [];
-  const headerRegex = /^##\s+(?:\d+\.\s+)?(.+)$/gm;
-  let match;
-  while ((match = headerRegex.exec(content)) !== null) {
-    const header = match[1].trim();
-    // Skip generic headers
-    if (!['Role', 'Context', 'Prerequisites', 'References', 'Notes'].some(s => header.startsWith(s))) {
-      capabilities.push(header);
-    }
-  }
-  return capabilities.slice(0, 10); // cap at 10
 }
 
 /** Extract prerequisites from content */

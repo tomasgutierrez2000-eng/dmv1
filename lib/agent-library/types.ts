@@ -8,6 +8,14 @@
 export type AgentStatus = 'built' | 'planned' | 'in-progress';
 export type AgentCategory = 'expert' | 'builder' | 'reviewer' | 'workflow' | 'session';
 
+export type CapabilityPhase = 'context' | 'analysis' | 'output' | 'validation' | 'general';
+
+export interface AgentCapability {
+  title: string;           // ## header text
+  description: string;     // First 2 sentences from content below header
+  phase: CapabilityPhase;
+}
+
 export interface AgentDefinition {
   name: string;
   slug: string;               // URL-safe identifier (filename without .md)
@@ -16,7 +24,7 @@ export interface AgentDefinition {
   category: AgentCategory;
   status: AgentStatus;
   sessionId: string | null;   // e.g. "S1" — extracted from filename pattern
-  capabilities: string[];     // from ## section headers
+  capabilities: AgentCapability[];  // structured capabilities from ## section headers
   prerequisites: string[];    // from "Prerequisites Check" / "Context Loading" sections
   dependencies: string[];     // agent names this depends on
   version: string | null;

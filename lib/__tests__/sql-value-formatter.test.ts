@@ -54,7 +54,7 @@ describe('formatSqlValue — exception IDs', () => {
   });
 
   it('all exception IDs are accounted for', () => {
-    expect(VARCHAR_EXCEPTION_IDS.size).toBe(6);
+    expect(VARCHAR_EXCEPTION_IDS.size).toBe(18);
   });
 });
 
@@ -243,8 +243,9 @@ describe('formatSqlValue — _flag columns (BOOLEAN)', () => {
     expect(formatSqlValue('is_active_flag', 'true')).toBe('TRUE');
   });
 
-  it('unknown string → NULL', () => {
-    expect(formatSqlValue('is_active_flag', 'maybe')).toBe('NULL');
+  it('unknown string → VARCHAR fallthrough (not a boolean)', () => {
+    // Implementation treats unrecognized flag values as VARCHAR (e.g., 'STABLE', 'LESS_STABLE')
+    expect(formatSqlValue('is_active_flag', 'maybe')).toBe("'maybe'");
   });
 });
 

@@ -8,9 +8,7 @@
 
 import fs from 'fs';
 import path from 'path';
-
-// Inline the parser logic here since we need to resolve from main repo root,
-// not from the Next.js process.cwd()
+import { extractCapabilities } from '../lib/agent-library/capability-parser';
 
 type AgentCategory = 'expert' | 'builder' | 'reviewer' | 'workflow' | 'session';
 type AgentStatus = 'built' | 'planned' | 'deprecated';
@@ -23,7 +21,7 @@ interface AgentDefinition {
   category: AgentCategory;
   status: AgentStatus;
   sessionId: string | null;
-  capabilities: string[];
+  capabilities: ReturnType<typeof extractCapabilities>;
   prerequisites: string[];
   dependencies: string[];
   version: string | null;
@@ -59,19 +57,6 @@ function inferStatus(content: string, filename: string): AgentStatus {
     return content.length > 500 ? 'built' : 'planned';
   }
   return content.length > 200 ? 'built' : 'planned';
-}
-
-function extractCapabilities(content: string): string[] {
-  const capabilities: string[] = [];
-  const headerRegex = /^##\s+(?:\d+\.\s+)?(.+)$/gm;
-  let match;
-  while ((match = headerRegex.exec(content)) !== null) {
-    const header = match[1].trim();
-    if (!['Role', 'Context', 'Prerequisites', 'References', 'Notes'].some(s => header.startsWith(s))) {
-      capabilities.push(header);
-    }
-  }
-  return capabilities.slice(0, 10);
 }
 
 function extractPrerequisites(content: string): string[] {

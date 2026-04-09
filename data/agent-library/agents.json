@@ -8,16 +8,56 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Intake Questions (Direct mode only)",
-      "Capital Knowledge Base",
-      "Decomposition Output Format",
-      "Confirmation Gate",
-      "Audit Logging",
-      "Duplicate Detection Algorithm",
-      "Error Handling",
-      "Example: Decomposing \"CET1 Capital Ratio\"",
-      "Integration Points"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct (user-initiated) User describes a metric need (e.g.",
+        "phase": "context"
+      },
+      {
+        "title": "Intake Questions (Direct mode only)",
+        "description": "Q1. Risk stripe confirmation This expert covers capital adequacy.",
+        "phase": "context"
+      },
+      {
+        "title": "Capital Knowledge Base",
+        "description": "4A. Risk-Based Capital Ratios — Basel III Three-tiered structure: CET1 Capital Components | Component | Treatment | |-----------|----------| | Common stock (par + surplus) | +100% | | Retained earning...",
+        "phase": "general"
+      },
+      {
+        "title": "Decomposition Output Format",
+        "description": "Identical structure to decomp-credit-risk Sections 5A-5I. Key differences: 5A.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Confirmation Gate",
+        "description": "Same as decomp-credit-risk.",
+        "phase": "output"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "Reasoning chain includes capital-specific steps: \"Capital framework: [framework], approach: [SA/IRB/dual]\" \"Buffer stack: [CCB + G-SIB + CCyB + SCB = X%]\" \"Binding constraint identification: [which ra...",
+        "phase": "validation"
+      },
+      {
+        "title": "Duplicate Detection Algorithm",
+        "description": "Same as decomp-credit-risk (Steps 1-4). Additional: Check existing capital metrics in sql/migrations/002-capital-metrics.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Standard errors plus:",
+        "phase": "general"
+      },
+      {
+        "title": "Example: Decomposing \"CET1 Capital Ratio\"",
+        "description": "Expert reasoning chain: Metric: CET1 Capital Ratio — the primary Basel III capital adequacy measure Framework: risk-based capital. Approach: dual (SA + IRB) Duplicate check: Check existing capital met...",
+        "phase": "analysis"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream User via /decomp-capital <metric name> (Mode A) Master Orchestrator (S8) via structured payload (Mode B) Downstream Data Model Expert (S2) — schema gaps (likely minimal given existing capital...",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [],
@@ -36,16 +76,56 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Intake Questions (Direct mode only)",
-      "Compliance & Regulatory Knowledge Base",
-      "Decomposition Output Format",
-      "Confirmation Gate",
-      "Audit Logging",
-      "Duplicate Detection Algorithm",
-      "Error Handling",
-      "Example: Decomposing \"DFAST Severely Adverse CET1 Minimum\"",
-      "Integration Points"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct (user-initiated) User describes a metric need (e.g.",
+        "phase": "context"
+      },
+      {
+        "title": "Intake Questions (Direct mode only)",
+        "description": "Q1. Risk stripe confirmation This expert covers compliance and regulatory reporting.",
+        "phase": "context"
+      },
+      {
+        "title": "Compliance & Regulatory Knowledge Base",
+        "description": "4A. DFAST/CCAR Stress Testing Framework Overview DFAST (Dodd-Frank Act Stress Testing): Annual company-run stress test; results publicly disclosed CCAR (Comprehensive Capital Analysis and Review): Fed...",
+        "phase": "general"
+      },
+      {
+        "title": "Decomposition Output Format",
+        "description": "Identical structure to decomp-credit-risk Sections 5A-5I. Key differences: 5A.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Confirmation Gate",
+        "description": "Same as decomp-credit-risk.",
+        "phase": "output"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "Reasoning chain includes: \"Compliance domain: [domain], regulator: [body]\" \"Filing/reporting frequency: [frequency], deadline: [deadline]\" \"Cross-stripe dependencies: [which other experts feed this me...",
+        "phase": "validation"
+      },
+      {
+        "title": "Duplicate Detection Algorithm",
+        "description": "Same as decomp-credit-risk (Steps 1-4).",
+        "phase": "analysis"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Standard errors plus:",
+        "phase": "general"
+      },
+      {
+        "title": "Example: Decomposing \"DFAST Severely Adverse CET1 Minimum\"",
+        "description": "Expert reasoning chain: Metric: DFAST SA CET1 Minimum — the trough CET1 ratio over 9 quarters under severely adverse Domain: stress_testing. Regulator: Federal Reserve.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream User via /decomp-compliance <metric name> (Mode A) Master Orchestrator (S8) via structured payload (Mode B) Downstream Data Model Expert (S2) — schema gaps (stress scenario, projection, regul...",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [
@@ -66,16 +146,61 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Intake Questions (Direct mode only — skip in Orchestrator mode)",
-      "Counterparty Credit Risk Knowledge Base",
-      "Decomposition Output Format",
-      "Confirmation Gate (MANDATORY in Direct mode, AUTOMATIC in Orchestrator mode)",
-      "Decomposition Summary: [Metric Name]",
-      "Audit Logging",
-      "Duplicate Detection Algorithm",
-      "Error Handling",
-      "Example: Decomposing \"SA-CCR EAD\""
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct (user-initiated) User describes a metric need in natural language (e.g.",
+        "phase": "context"
+      },
+      {
+        "title": "Intake Questions (Direct mode only — skip in Orchestrator mode)",
+        "description": "Q1. Risk stripe confirmation This expert covers counterparty credit risk (derivatives, SFTs, long-settlement transactions).",
+        "phase": "context"
+      },
+      {
+        "title": "Counterparty Credit Risk Knowledge Base",
+        "description": "4A. SA-CCR Framework (Basel III CRE 52) SA-CCR replaced CEM as the standardized approach for measuring counterparty credit risk exposure.",
+        "phase": "general"
+      },
+      {
+        "title": "Decomposition Output Format",
+        "description": "This is the EXACT output format. All stripe experts MUST produce this structure.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Confirmation Gate (MANDATORY in Direct mode, AUTOMATIC in Orchestrator mode)",
+        "description": "Mode A (Direct): Present summary to user, wait for explicit YES/NO/PARTIAL. Mode B (Orchestrator): Orchestrator reviews confidence level.",
+        "phase": "context"
+      },
+      {
+        "title": "Decomposition Summary: [Metric Name]",
+        "description": "Metric ID hint: [CCR-NNN] Class: [SOURCED/CALCULATED/HYBRID] | Direction: [HIGHER/LOWER/NEUTRAL] CCR framework: [SA-CCR/IMM/CVA] Product scope: [derivatives/SFTs/all] Rollup strategy: [strategy] Confi...",
+        "phase": "analysis"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "7a. Session initialization 7b.",
+        "phase": "validation"
+      },
+      {
+        "title": "Duplicate Detection Algorithm",
+        "description": "Same as decomp-credit-risk (Steps 1-4: exact match, semantic similarity, formula similarity, YAML cross-check). Decision rules identical.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Missing data dictionary Missing bank profile Derivative/trade tables not in schema All ingredients fail DD validation",
+        "phase": "general"
+      },
+      {
+        "title": "Example: Decomposing \"SA-CCR EAD\"",
+        "description": "User: \"Decompose SA-CCR Exposure at Default\" Expert reasoning chain: Metric identified: SA-CCR EAD — the standardized counterparty credit risk exposure measure CCR framework: SA-CCR. Product scope: al...",
+        "phase": "analysis"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream User via /decomp-ccr <metric name> (Mode A) Master Orchestrator (S8) via structured payload (Mode B) Downstream Data Model Expert (S2) — receives schema_gaps (likely significant: netting sets...",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [],
@@ -94,16 +219,61 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Intake Questions (Direct mode only — skip in Orchestrator mode)",
-      "Credit Risk Knowledge Base",
-      "Decomposition Output Format",
-      "Confirmation Gate (MANDATORY in Direct mode, AUTOMATIC in Orchestrator mode)",
-      "Decomposition Summary: [Metric Name]",
-      "Audit Logging",
-      "Duplicate Detection Algorithm",
-      "Error Handling",
-      "Example: Decomposing \"Expected Loss Rate\""
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct (user-initiated) User describes a metric need in natural language (e.g.",
+        "phase": "context"
+      },
+      {
+        "title": "Intake Questions (Direct mode only — skip in Orchestrator mode)",
+        "description": "Ask ALL of these before proceeding. Present as a structured questionnaire.",
+        "phase": "context"
+      },
+      {
+        "title": "Credit Risk Knowledge Base",
+        "description": "4A. Core Credit Risk Metrics — Basel III/IV Formulas Probability of Default (PD) IRB Formula: PD = f(internal rating) calibrated to through-the-cycle default frequency Point-in-Time (PIT): Current def...",
+        "phase": "general"
+      },
+      {
+        "title": "Decomposition Output Format",
+        "description": "This is the EXACT output format. All stripe experts MUST produce this structure.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Confirmation Gate (MANDATORY in Direct mode, AUTOMATIC in Orchestrator mode)",
+        "description": "Mode A (Direct): Present summary to user, wait for explicit YES/NO/PARTIAL. Mode B (Orchestrator): The orchestrator reviews the confidence level (5I).",
+        "phase": "context"
+      },
+      {
+        "title": "Decomposition Summary: [Metric Name]",
+        "description": "Metric ID hint: [DOMAIN-NNN] Class: [SOURCED/CALCULATED/HYBRID] | Direction: [HIGHER/LOWER/NEUTRAL] Rollup strategy: [strategy] Confidence: [HIGH/MEDIUM/LOW] Ingredients ([N] total) | # | Layer | Tabl...",
+        "phase": "analysis"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "7a. Session initialization At the start of every invocation, initialize the audit logger: 7b.",
+        "phase": "validation"
+      },
+      {
+        "title": "Duplicate Detection Algorithm",
+        "description": "Before decomposing, check for existing metrics that cover the same business concept: Step 1: Exact match Search catalogue.json for exact item_id, abbreviation, or name match.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Missing data dictionary If data-dictionary.json is not found or empty: Missing bank profile If bank-profile.",
+        "phase": "general"
+      },
+      {
+        "title": "Example: Decomposing \"Expected Loss Rate\"",
+        "description": "To illustrate the full flow, here is a condensed example: User: \"Decompose Expected Loss Rate for the credit portfolio\" Expert reasoning chain: Metric identified: Expected Loss Rate (EL Rate) Duplicat...",
+        "phase": "analysis"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream (who invokes this expert) User via /decomp-credit-risk <metric name> (Mode A) Master Orchestrator (S8) via structured payload (Mode B) Downstream (who consumes this expert's output) Data Mode...",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [],
@@ -122,16 +292,61 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Schema Analysis Procedure",
-      "Output Format",
-      "Session: {session_id}",
-      "Trigger: {metric_name or capability description}",
-      "Risk Stripe: {credit_risk | capital_risk | ...}",
-      "Confidence: {HIGH | MEDIUM | LOW} — {reasoning}",
-      "Confirmation Gate",
-      "Audit Logging",
-      "Error Handling"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct (user describes a need) Ask these intake questions: What capability are you building? (new metric, new report, new risk stripe, schema extension) Which risk stripe?",
+        "phase": "context"
+      },
+      {
+        "title": "Schema Analysis Procedure",
+        "description": "Step 1: Map Existing Fields For each ingredient in the decomposition (or user-described need): Classify each ingredient as: FOUND — exact match exists in the model PARTIAL — similar field exists but w...",
+        "phase": "analysis"
+      },
+      {
+        "title": "Output Format",
+        "description": "Recommendation Document ```markdown Data Model Expert — Schema Recommendation Session: {session_id}",
+        "phase": "output"
+      },
+      {
+        "title": "Session: {session_id}",
+        "description": "Trigger: {metric_name or capability description}",
+        "phase": "general"
+      },
+      {
+        "title": "Trigger: {metric_name or capability description}",
+        "description": "Risk Stripe: {credit_risk | capital_risk | ..",
+        "phase": "general"
+      },
+      {
+        "title": "Risk Stripe: {credit_risk | capital_risk | ...}",
+        "description": "Confidence: {HIGH | MEDIUM | LOW} — {reasoning}",
+        "phase": "general"
+      },
+      {
+        "title": "Confidence: {HIGH | MEDIUM | LOW} — {reasoning}",
+        "description": "",
+        "phase": "general"
+      },
+      {
+        "title": "Confirmation Gate",
+        "description": "⏸ AWAITING USER CONFIRMATION The above schema changes are RECOMMENDATIONS ONLY. No DDL has been executed.",
+        "phase": "output"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "At each major step, log to the audit trail: Write a JSON session log to .claude/audit/sessions/data-model-expert-{timestamp}.",
+        "phase": "validation"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Data dictionary not found: Halt. Report \"Golden source data-dictionary.",
+        "phase": "general"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream: Receives from Decomp Expert (decomp-credit-risk.md or other stripe experts) Downstream: Hands off to DB Schema Builder (session-s3) after user confirmation Parallel: Regulatory Mapping Exper...",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/config/bank-profile.yaml",
@@ -158,16 +373,56 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Intake Questions (Direct mode only)",
-      "IRRBB & ALM Knowledge Base",
-      "Decomposition Output Format",
-      "Confirmation Gate",
-      "Audit Logging",
-      "Duplicate Detection Algorithm",
-      "Error Handling",
-      "Example: Decomposing \"NII Sensitivity to +200bp\"",
-      "Integration Points"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct (user-initiated) User describes a metric need (e.g.",
+        "phase": "context"
+      },
+      {
+        "title": "Intake Questions (Direct mode only)",
+        "description": "Q1. Risk stripe confirmation This expert covers IRRBB and ALM (banking book interest rate risk).",
+        "phase": "context"
+      },
+      {
+        "title": "IRRBB & ALM Knowledge Base",
+        "description": "4A. NII Sensitivity (Earnings-at-Risk) Purpose: Measure the impact of interest rate changes on net interest income over a defined horizon (typically 12 months).",
+        "phase": "general"
+      },
+      {
+        "title": "Decomposition Output Format",
+        "description": "Identical structure to decomp-credit-risk Sections 5A-5I. Key differences: 5A.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Confirmation Gate",
+        "description": "Same as decomp-credit-risk.",
+        "phase": "output"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "Reasoning chain includes: \"IRRBB framework: [framework], rate scenarios: [scenarios]\" \"Behavioral modeling: [NMD pass-through, prepayment CPR, cap/floor]\" \"Optionality risk: [embedded options identifi...",
+        "phase": "validation"
+      },
+      {
+        "title": "Duplicate Detection Algorithm",
+        "description": "Same as decomp-credit-risk (Steps 1-4).",
+        "phase": "analysis"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Standard errors plus:",
+        "phase": "general"
+      },
+      {
+        "title": "Example: Decomposing \"NII Sensitivity to +200bp\"",
+        "description": "Expert reasoning chain: Metric: ΔNII under +200bp parallel shift — primary IRRBB earnings measure Framework: NII sensitivity. Scenarios: parallel up (+200bp) Duplicate check: No match.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream User via /decomp-irrbb-alm <metric name> (Mode A) Master Orchestrator (S8) via structured payload (Mode B) Downstream Data Model Expert (S2) — schema gaps (extensive: repricing, yield curve,...",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [],
@@ -186,16 +441,56 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Intake Questions (Direct mode only)",
-      "Liquidity Risk Knowledge Base",
-      "Decomposition Output Format",
-      "Confirmation Gate",
-      "Audit Logging",
-      "Duplicate Detection Algorithm",
-      "Error Handling",
-      "Example: Decomposing \"Liquidity Coverage Ratio\"",
-      "Integration Points"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct (user-initiated) User describes a metric need (e.g.",
+        "phase": "context"
+      },
+      {
+        "title": "Intake Questions (Direct mode only)",
+        "description": "Q1. Risk stripe confirmation This expert covers liquidity risk.",
+        "phase": "context"
+      },
+      {
+        "title": "Liquidity Risk Knowledge Base",
+        "description": "4A. Liquidity Coverage Ratio (LCR) — Basel III Purpose: Ensure banks hold sufficient HQLA to survive a 30-day acute liquidity stress.",
+        "phase": "general"
+      },
+      {
+        "title": "Decomposition Output Format",
+        "description": "Identical structure to decomp-credit-risk Sections 5A-5I. Key differences: 5A.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Confirmation Gate",
+        "description": "Same as decomp-credit-risk.",
+        "phase": "output"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "Reasoning chain includes: \"Liquidity framework: [framework], currency scope: [scope]\" \"Entity-level vs consolidated: [explain]\" \"Trapped liquidity considerations: [if multi-entity]\" All other audit pa...",
+        "phase": "validation"
+      },
+      {
+        "title": "Duplicate Detection Algorithm",
+        "description": "Same as decomp-credit-risk (Steps 1-4).",
+        "phase": "analysis"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Standard errors (same as decomp-credit-risk) Missing data dictionary, missing bank profile, majority ingredients fail validation.",
+        "phase": "general"
+      },
+      {
+        "title": "Example: Decomposing \"Liquidity Coverage Ratio\"",
+        "description": "Expert reasoning chain: Metric: LCR — the headline Basel III liquidity ratio Framework: LCR. Currency: USD + significant currencies (EUR, GBP, JPY) Duplicate check: No match.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream User via /decomp-liquidity <metric name> (Mode A) Master Orchestrator (S8) via structured payload (Mode B) Downstream Data Model Expert (S2) — receives schema gaps (deposit, funding, HQLA tab...",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [],
@@ -214,16 +509,61 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Intake Questions (Direct mode only — skip in Orchestrator mode)",
-      "Market Risk Knowledge Base",
-      "Decomposition Output Format",
-      "Confirmation Gate (MANDATORY in Direct mode, AUTOMATIC in Orchestrator mode)",
-      "Decomposition Summary: [Metric Name]",
-      "Audit Logging",
-      "Duplicate Detection Algorithm",
-      "Error Handling",
-      "Example: Decomposing \"FRTB SA Capital Charge\""
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct (user-initiated) User describes a metric need in natural language (e.g.",
+        "phase": "context"
+      },
+      {
+        "title": "Intake Questions (Direct mode only — skip in Orchestrator mode)",
+        "description": "Ask ALL of these before proceeding. Present as a structured questionnaire.",
+        "phase": "context"
+      },
+      {
+        "title": "Market Risk Knowledge Base",
+        "description": "4A. FRTB Framework Overview The Fundamental Review of the Trading Book (FRTB) — Basel III MAR 10-33 — replaces the legacy VaR-based framework with two parallel approaches: Internal Models Approach (IM...",
+        "phase": "general"
+      },
+      {
+        "title": "Decomposition Output Format",
+        "description": "This is the EXACT output format. All stripe experts MUST produce this structure.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Confirmation Gate (MANDATORY in Direct mode, AUTOMATIC in Orchestrator mode)",
+        "description": "Mode A (Direct): Present summary to user, wait for explicit YES/NO/PARTIAL. Mode B (Orchestrator): The orchestrator reviews the confidence level (5I).",
+        "phase": "context"
+      },
+      {
+        "title": "Decomposition Summary: [Metric Name]",
+        "description": "Metric ID hint: [MKT-NNN] Class: [SOURCED/CALCULATED/HYBRID] | Direction: [HIGHER/LOWER/NEUTRAL] FRTB framework: [IMA/SA/both] Risk class: [GIRR/CSR/EQ/COMM/FX/all] Rollup strategy: [strategy] Confide...",
+        "phase": "analysis"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "7a. Session initialization 7b.",
+        "phase": "validation"
+      },
+      {
+        "title": "Duplicate Detection Algorithm",
+        "description": "Before decomposing, check for existing metrics that cover the same business concept: Step 1: Exact match Search catalogue.json for exact item_id, abbreviation, or name match.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Missing data dictionary Missing bank profile Position/market data tables not in schema All ingredients fail DD validation",
+        "phase": "general"
+      },
+      {
+        "title": "Example: Decomposing \"FRTB SA Capital Charge\"",
+        "description": "User: \"Decompose the FRTB Standardized Approach total capital charge\" Expert reasoning chain: Metric identified: FRTB SA Capital Charge (total) FRTB framework: SA. Risk class: all (aggregated across r...",
+        "phase": "analysis"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream (who invokes this expert) User via /decomp-market-risk <metric name> (Mode A) Master Orchestrator (S8) via structured payload (Mode B) Downstream (who consumes this expert's output) Data Mode...",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [],
@@ -242,16 +582,56 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Intake Questions (Direct mode only)",
-      "Operational Risk Knowledge Base",
-      "Decomposition Output Format",
-      "Confirmation Gate",
-      "Audit Logging",
-      "Duplicate Detection Algorithm",
-      "Error Handling",
-      "Example: Decomposing \"SMA Operational Risk Capital\"",
-      "Integration Points"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct (user-initiated) User describes a metric need (e.g.",
+        "phase": "context"
+      },
+      {
+        "title": "Intake Questions (Direct mode only)",
+        "description": "Q1. Risk stripe confirmation This expert covers operational risk (Basel II/III/IV definition: losses from inadequate or failed internal processes, people, systems, or external events — includes legal...",
+        "phase": "context"
+      },
+      {
+        "title": "Operational Risk Knowledge Base",
+        "description": "4A. Standardized Measurement Approach (SMA) — Basel IV SMA replaces all prior approaches (BIA, TSA, AMA) with a single standardized method effective January 2023.",
+        "phase": "general"
+      },
+      {
+        "title": "Decomposition Output Format",
+        "description": "Identical structure to decomp-credit-risk Sections 5A-5I. Key differences: 5A.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Confirmation Gate",
+        "description": "Same as decomp-credit-risk.",
+        "phase": "output"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "Reasoning chain includes: \"Op risk framework: [framework], event type scope: [scope]\" \"SMA bucket: [1/2/3] based on estimated BI\" \"ILM treatment: [loss-based / ILM=1 per US proposal]\" \"Loss data avail...",
+        "phase": "validation"
+      },
+      {
+        "title": "Duplicate Detection Algorithm",
+        "description": "Same as decomp-credit-risk (Steps 1-4).",
+        "phase": "analysis"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Standard errors plus:",
+        "phase": "general"
+      },
+      {
+        "title": "Example: Decomposing \"SMA Operational Risk Capital\"",
+        "description": "Expert reasoning chain: Metric: SMA Op Risk Capital — the Basel IV standardized operational risk capital charge Framework: SMA. Event type: all (BI is aggregate) Duplicate check: No match.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream User via /decomp-oprisk <metric name> (Mode A) Master Orchestrator (S8) via structured payload (Mode B) Downstream Data Model Expert (S2) — schema gaps (loss events, KRI, RCSA tables) YAML Co...",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [],
@@ -270,16 +650,81 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Regulatory Framework Knowledge Base",
-      "Coverage Assessment Procedure",
-      "Output Format",
-      "Institution: {institution_name} ({institution_tier})",
-      "Assessment Date: {date}",
-      "Assessment Mode: {Full | Targeted | Delta}",
-      "Schema Manifest Version: {last_updated from schema-manifest.yaml}",
-      "Executive Summary",
-      "Detailed Coverage — FR Y-14Q Schedule H"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Full Assessment (default) Run a complete coverage assessment across all in-scope regulatory frameworks. Use when: First-time regulatory readiness check After major schema changes Quarterly reg...",
+        "phase": "context"
+      },
+      {
+        "title": "Regulatory Framework Knowledge Base",
+        "description": "Framework 1: FR Y-14Q (Quarterly — Federal Reserve) The primary credit risk regulatory report for GSIBs. Filed quarterly.",
+        "phase": "general"
+      },
+      {
+        "title": "Coverage Assessment Procedure",
+        "description": "Step 1: Field Inventory For each framework/schedule, enumerate every required data element and search the data model: Classification rules: COVERED: Field exists in the data model with correct type an...",
+        "phase": "general"
+      },
+      {
+        "title": "Output Format",
+        "description": "Coverage Report ```markdown Regulatory Coverage Assessment Institution: {institution_name} ({institution_tier})",
+        "phase": "output"
+      },
+      {
+        "title": "Institution: {institution_name} ({institution_tier})",
+        "description": "Assessment Date: {date}",
+        "phase": "general"
+      },
+      {
+        "title": "Assessment Date: {date}",
+        "description": "Assessment Mode: {Full | Targeted | Delta}",
+        "phase": "general"
+      },
+      {
+        "title": "Assessment Mode: {Full | Targeted | Delta}",
+        "description": "Schema Manifest Version: {last_updated from schema-manifest.",
+        "phase": "context"
+      },
+      {
+        "title": "Schema Manifest Version: {last_updated from schema-manifest.yaml}",
+        "description": "",
+        "phase": "general"
+      },
+      {
+        "title": "Executive Summary",
+        "description": "| Framework | Schedule | Total Fields | Covered | Partial | Gap | Coverage % | Rating | |-----------|----------|-------------|---------|---------|-----|-----------|--------| | FR Y-14Q | Schedule H |...",
+        "phase": "general"
+      },
+      {
+        "title": "Detailed Coverage — FR Y-14Q Schedule H",
+        "description": "Covered Fields (95/120) | # | Regulatory Field | Data Model Field | Table | Type | Notes | |---|-----------------|-----------------|-------|------|-------| | 1 | Internal Borrower ID | counterparty_id...",
+        "phase": "general"
+      },
+      {
+        "title": "Detailed Coverage — [repeat for each framework]",
+        "description": "..",
+        "phase": "general"
+      },
+      {
+        "title": "BCBS 239 Principle Assessment",
+        "description": "| # | Principle | Rating | Evidence | Gaps | |---|-----------|--------|----------|------| | 1 | Governance | PARTIAL | Schema has audit columns (created_ts, updated_ts, record_source) but no formal da...",
+        "phase": "general"
+      },
+      {
+        "title": "Cross-Framework Field Value Analysis",
+        "description": "Highest-Value Fields (satisfy 3+ frameworks) | Field | Table | Frameworks Covered | Priority if Missing | |-------|-------|--------------------|-------------------| | pd_pct | l2.facility_risk_snapsho...",
+        "phase": "analysis"
+      },
+      {
+        "title": "Recommended Remediation Roadmap",
+        "description": "Immediate (P0 — this quarter) Add CECL fields to l2.facility_risk_snapshot: cecl_stage_code, cecl_allowance_amt    - Closes: Y-14Q Schedule H (2 fields), FFIEC 101 (1 field)    - Feed to: Data Model E...",
+        "phase": "general"
+      },
+      {
+        "title": "Handoff",
+        "description": "This assessment feeds into: Data Model Expert → receives gap list for DDL proposals (P0 gaps first) Decomp Expert → receives metric gaps for new metric definitions Orchestrator → receives coverage sco...",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/config/bank-profile.yaml",
@@ -306,16 +751,66 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Regeneration Scope Decision",
-      "Data Generation Scope",
-      "Dependency Analysis",
-      "Data Profile Generation",
-      "Generator Implementation",
-      "Execution Pipeline",
-      "Validation",
-      "Audit Logging",
-      "Integration Points"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: From DB Schema Builder (standard pipeline) Receives a post-DDL notification: Mode B: Direct (user-initiated) User describes what data is needed: \"Generate data for the new facility_covenant_sn...",
+        "phase": "context"
+      },
+      {
+        "title": "Regeneration Scope Decision",
+        "description": "When triggered by a schema change, present the choice to the user (or orchestrator): ```",
+        "phase": "general"
+      },
+      {
+        "title": "Data Generation Scope",
+        "description": "Schema changes detected: [list changes] Options: Net-new only — Generate data only for new/modified tables. Fast, idempotent.",
+        "phase": "general"
+      },
+      {
+        "title": "Dependency Analysis",
+        "description": "4A. FK Chain Resolution For every new/modified table, trace its complete FK chain: Use the data dictionary to resolve all FKs.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Data Profile Generation",
+        "description": "For each target table, produce a Data Profile specifying how each column is populated. 5A.",
+        "phase": "general"
+      },
+      {
+        "title": "Generator Implementation",
+        "description": "6A. Determine Generator Approach Existing V2 generator covers the table → Extend it with new columns    - Edit the generator file in scenarios/factory/v2/generators/    - Add column generation logic f...",
+        "phase": "general"
+      },
+      {
+        "title": "Execution Pipeline",
+        "description": "7A. For Net-New Tables 7B.",
+        "phase": "general"
+      },
+      {
+        "title": "Validation",
+        "description": "8A. Structural Validation (Automated) Run automatically by the factory pipeline: Schema validation — all tables/columns exist in DD (schema-validator.",
+        "phase": "validation"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "9a. Session Initialization 9b.",
+        "phase": "validation"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream (who triggers this builder) DB Schema Builder (S3) — after DDL execution, sends schema change notification Master Orchestrator (S8) — as part of end-to-end metric onboarding pipeline User — d...",
+        "phase": "general"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Data dictionary not found Generator compilation failure FK parent table has no data Factory runner failure",
+        "phase": "general"
+      },
+      {
+        "title": "Safety Rules",
+        "description": "Never delete production data. Factory data uses reserved ID ranges (1000+, 5000+).",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/config/bank-profile.yaml",
@@ -346,16 +841,61 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Input Validation (Gate 0 — reject garbage early)",
-      "DDL Test Battery (6 Tests — ALL must pass)",
-      "PRE_EXECUTION Reviewer Gate (MANDATORY — NON-BYPASSABLE)",
-      "Migration File Generation",
-      "DDL Execution (Transactional)",
-      "Post-Execution Actions (automatic)",
-      "Audit Logging",
-      "Error Handling",
-      "Integration Points"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: From Data Model Expert (standard pipeline) Receives a Schema Recommendation document with: changes_required[] — each with change_type, object_schema, object_name, ddl_statement, rationale, rol...",
+        "phase": "context"
+      },
+      {
+        "title": "Input Validation (Gate 0 — reject garbage early)",
+        "description": "For EVERY proposed change, verify before any testing: | Check | Reject If | |-------|-----------| | change_type | Not in: CREATE_TABLE, ALTER_TABLE, ADD_COLUMN, MODIFY_COLUMN, DROP_COLUMN, CREATE_INDE...",
+        "phase": "output"
+      },
+      {
+        "title": "DDL Test Battery (6 Tests — ALL must pass)",
+        "description": "Run these tests IN ORDER against each ddl_statement. If ANY test fails, the entire batch is rejected.",
+        "phase": "general"
+      },
+      {
+        "title": "PRE_EXECUTION Reviewer Gate (MANDATORY — NON-BYPASSABLE)",
+        "description": "After all 6 tests pass, present a review summary to the user. This gate cannot be skipped by the orchestrator, by flags, or by any override.",
+        "phase": "output"
+      },
+      {
+        "title": "Migration File Generation",
+        "description": "File naming Scan sql/migrations/*.sql for the highest numeric prefix.",
+        "phase": "general"
+      },
+      {
+        "title": "DDL Execution (Transactional)",
+        "description": "Execute against PostgreSQL using the connection details from bank-profile.yaml: Default paths (from bank-profile.",
+        "phase": "general"
+      },
+      {
+        "title": "Post-Execution Actions (automatic)",
+        "description": "After successful DDL execution, run these in sequence: 8a. Introspect database This updates data-dictionary.",
+        "phase": "general"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "Log at every major step using the AuditLogger patterns: Session start Each DDL test Schema change record (per DDL statement) Session finalize Write JSON session log to .claude/audit/sessions/db-schema...",
+        "phase": "validation"
+      },
+      {
+        "title": "Error Handling",
+        "description": "| Error | Response | |-------|----------| | Test battery failure | Halt. Report which test(s) failed with specific details.",
+        "phase": "general"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream: Receives from Data Model Expert (data-model-expert.md) or direct user input Downstream: Triggers db:introspect, schema manifest regen, POST_EXECUTION reviewer (S4) Parallel: Migration Manage...",
+        "phase": "general"
+      },
+      {
+        "title": "Safety Rules (IMMUTABLE)",
+        "description": "Never execute DML (INSERT/UPDATE/DELETE) through this agent. DDL only.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/config/bank-profile.yaml",
@@ -382,16 +922,61 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Migration Registry",
-      "Status Report",
-      "Ordering Validation",
-      "Apply Pending Migrations",
-      "Rollback",
-      "Rollback Generation",
-      "Dependency Graph",
-      "Audit Logging",
-      "Integration Points"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Status report (default when no arguments) Display full migration status (Section 4). Mode B: Validate ordering Run dependency and ordering validation across all migrations (Section 5).",
+        "phase": "context"
+      },
+      {
+        "title": "Migration Registry",
+        "description": "The migration registry uses a dual-source approach: Primary: audit.schema_migrations table in PostgreSQL — authoritative record of what was applied Fallback: Filesystem scan + information_schema intro...",
+        "phase": "general"
+      },
+      {
+        "title": "Status Report",
+        "description": "Display migration status in a clear table format: Warnings to detect: Duplicate sequence numbers — multiple files with same prefix (e.g.",
+        "phase": "output"
+      },
+      {
+        "title": "Ordering Validation",
+        "description": "Validate that migrations can be applied in sequence without FK or dependency violations: 5a. Dependency chain validation For each migration with a -- Dependencies: header: Verify all declared dependen...",
+        "phase": "validation"
+      },
+      {
+        "title": "Apply Pending Migrations",
+        "description": "6a. Pre-apply validation Before applying any migration: Run ordering validation (Section 5) Verify all dependencies are APPLIED Verify the migration file parses without syntax errors 6b.",
+        "phase": "general"
+      },
+      {
+        "title": "Rollback",
+        "description": "7a. Single migration rollback Find the rollback file: sql/migrations/037-{desc}-rollback.",
+        "phase": "general"
+      },
+      {
+        "title": "Rollback Generation",
+        "description": "For migrations that lack a rollback file, auto-generate one by parsing the forward migration: | Forward DDL | Rollback DDL | |-------------|-------------| | CREATE TABLE schema.table (.",
+        "phase": "general"
+      },
+      {
+        "title": "Dependency Graph",
+        "description": "Visualize migration dependencies as a text DAG: For a specific migration:",
+        "phase": "general"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "Log all operations to audit trail: Status check Apply Rollback",
+        "phase": "validation"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream: DB Schema Builder writes migration files; this agent tracks and applies them Downstream: After apply/rollback, triggers db:introspect and schema manifest regen Parallel: DB Schema Builder ma...",
+        "phase": "general"
+      },
+      {
+        "title": "Safety Rules (IMMUTABLE)",
+        "description": "Never apply migrations without user confirmation. Never rollback without user confirmation.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       "sql/migrations/*.sql",
@@ -414,15 +999,51 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Pre-Flight Validation",
-      "Decomposition-to-YAML Translation",
-      "Invoke Add-Metric Workflow",
-      "Output Format",
-      "Audit Logging",
-      "Integration Points",
-      "Error Handling",
-      "Safety Rules"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: From Decomposition Expert (standard pipeline) Receives the full decomposition JSON (Sections 5A-5I from decomp-credit-risk.md): Mode B: Direct (user-initiated) User provides a metric descripti...",
+        "phase": "context"
+      },
+      {
+        "title": "Pre-Flight Validation",
+        "description": "Before invoking the add-metric workflow, validate the decomposition: 3A. Schema Gap Check 3B.",
+        "phase": "validation"
+      },
+      {
+        "title": "Decomposition-to-YAML Translation",
+        "description": "Map the decomposition JSON to YAML metric config structure: 4A. Identification Block 4B.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Invoke Add-Metric Workflow",
+        "description": "After YAML translation is complete, execute the CLAUDE.md 6-phase workflow: Phase 3: YAML Authoring Write the YAML file to scripts/calc_engine/metrics/{domain}/{METRIC_ID}.",
+        "phase": "general"
+      },
+      {
+        "title": "Output Format",
+        "description": "6A. Success Response (to Orchestrator or User) 6B.",
+        "phase": "output"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "7a. Session Initialization 7b.",
+        "phase": "validation"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream (who invokes this writer) Decomposition Expert (S1) — sends structured decomposition JSON Master Orchestrator (S8) — as part of end-to-end metric onboa",
+        "phase": "general"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Blocking schema gaps calc:sync failure calc:demo produces all zeros/NULLs PostgreSQL formula execution failure",
+        "phase": "general"
+      },
+      {
+        "title": "Safety Rules",
+        "description": "Never modify catalogue.json directly.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/config/bank-profile.yaml",
@@ -452,14 +1073,46 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Data Source Strategy",
-      "Report Sections",
-      "Time Range Filtering",
-      "Trend Analysis",
-      "Audit Logging",
-      "Integration Points",
-      "Safety Rules"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Summary Report (default) High-level dashboard of all agent activity. Quick read for daily standup or weekly review.",
+        "phase": "context"
+      },
+      {
+        "title": "Data Source Strategy",
+        "description": "Primary: Local JSON Files (always available) The AuditLogger always writes to local JSON regardless of database connectivity. These are the guaranteed-available data source.",
+        "phase": "general"
+      },
+      {
+        "title": "Report Sections",
+        "description": "Section 1: Agent Activity Summary Parse all session JSON files. Group by agent_name.",
+        "phase": "output"
+      },
+      {
+        "title": "Time Range Filtering",
+        "description": "All modes support a --since parameter: --since 2026-03-01 — from specific date --since 7d — last 7 days --since 30d — last 30 days Default: last 30 days For local JSON: filter by started_at or created...",
+        "phase": "general"
+      },
+      {
+        "title": "Trend Analysis",
+        "description": "When generating reports for periods >7 days, compute trends: Schema Change Velocity Changes per week, with week-over-week delta Trend arrow: ↑ (>20% increase),",
+        "phase": "analysis"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "Session start Report generation Session finalize",
+        "phase": "validation"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream: Reads from all agent audit logs (especially Drift Monitor, DB Schema Builder, Risk Expert Reviewer) Downstream: Reports consumed by engineering leads, risk managers, and regulatory examinati...",
+        "phase": "general"
+      },
+      {
+        "title": "Safety Rules",
+        "description": "Read-only — this agent NEVER modifies audit data, schema, or any production tables. No PII exposure — never include actual data values, credentials, or connection strings in reports.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/config/bank-profile.yaml",
@@ -487,16 +1140,61 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Ten-Dimension Assessment Framework",
-      "Finding Format",
-      "Regulatory Coverage Score",
-      "Gate Decision (PRE_EXECUTION mode)",
-      "Implementation Delta Report (POST_EXECUTION mode)",
-      "Audit Logging",
-      "Review Summary Output",
-      "Risk Expert Review: [Target Description]",
-      "Integration Points"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: PRE_EXECUTION (Gate) Invoked BEFORE a builder agent applies changes. Receives a proposed change payload and returns APPROVED / BLOCKED / APPROVED_WITH_CONDITIONS.",
+        "phase": "context"
+      },
+      {
+        "title": "Ten-Dimension Assessment Framework",
+        "description": "Each dimension is scored PASS / PARTIAL / FAIL. Dimensions declare their own applicability — skip inapplicable dimensions and note why.",
+        "phase": "general"
+      },
+      {
+        "title": "Finding Format",
+        "description": "Each finding is emitted as a structured record compatible with audit.",
+        "phase": "output"
+      },
+      {
+        "title": "Regulatory Coverage Score",
+        "description": "Scored 0-100 across applicable frameworks. Each framework checked gets a pass/fail on its relevant requirements.",
+        "phase": "general"
+      },
+      {
+        "title": "Gate Decision (PRE_EXECUTION mode)",
+        "description": "After assessing all applicable dimensions, emit a gate decision: APPROVED Zero CRITICAL or HIGH findings Regulatory coverage score >= 80 Proceed to execution AP",
+        "phase": "context"
+      },
+      {
+        "title": "Implementation Delta Report (POST_EXECUTION mode)",
+        "description": "After changes are applied, compare actual vs expected state: 7A. Schema Delta 7B.",
+        "phase": "context"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "8a. Session initialization 8b.",
+        "phase": "validation"
+      },
+      {
+        "title": "Review Summary Output",
+        "description": "Present to user (or return to orchestrator): ```",
+        "phase": "output"
+      },
+      {
+        "title": "Risk Expert Review: [Target Description]",
+        "description": "Mode: PRE_EXECUTION / POST_EXECUTION Gate Decision: APPROVED / APPROVED_WITH_CONDITIONS / BLOCKED Dimension Results | # | Dimension | Result | Applicable | Key Finding | |---|-----------|--------|----...",
+        "phase": "validation"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream (who invokes this reviewer) DB Schema Builder (S3) — sends proposed DDL for PRE_EXECUTION review Decomp Expert (S1) — sends decomposition for regulatory accuracy check Data Factory (scenarios...",
+        "phase": "general"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Missing audit session file Schema manifest unavailable validate:l1 execution failure Do NOT silently skip Dimension 6 if validate:l1 fails. Always log a finding.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [
@@ -519,16 +1217,71 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Invocation Modes",
-      "Drift Detection Pipeline",
-      "Drift Classification",
-      "Metric Impact Analysis",
-      "Drift Report Output",
-      "CRITICAL Findings",
-      "HIGH Findings",
-      "MEDIUM Findings",
-      "LOW Findings",
-      "Post-Migration Verification (Mode C)"
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Full Scan (default) Compare ALL tables across L1, L2, L3 schemas against the data dictionary. Produces a complete drift report.",
+        "phase": "context"
+      },
+      {
+        "title": "Drift Detection Pipeline",
+        "description": "Step 1: Reuse lib/db-status.ts for Table/Column Drift The existing lib/db-status.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Drift Classification",
+        "description": "Severity Rules | Severity | Criteria | Action Required | |----------|----------|-----------------| | CRITICAL | Table/column missing in DB that is referenced by active metric SQL. PK not enforced.",
+        "phase": "general"
+      },
+      {
+        "title": "Metric Impact Analysis",
+        "description": "For every COLUMN_MISSING_IN_DB or TABLE_MISSING_IN_DB finding, cross-reference against: Active metric formulas — scan scripts/calc_engine/metrics/*/.yaml for references to the missing table/column Cat...",
+        "phase": "analysis"
+      },
+      {
+        "title": "Drift Report Output",
+        "description": "Format: Markdown (default) ``` ═══════════════════════════════════════════════════════════════   SCHEMA DRIFT REPORT — {YYYY-MM-DD HH:MM UTC} ══════════════════",
+        "phase": "output"
+      },
+      {
+        "title": "CRITICAL Findings",
+        "description": "DRIFT-001: COLUMN_MISSING_IN_DB Table: l2.",
+        "phase": "general"
+      },
+      {
+        "title": "HIGH Findings",
+        "description": "..",
+        "phase": "general"
+      },
+      {
+        "title": "MEDIUM Findings",
+        "description": "..",
+        "phase": "general"
+      },
+      {
+        "title": "LOW Findings",
+        "description": "..",
+        "phase": "general"
+      },
+      {
+        "title": "Post-Migration Verification (Mode C)",
+        "description": "When invoked with --verify-migration {NNN}-{name}: Read the migration file at sql/migrations/{NNN}-{name}.sql Parse expected changes (CREATE TABLE, ADD COLUMN, etc.",
+        "phase": "context"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "Session start Each drift finding Session finalize",
+        "phase": "validation"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream: Runs independently or after DB Schema Builder (Mode C) Downstream: Feeds findings to Audit Reporter for trend analysis Related agents:   - DB Schema Builder (builders/db-schema-builder.md) —...",
+        "phase": "general"
+      },
+      {
+        "title": "Safety Rules",
+        "description": "Read-only — this agent NEVER modifies the database, data dictionary, or manifest. It only reads and reports.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/config/bank-profile.yaml",
@@ -556,18 +1309,380 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Purpose",
-      "Invocation Modes",
-      "SR 11-7 Documentation Checklist (12 Items)",
-      "Tier-Adjusted Requirements",
-      "Output Format",
-      "SR 11-7 Documentation Check: [Metric ID] — [Name]",
-      "SR 11-7 Domain Summary: [Domain Name]",
-      "SR 11-7 Portfolio Summary",
-      "Audit Logging",
-      "Integration Points"
+      {
+        "title": "Purpose",
+        "description": "This checker validates documentation completeness, NOT substantive correctness. It answers: \"Are all required SR 11-7 artifacts present and non-empty?",
+        "phase": "general"
+      },
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Single Metric Check documentation for one metric by ID or name. Mode B: Domain Sweep Check all metrics in a domain.",
+        "phase": "context"
+      },
+      {
+        "title": "SR 11-7 Documentation Checklist (12 Items)",
+        "description": "Each item is scored: PRESENT (artifact exists and is non-empty), PARTIAL (artifact exists but incomplete), MISSING (artifact not found). Item 1: Model Purpose & Scope What to check: Does the metric ha...",
+        "phase": "analysis"
+      },
+      {
+        "title": "Tier-Adjusted Requirements",
+        "description": "| Item | GSIB | Large Regional | Regional | |------|------|----------------|----------| | 1. Purpose & Scope | REQUIRED | REQUIRED | REQUIRED | | 2.",
+        "phase": "general"
+      },
+      {
+        "title": "Output Format",
+        "description": "Per-Metric Report ```",
+        "phase": "output"
+      },
+      {
+        "title": "SR 11-7 Documentation Check: [Metric ID] — [Name]",
+        "description": "Tier: GSIB | Required items: 12 | Status: COMPLIANT / NON-COMPLIANT Checklist | # | Item | Status | Source | Detail | |---|------|--------|--------|--------| | 1 | Purpose & Scope | PRESENT | YAML + C...",
+        "phase": "analysis"
+      },
+      {
+        "title": "SR 11-7 Domain Summary: [Domain Name]",
+        "description": "Metrics assessed: [N] | Compliant: [N] | Non-compliant: [N] | Metric ID | Name | Score | Status | Missing Items | |-----------|------|-------|--------|---------------| | EXP-001 | Gross Exposure | 11/...",
+        "phase": "validation"
+      },
+      {
+        "title": "SR 11-7 Portfolio Summary",
+        "description": "Total metrics: [N] | Compliant: [N] ([%]) | Non-compliant: [N] ([%]) By Domain | Domain | Metrics | Compliant | Rate | |--------|---------|-----------|------| | Exposure | 16 | 14 | 87.5% | | Pricing...",
+        "phase": "validation"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "",
+        "phase": "validation"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream Risk Expert Reviewer — after reviewing metric correctness, triggers SR 11-7 check for documentation Master Orchestrator — includes SR 11-7 check in end",
+        "phase": "general"
+      },
+      {
+        "title": "Error Handling",
+        "description": "Metric not found No YAML for catalogue metric Audit database unavailable",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "---",
+    "slug": "generator-builder",
+    "description": "generator builder",
+    "filePath": ".claude/commands/factory/generator-builder.md",
+    "category": "workflow",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct Mode B: Orchestrator-invoked Receives table list from Strategy Advisor. Scaffolds generators, presents for review, writes after approval.",
+        "phase": "context"
+      },
+      {
+        "title": "Generator Scaffolding Procedure",
+        "description": "3A. Analyze the Table Review the output: Column strategies (FK_LOOKUP, GSIB_RANGE, FROM_STATE, etc.",
+        "phase": "general"
+      },
+      {
+        "title": "Generator Code Pattern",
+        "description": "Every generator MUST follow this exact pattern:",
+        "phase": "general"
+      },
+      {
+        "title": "Safety Rules",
+        "description": "Never auto-write generators without presenting the code for review Always validate scaffolded code against the DD contract Never use Math.",
+        "phase": "general"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream: Schema Analyzer (schema contracts), Strategy Advisor (table list) Downstream: Story Weaver (generators read from FacilityStateMap), Validator (validates output) TypeScript: scenarios/factory...",
+        "phase": "general"
+      }
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      "scenarios/factory/v2/generators/index.ts",
+      "scenarios/factory/v2/generators/exposure.ts",
+      "CLAUDE.md"
+    ],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "---",
+    "slug": "scenario-observer",
+    "description": "scenario observer",
+    "filePath": ".claude/commands/factory/scenario-observer.md",
+    "category": "workflow",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct Mode B: Orchestrator-invoked Receives loaded data summary. Generates proof report.",
+        "phase": "context"
+      },
+      {
+        "title": "Observation Procedure",
+        "description": "3A. Coherence Matrix (10 checks per facility) For each facility for the target date, run these checks: PD-Rating alignment: PD within rating tier band (±20% tolerance) PD-DPD correlation: DPD 90+ → PD...",
+        "phase": "general"
+      },
+      {
+        "title": "Output Format",
+        "description": "",
+        "phase": "output"
+      },
+      {
+        "title": "Safety Rules",
+        "description": "Read-only agent — never modifies data, only observes and reports If coherence pass rate < 90%, recommend re-running Story Weaver If GSIB distribution is severely off (e.g.",
+        "phase": "general"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream: Validator (must PASS before observer runs), DB Load Downstream: Final report to user/orchestrator TypeScript: scenarios/factory/scenario-observer.",
+        "phase": "general"
+      }
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      "data/metric-library/catalogue.json",
+      "CLAUDE.md"
+    ],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "---",
+    "slug": "schema-analyzer",
+    "description": "schema analyzer",
+    "filePath": ".claude/commands/factory/schema-analyzer.md",
+    "category": "workflow",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct (user-invoked) Mode B: Orchestrator-invoked Receives a session_id and optional target tables from the DATA_FACTORY orchestrator mode. Returns structured JSON for pipeline consumption.",
+        "phase": "context"
+      },
+      {
+        "title": "Analysis Procedure",
+        "description": "3A. Run Coverage Analysis Execute the Schema Analyzer CLI: Parse the JSON output.",
+        "phase": "analysis"
+      },
+      {
+        "title": "Output Format (Orchestrator Mode)",
+        "description": "When invoked by the orchestrator, return structured JSON:",
+        "phase": "context"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "Log all analysis actions:",
+        "phase": "validation"
+      },
+      {
+        "title": "Safety Rules",
+        "description": "Never modify the data dictionary or any DDL files — this agent is READ-ONLY Never execute SQL against PostgreSQL — only read the DD JSON file If the DD file is",
+        "phase": "general"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream: Orchestrator DATA_FACTORY mode (Phase 1: SCHEMA_ANALYZE) Downstream: Strategy Advisor (receives coverage report + generation plan), Generator Builder (receives schema contracts for uncovered...",
+        "phase": "general"
+      }
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      ".claude/config/schema-manifest.yaml",
+      "CLAUDE.md"
+    ],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "---",
+    "slug": "story-weaver",
+    "description": "story weaver",
+    "filePath": ".claude/commands/factory/story-weaver.md",
+    "category": "workflow",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct Mode B: Orchestrator-invoked Receives target dates + strategy from Strategy Advisor. Evolves all facility states and generates table rows.",
+        "phase": "context"
+      },
+      {
+        "title": "The Causal Graph (CRITICAL)",
+        "description": "All field values are derived in this strict order. Downstream fields NEVER drive upstream fields: Example: Revenue miss (root_cause) → PD rises from 0.",
+        "phase": "general"
+      },
+      {
+        "title": "Health State Machine",
+        "description": "Transition rules (cannot skip states, cannot improve without event): | From → To | Trigger | PD Range | |---|---|---| | PERFORMING → WATCH | PD ≥ 0.40% or rating ≤ BBB- | 0.",
+        "phase": "general"
+      },
+      {
+        "title": "Story Templates",
+        "description": "| Template | Portfolio Share | Duration | Arc | |---|---|---|---| | STABLE | 65-75% | Ongoing | PD ±5%/month, no events | | CREDIT_DETERIORATION | 10-15% | 4-8",
+        "phase": "general"
+      },
+      {
+        "title": "Cross-Table Projection Rules",
+        "description": "From a single FacilityStory state, derive ALL table rows: | Table | Key Fields | Source | |---|---|---| | facility_exposure_snapshot | drawn_amount, undrawn, co",
+        "phase": "general"
+      },
+      {
+        "title": "Cross-Entity Coherence Rules",
+        "description": "Same counterparty = same PD and rating across all facilities. LGD, utilization, DPD may differ (facility-type-dependent) Same sector = correlated but not identical.",
+        "phase": "general"
+      },
+      {
+        "title": "GSIB Calibration Reference",
+        "description": "| Metric | IG | Standard | Substandard | Doubtful | Loss | |---|---|---|---|---|---| | PD (%) | 0.01-0.",
+        "phase": "general"
+      },
+      {
+        "title": "Story Weaving Procedure",
+        "description": "9A. Load Previous State Query PG for each facility's last known state, or read from the existing FacilityStateMap.",
+        "phase": "general"
+      },
+      {
+        "title": "Safety Rules",
+        "description": "Never generate values independently — always derive from the causal graph Never skip health states — PERFORMING→STRESSED is unrealistic Never improve without a",
+        "phase": "general"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream: Strategy Advisor (target dates, strategy), Schema Analyzer (contracts for new tables) Downstream: Validator (validates stories + rows), Scenario Observer (proves observability) TypeScript: s...",
+        "phase": "general"
+      }
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      "CLAUDE.md",
+      "scenarios/factory/story-templates.ts",
+      "scenarios/factory/gsib-calibration.ts"
+    ],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "---",
+    "slug": "strategy-advisor",
+    "description": "strategy advisor",
+    "filePath": ".claude/commands/factory/strategy-advisor.md",
+    "category": "workflow",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      {
+        "title": "Invocation Modes",
+        "description": "Mode A: Direct (user-invoked) Mode B: Orchestrator-invoked Receives session_id + coverage report from Schema Analyzer. Returns strategy decision + execution plan.",
+        "phase": "context"
+      },
+      {
+        "title": "Strategy Procedure",
+        "description": "3A. Assess Current State Run the Strategy Advisor CLI: This queries PostgreSQL for: Row counts per table Date ranges (MIN/MAX as_of_date) Whether target dates already exist If DATABASE_URL is not set,...",
+        "phase": "general"
+      },
+      {
+        "title": "Output Format (Orchestrator Mode)",
+        "description": "",
+        "phase": "context"
+      },
+      {
+        "title": "Audit Logging",
+        "description": "",
+        "phase": "validation"
+      },
+      {
+        "title": "Safety Rules",
+        "description": "Never execute FRESH_START without user confirmation — truncating data is destructive Never run cleanup SQL directly — present it for review, let the orchestrator or user execute If requiresConfirmatio...",
+        "phase": "general"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream: Schema Analyzer (receives coverage report + generation plan) Downstream: Generator Builder (receives strategy decision), Story Weaver (receives target dates + strategy), Orchestrator (receiv...",
+        "phase": "general"
+      }
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      "CLAUDE.md"
+    ],
+    "dependencies": [],
+    "version": null,
+    "inputFormat": "$ARGUMENTS",
+    "lastRunAt": null,
+    "totalRuns": 0,
+    "successRate": null
+  },
+  {
+    "name": "---",
+    "slug": "validator",
+    "description": "validator",
+    "filePath": ".claude/commands/factory/validator.md",
+    "category": "workflow",
+    "status": "built",
+    "sessionId": null,
+    "capabilities": [
+      {
+        "title": "Three Validation Tiers",
+        "description": "Tier 1: Structural (CRITICAL — blocks load) Schema compliance: every table/column exists in DD PK uniqueness: no duplicate composite PKs FK integrity: every FK value exists in parent table PKs NULL co...",
+        "phase": "validation"
+      },
+      {
+        "title": "Validation Procedure",
+        "description": "3A. Run Pre-Flight Checklist Use the EnhancedValidator TypeScript module: 3B.",
+        "phase": "validation"
+      },
+      {
+        "title": "Historical Failure Modes Checklist",
+        "description": "Every failure from CLAUDE.md is a named check: | Check | CLAUDE.",
+        "phase": "context"
+      },
+      {
+        "title": "Safety Rules",
+        "description": "Never approve data with CRITICAL failures — even if the user asks Never modify generated data — report issues, let generators fix them Always run the full check",
+        "phase": "general"
+      },
+      {
+        "title": "Integration Points",
+        "description": "Upstream: Story Weaver (generated data), Generator Builder (new generator output) Downstream: DB Load (only if PASS), Scenario Observer (post-load verification) TypeScript: scenarios/factory/enhanced-...",
+        "phase": "general"
+      }
+    ],
+    "prerequisites": [
+      ".claude/config/bank-profile.yaml",
+      "CLAUDE.md"
+    ],
     "dependencies": [],
     "version": null,
     "inputFormat": "$ARGUMENTS",
@@ -584,16 +1699,81 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Session Initialization",
-      "Intent Parsing",
-      "Pipeline Planning",
-      "Orchestrator Pipeline Plan",
-      "Pipeline Execution",
-      "Phase-Specific Logic",
-      "Decomposition: {metric_name}",
-      "DRY RUN: What Would Happen",
-      "End-of-Session Summary",
-      "Orchestrator Session Summary"
+      {
+        "title": "Session Initialization",
+        "description": "On every invocation, execute these steps before any user interaction: 1A. Generate Session Identity Store in working memory for the entire session.",
+        "phase": "general"
+      },
+      {
+        "title": "Intent Parsing",
+        "description": "Parse $ARGUMENTS to determine workflow mode. Accept two input styles: 2A.",
+        "phase": "general"
+      },
+      {
+        "title": "Pipeline Planning",
+        "description": "After mode detection, generate a pipeline plan showing which agents will run in which order. 3A.",
+        "phase": "general"
+      },
+      {
+        "title": "Orchestrator Pipeline Plan",
+        "description": "Session: {SESSION_ID} Mode: {MODE} Target: {metric_name} ({risk_stripe}) Institution tier: {tier} Execution Plan | Phase | Agent | Action | Status | |-------|-------|--------|--------| | 1 | decomp-{s...",
+        "phase": "general"
+      },
+      {
+        "title": "Pipeline Execution",
+        "description": "Execute phases sequentially. After each phase, write a checkpoint to the audit session JSON.",
+        "phase": "general"
+      },
+      {
+        "title": "Phase-Specific Logic",
+        "description": "5A.",
+        "phase": "validation"
+      },
+      {
+        "title": "Decomposition: {metric_name}",
+        "description": "Expert: decomp-{stripe} Confidence: {overall} ({reasoning}) Domain: {domain} / {sub_domain} Class: {metric_class} | Direction: {direction} | Unit: {unit_type} Ingredients ({count}) | # | Layer | Table...",
+        "phase": "analysis"
+      },
+      {
+        "title": "DRY RUN: What Would Happen",
+        "description": "Schema Changes ({count}) {DDL statements} Data Generation ({count} tables, ~{row_count} rows) {table list with column strategies} Metric Configuration {YAML preview} Estimated Reviewer Findings Based...",
+        "phase": "general"
+      },
+      {
+        "title": "End-of-Session Summary",
+        "description": "After all phases complete (or on ABORT), present a comprehensive summary. 6A.",
+        "phase": "general"
+      },
+      {
+        "title": "Orchestrator Session Summary",
+        "description": "Session: {SESSION_ID} Mode: {MODE} Duration: {elapsed_time} Target: {metric_name} ({risk_stripe}) Phase Results | # | Phase | Agent | Status | Duration | Key Output | |---|-------|-------|--------|---...",
+        "phase": "general"
+      },
+      {
+        "title": "Multi-Metric Orchestration",
+        "description": "When the user requests multiple metrics (e.g.",
+        "phase": "general"
+      },
+      {
+        "title": "Batch Plan: 3 Metrics",
+        "description": "| # | Metric | Stripe | Expert | Shared Schema? | |---|--------|--------|--------|---------------| | 1 | Expected Loss | credit_risk | decomp-credit-risk | Yes (group A) | | 2 | LGD | credit_risk | de...",
+        "phase": "general"
+      },
+      {
+        "title": "Safety Rules",
+        "description": "8A. Never Execute Domain Logic The orchestrator NEVER: Writes DDL SQL directly Writes YAML metric configs directly Modifies catalogue.",
+        "phase": "general"
+      },
+      {
+        "title": "Error Recovery",
+        "description": "9A. Agent Unavailable If a required agent is MISSING: DECOMPOSE/SCHEMA_GAP: HALT — cannot proceed without expert analysis SCHEMA_BUILD/MIGRATE: HALT — cannot apply schema changes without builder DATA_...",
+        "phase": "general"
+      },
+      {
+        "title": "Observability",
+        "description": "10A. Progress Reporting During execution, emit brief status lines at phase transitions (silent within phases): 10B.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [
@@ -616,8 +1796,16 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Input Format",
-      "Steps"
+      {
+        "title": "Input Format",
+        "description": "The user will provide spec data in tabular format with these columns: Normalized DE Name → item_name + normalized_de_name Data Element in DM → data_element_in_dm (the raw field name in the data model)...",
+        "phase": "output"
+      },
+      {
+        "title": "Steps",
+        "description": "Phase 1: Read & Understand Context Read lib/metric-library/types.ts for the CatalogueItem, LevelDefinition, IngredientField, DemoFacility, DemoPosition interfaces Read data/metric-library/catalogue.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [],
@@ -636,7 +1824,11 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Steps"
+      {
+        "title": "Steps",
+        "description": "Find the metric in data/l3-metrics.ts by ID or name Check data/metric-library/catalogue.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [],
@@ -655,7 +1847,11 @@
     "status": "built",
     "sessionId": null,
     "capabilities": [
-      "Steps"
+      {
+        "title": "Steps",
+        "description": "Run git diff main..",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [],
@@ -674,10 +1870,26 @@
     "status": "built",
     "sessionId": "S1",
     "capabilities": [
-      "Design Doc (read for context)",
-      "Your First Actions",
-      "Clarifying Questions (ask ALL before building)",
-      "After Answers, Build"
+      {
+        "title": "Design Doc (read for context)",
+        "description": "Read the design doc referenced in CLAUDE.md under \"Agent Suite Architecture\" for the full 3-tier architecture context.",
+        "phase": "context"
+      },
+      {
+        "title": "Your First Actions",
+        "description": "Read CLAUDE.md completely.",
+        "phase": "general"
+      },
+      {
+        "title": "Clarifying Questions (ask ALL before building)",
+        "description": "Q1. When the Decomp Expert recommends schema changes, should it produce a structured JSON payload for the Data Model Expert, or a human-readable recommendation that the user reviews first?",
+        "phase": "analysis"
+      },
+      {
+        "title": "After Answers, Build",
+        "description": "Create .claude/commands/experts/decomp-credit-risk.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/config/bank-profile.yaml",
@@ -702,9 +1914,21 @@
     "status": "built",
     "sessionId": "S6",
     "capabilities": [
-      "Your First Actions",
-      "Clarifying Questions",
-      "After Answers, Build ONE File"
+      {
+        "title": "Your First Actions",
+        "description": "Read CLAUDE.md completely.",
+        "phase": "general"
+      },
+      {
+        "title": "Clarifying Questions",
+        "description": "Q1. Generate full Next.",
+        "phase": "analysis"
+      },
+      {
+        "title": "After Answers, Build ONE File",
+        "description": ".claude/commands/builders/dashboard-generator.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/commands/experts/decomp-credit-risk.md",
@@ -728,9 +1952,21 @@
     "status": "built",
     "sessionId": "S5",
     "capabilities": [
-      "Your First Actions",
-      "Clarifying Questions",
-      "After Answers, Build TWO Files"
+      {
+        "title": "Your First Actions",
+        "description": "Read CLAUDE.md completely — especially the data factory section and \"Adding a New Metric\" workflow.",
+        "phase": "general"
+      },
+      {
+        "title": "Clarifying Questions",
+        "description": "Q1. Default synthetic data volume for new tables?",
+        "phase": "analysis"
+      },
+      {
+        "title": "After Answers, Build TWO Files",
+        "description": "File 1: .claude/commands/builders/data-factory-builder.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/commands/builders/db-schema-builder.md",
@@ -757,10 +1993,26 @@
     "status": "built",
     "sessionId": "S2",
     "capabilities": [
-      "Design Doc",
-      "Your First Actions",
-      "Clarifying Questions (ask ALL before building)",
-      "After Answers, Build TWO Files"
+      {
+        "title": "Design Doc",
+        "description": "Read the design doc in CLAUDE.md \"Agent Suite Architecture\" section.",
+        "phase": "general"
+      },
+      {
+        "title": "Your First Actions",
+        "description": "Read CLAUDE.md completely — especially the DDL rules, naming conventions, and data type rules sections.",
+        "phase": "general"
+      },
+      {
+        "title": "Clarifying Questions (ask ALL before building)",
+        "description": "Q1. When the Data Model Expert recommends a new table, should it suggest a target schema name (e.",
+        "phase": "analysis"
+      },
+      {
+        "title": "After Answers, Build TWO Files",
+        "description": "File 1: .claude/commands/experts/data-model-expert.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/config/bank-profile.yaml",
@@ -784,9 +2036,21 @@
     "status": "planned",
     "sessionId": "S3",
     "capabilities": [
-      "Your First Actions",
-      "Clarifying Questions",
-      "After Answers, Build TWO Files"
+      {
+        "title": "Your First Actions",
+        "description": "Read CLAUDE.md completely — especially the DDL rules, GCP Cloud SQL rules, data type naming conventions, FK integrity rules.",
+        "phase": "general"
+      },
+      {
+        "title": "Clarifying Questions",
+        "description": "Q1. Execute DDL directly, generate migration files for review, or both (generate + optionally execute)?",
+        "phase": "analysis"
+      },
+      {
+        "title": "After Answers, Build TWO Files",
+        "description": "File 1: .claude/commands/builders/db-schema-builder.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/commands/experts/data-model-expert.md",
@@ -814,9 +2078,21 @@
     "status": "built",
     "sessionId": "S8",
     "capabilities": [
-      "Your First Actions",
-      "Clarifying Questions",
-      "After Answers, Build ONE File"
+      {
+        "title": "Your First Actions",
+        "description": "Read CLAUDE.md completely.",
+        "phase": "general"
+      },
+      {
+        "title": "Clarifying Questions",
+        "description": "Q1. User input detail level — high level (\"add Expected Loss\") or metric-specific (\"decompose EL, find gaps, build\")?",
+        "phase": "analysis"
+      },
+      {
+        "title": "After Answers, Build ONE File",
+        "description": ".claude/commands/orchestrate.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [],
@@ -835,9 +2111,21 @@
     "status": "built",
     "sessionId": "S2-5",
     "capabilities": [
-      "Your First Actions",
-      "Clarifying Questions",
-      "After Answers, Build 7 Files (confirm each before next)"
+      {
+        "title": "Your First Actions",
+        "description": "Read CLAUDE.md completely.",
+        "phase": "general"
+      },
+      {
+        "title": "Clarifying Questions",
+        "description": "Q1. Build all 7 in this session (confirming each before the next), or the 2-3 most urgent first?",
+        "phase": "analysis"
+      },
+      {
+        "title": "After Answers, Build 7 Files (confirm each before next)",
+        "description": "Build in this order: experts/decomp-market-risk.md — FRTB, VaR, ES, Greeks, SBM, DRC, RRAO experts/decomp-ccr.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/commands/experts/decomp-credit-risk.md",
@@ -861,9 +2149,21 @@
     "status": "built",
     "sessionId": "S4",
     "capabilities": [
-      "Your First Actions",
-      "Clarifying Questions",
-      "After Answers, Build TWO Files"
+      {
+        "title": "Your First Actions",
+        "description": "Read CLAUDE.md completely.",
+        "phase": "general"
+      },
+      {
+        "title": "Clarifying Questions",
+        "description": "Q1. Do all 10 dimensions apply to EVERY review, or context-dependent?",
+        "phase": "analysis"
+      },
+      {
+        "title": "After Answers, Build TWO Files",
+        "description": "File 1: .claude/commands/reviewers/risk-expert-reviewer.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/commands/experts/decomp-credit-risk.md",
@@ -888,9 +2188,21 @@
     "status": "built",
     "sessionId": "S7",
     "capabilities": [
-      "Your First Actions",
-      "Clarifying Questions",
-      "After Answers, Build TWO Files"
+      {
+        "title": "Your First Actions",
+        "description": "Read CLAUDE.md — especially the Database Recon Indicators and db-status sections.",
+        "phase": "general"
+      },
+      {
+        "title": "Clarifying Questions",
+        "description": "Q1. Drift Monitor: compare manifest vs.",
+        "phase": "analysis"
+      },
+      {
+        "title": "After Answers, Build TWO Files",
+        "description": "File 1: .claude/commands/reviewers/drift-monitor.",
+        "phase": "general"
+      }
     ],
     "prerequisites": [
       ".claude/commands/builders/db-schema-builder.md",
@@ -916,7 +2228,11 @@
     "status": "built",
     "sessionId": "S9",
     "capabilities": [
-      "What To Do"
+      {
+        "title": "What To Do",
+        "description": "Part 1: Integration Smoke Test (DRY_RUN) Invoke /orchestrate with: \"I need to add a Current Expected Credit Loss (CECL) allowance metric to the credit risk stripe — decompose it, identify schema gaps,...",
+        "phase": "general"
+      }
     ],
     "prerequisites": [],
     "dependencies": [
